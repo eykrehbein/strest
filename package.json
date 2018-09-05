@@ -1,0 +1,13 @@
+{
+  "name": "strest",
+  "version": "1.0.0",
+  "description": "API Testing",
+  "main": "dist/index.js",
+  "repository": "https://github.com/eykhagen/strest",
+  "author": "Eyk Rehbein",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "typescript": "^3.0.3"
+  }
+}
