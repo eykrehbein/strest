@@ -5,10 +5,15 @@ import * as handler from './handler';
 const initializeCommands = () => {
   // main command
   program
+    .usage('[targetFileOrDirectory]')
     .option('-p, --print', 'Print out all response data')
     .option('-l, --log', 'Create a logfile including all response data')
-    .action(async (cmd: any) => {
-      await handler.start(cmd);
+    .action(async (dir, cmd: any) => {
+      if(typeof cmd === 'undefined') {
+        cmd = dir;
+        dir = null;
+      }
+      await handler.start(dir,cmd);
     })
   
   program.parse(process.argv);
