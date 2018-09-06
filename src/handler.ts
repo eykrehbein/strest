@@ -1,13 +1,16 @@
-import * as fsModule from './fs';
 import chalk from 'chalk';
 import * as path from 'path';
+
+import * as fsModule from './fs';
+import * as yamlParser from './yaml-parse';
 /**
  * Main function. Fired when command was called
  * @param dir [optional] Target directory
  * @param cmd The command, including all flags
  */
 export const start = async (dir:string , _: any) => {
-  // find all test files
+  
+  // step 1: find all test files
   const testFiles = await fsModule.findTestFiles(dir);
   if(testFiles === null) {
     writeErrorMessage(`Path ${chalk.underline(path.join(process.cwd(), dir))} does not exist`);
@@ -17,8 +20,13 @@ export const start = async (dir:string , _: any) => {
     writeMessage(chalk.gray('No testing files found'))
     return;
   }
-  console.log(testFiles.length);
-  // read the test files
+  
+  // step 2 :read the test files
+
+  // Array of yaml-to-json parsed config data of how to perform the requests
+  const testSettings = yamlParser.parseTestingFiles(testFiles)
+ 
+
 }
 
 /**
