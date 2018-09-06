@@ -8,6 +8,10 @@
   dependencies:
     commander "*"
 
+"@types/joi@^13.4.4":
+  version "13.4.4"
+  resolved "https://registry.yarnpkg.com/@types/joi/-/joi-13.4.4.tgz#258bda71b30b6f3f9a11eea3e122fccdab8df053"
+
 "@types/js-yaml@^3.11.2":
   version "3.11.2"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.11.2.tgz#699ad86054cc20043c30d66a6fcde30bbf5d3d5e"

@@ -24,7 +24,7 @@ export const findTestFiles = async (dir: string) => {
     const files = await recursiveWalk(cwd, ['node_modules', '.git']);
     
     // all matching file paths will be stored here
-    let matchList: Array<String> = [];
+    let matchList: string[] = [];
 
     // find all files that end with .strest.yaml
     files.map((path) => {

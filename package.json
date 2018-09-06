@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "@types/commander": "^2.12.2",
+    "@types/joi": "^13.4.4",
     "@types/js-yaml": "^3.11.2",
     "@types/node": "^10.9.4",
     "@types/recursive-readdir": "^2.2.0",
