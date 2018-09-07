@@ -3,12 +3,17 @@ import * as path from 'path';
 
 import * as fsModule from './fs';
 import * as yamlParser from './yaml-parse';
+import * as test from './test';
+
 /**
  * Main function. Fired when command was called
  * @param dir [optional] Target directory
  * @param cmd The command, including all flags
  */
 export const start = async (dir:string , _: any) => {
+  // use time for letting the user know how long the execution of the test took
+  const executionStartedTime = new Date().getTime();
+
   console.log();
   // step 1: find all test files
   const testFiles = await fsModule.findTestFiles(dir);
@@ -42,7 +47,17 @@ export const start = async (dir:string , _: any) => {
   writeMessage(`Schema validation: ${colorizedAmountOfValidSchemas} of ${colorizedTestFileAmount} file(s) passed`)
 
   const validTests = validateSchema.proofedSettings;
+  if(validTests.length === 0) {
+    console.log();
+    return;
+  }
+  console.log();
+  await test.performTests(validTests);
+  console.log();
 
+  const executionEndedTime = new Date().getTime();
+  const executionTime = executionEndedTime - executionStartedTime;
+  writeMessage(`✨  Done in ${chalk.bold((executionTime/1000).toString() + 's')}`, false);
   console.log();
 }
 
@@ -50,7 +65,11 @@ export const start = async (dir:string , _: any) => {
  * Print out a formatted message
  * @param message 
  */
-export const writeMessage = (message: string) => {
+export const writeMessage = (message: string, isBold?: boolean) => {
+  if(isBold === false) {
+    console.log(`[ ${colorizeMain(chalk.bold('Strest'))} ] ${message}`);
+    return;
+  }
   console.log(`[ ${colorizeMain(chalk.bold('Strest'))} ] ${chalk.bold(message)}`);
 }
 /**

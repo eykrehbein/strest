@@ -10,10 +10,13 @@
   "preferGlobal": true,
   "bin": "dist/main.js",
   "dependencies": {
+    "axios": "^0.18.0",
     "chalk": "^2.4.1",
     "commander": "^2.17.1",
     "joi": "^13.6.0",
     "js-yaml": "^3.12.0",
+    "ora": "^3.0.0",
+    "qs": "^6.5.2",
     "recursive-readdir": "^2.2.2"
   },
   "devDependencies": {
@@ -21,6 +24,8 @@
     "@types/joi": "^13.4.4",
     "@types/js-yaml": "^3.11.2",
     "@types/node": "^10.9.4",
+    "@types/ora": "^1.3.4",
+    "@types/qs": "^6.5.1",
     "@types/recursive-readdir": "^2.2.0",
     "typescript": "^3.0.3"
   }
