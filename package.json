@@ -1,7 +1,7 @@
 {
   "name": "strest",
   "version": "1.0.0",
-  "description": "API Testing",
+  "description": "A new dimension of REST API testing",
   "main": "dist/main.js",
   "repository": "https://github.com/eykhagen/strest",
   "author": "Eyk Rehbein",

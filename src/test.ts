@@ -1,9 +1,11 @@
 import chalk from 'chalk';
+import * as Joi from 'joi';
 import * as ora from 'ora';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import * as qs from 'qs';
 import { colorizeMain, colorizeCustomRed } from './handler';
 import { requestObjectSchema as requestObjectSchema } from './configSchema';
+
 
 
 
@@ -46,7 +48,32 @@ export const performTests = async (testObjects: object[]) => {
             // if one test failed, don't run others
             abortBecauseTestFailed = true;
           } else {
-            spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded`)
+            if(error.message !== null) {
+              // log the response info and data
+              const res: AxiosResponse<any> = error.message;
+              let parsedData = res.data;
+              if(typeof res.data === 'object') {
+                parsedData = JSON.stringify(res.data, null, 2);
+              }
+
+              let dataString = '';
+              if(parsedData != '') {
+                dataString = `\n\n${colorizeMain('Data')}: \n\n${chalk.grey(parsedData)}\n`;
+              } else {
+                dataString = `\n\n${colorizeMain('Data')}: No data received\n`;
+              }
+
+              spinner.succeed(
+                `Testing ${chalk.bold(colorizeMain(requestName))} succeeded` +
+                `\n\n${colorizeMain('Status')}: ${res.status}`+
+                `\n${colorizeMain('Status Text')}: ${res.statusText}` +
+                `\n\n${colorizeMain('Headers')}: \n\n${chalk.grey(JSON.stringify(res.headers, null ,2))}` +
+                `${dataString}`
+              )
+            } else {
+              spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded`)
+            }
+            
           }
     
         }
@@ -106,11 +133,179 @@ const computeRequestObject = (obj: Object) => {
 }
 
 /**
+ * Print out a formatted Validation error
+ */
+const validationError = (message: string) => {
+  return `[ Validation ] ${message}`
+}
+
+/**
+ * Checks whether a type matches the dataToProof
+ * @param type 
+ * @param dataToProof 
+ */
+const validateType = (type: string, dataToProof: any) => {  
+  
+  switch(type) {
+    // strings
+    case "string":
+      return Joi.validate(dataToProof, Joi.string()).error === null
+    case "string.hex":
+      return Joi.validate(dataToProof, Joi.string().hex()).error === null
+    case "string.email":
+      return Joi.validate(dataToProof, Joi.string().email()).error === null
+    case "string.ip":
+      return Joi.validate(dataToProof, Joi.string().ip()).error === null
+    case "string.url":
+    case "string.uri":
+      return Joi.validate(dataToProof, Joi.string().uri()).error === null
+    case "string.lowercase":
+      return Joi.validate(dataToProof, Joi.string().lowercase()).error === null
+    case "string.uppercase":
+      return Joi.validate(dataToProof, Joi.string().uppercase()).error === null
+    case "string.base64":
+      return Joi.validate(dataToProof, Joi.string().base64()).error === null
+    // boolean
+    case "bool":
+    case "boolean":
+      return Joi.validate(dataToProof, Joi.boolean()).error === null
+    // object
+    case "object":
+      return Joi.validate(dataToProof, Joi.object()).error === null
+    // array
+    case "array":
+      return Joi.validate(dataToProof, Joi.array()).error === null
+    // number
+    case "number":
+      return Joi.validate(dataToProof, Joi.number()).error === null
+    case "number.positive":
+      return Joi.validate(dataToProof, Joi.number().positive()).error === null
+    case "number.negative":
+      return Joi.validate(dataToProof, Joi.number().negative).error === null
+    default: 
+      return undefined;
+  };
+} 
+
+/**
+ * Validate one object
+ * @param obj 
+ */
+function validateObjectFunc(validateObject: any, dataObj: any, key: any) {
+
+
+    // if(typeof validateObject[key] === 'object') {
+    //   if(typeof dataObj[key] === 'undefined') {
+    //     return validationError(`The key ${chalk.bold(key)} was defined in the validation schema but there was no equivalent found in the response data.`)
+    //   }
+    //   const err: any = validateObjectFunc(validateObject, dataObj, key)
+    //   if(err !== null) {
+    //     return err;
+    //   }
+    // } else {
+      if(typeof dataObj[key] === 'undefined') {
+        return validationError(`The key ${chalk.bold(key)} was defined in the validation schema but there was no equivalent found in the response data.`)
+      }
+
+      const regex = /Type\((.*?)\)/
+      // test if the validation schema is a custom Type validation e.g. username: Type(String)
+      if(regex.test(validateObject[key])) {
+        const fullValue: any = regex.exec(validateObject[key]);
+          
+        let types = fullValue[1].replace(/\s/g,'').toLowerCase().split('|')
+
+        let confirmCounter = 0;
+
+        for(let type of types){
+          let c = validateType(type, dataObj[key]);
+          if(typeof c !== 'undefined') {
+            if(c === false) {
+              if(types.length === 1) {
+                return validationError(`The value of ${chalk.bold(key)} should be of type ${chalk.bold(type)} but it has a different type`);
+              }
+            } else {
+              if(types.length === 1) {
+                return null;
+              }
+              confirmCounter++;
+            }
+          } else {
+            return validationError(`The type ${chalk.bold(type)} does not exist. Please use a valid type.`)
+          }
+        }
+        if(confirmCounter === 0) {
+          return validationError(`The value of ${chalk.bold(key)} doesn't match with any of the given types`);
+        }
+
+      } else {
+        // if the validation is a custom value -> the response data at this key has to match this value
+        if(validateObject[key] !== dataObj[key]) {
+          return validationError(`The value of ${chalk.bold(key)} should have been ${chalk.bold(validateObject[key])} but it was ${chalk.bold(dataObj[key])}`)
+        } else {
+          return null;
+        }
+      }
+    
+  return null;
+
+}
+/**
+ * Loop recursively through all object
+ * @param validateSchema 
+ * @param dataToProof 
+ */
+const createValidationLoop = (proofObject: any, dataToProof: any, key: any) => { 
+  if(typeof dataToProof[key] === 'undefined') {
+    return validationError(`The required item ${chalk.bold(key)} wasn't found in the response data`)
+  }
+  if(typeof proofObject[key] === 'object') {
+    
+    for(let l in proofObject[key]) {
+      let err: any = createValidationLoop(proofObject[key], dataToProof[key], l);
+      if(err !== null) {
+        return err;
+      }
+    }
+  } else {
+    let err = validateObjectFunc(proofObject, dataToProof, key);
+    if(err !== null) {
+      return err;
+    }
+  }
+  return null;
+}
+
+/**
+ * Validate a response with the given schema
+ * @param validateSchema 
+ */
+const validateResponse = (validateSchema: any, dataToProof: any) => {
+  /**
+   * Example:
+   * validate:
+   *  token: Type(string | null)
+   */
+  let validateCode: any = validateSchema.code;
+  let proofObject: any = validateSchema.json || validateSchema.raw;
+
+  if(typeof proofObject === 'object') {
+    for(let key in proofObject) {
+      let err = createValidationLoop(proofObject, dataToProof, key)
+      if(err !== null) {
+        return err;
+      }
+    }
+
+  }
+
+  return null;
+}
+
+/**
  * Perform the Request
  * @param requestObject 
  * @param requestName 
  */
-
 const performRequest = async (requestObject: requestObjectSchema, requestName: string) => {
 
   const error = computeRequestObject(requestObject);
@@ -169,12 +364,25 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(typeof response.data !== 'undefined') {
       requestReponses[requestName] = response.data;
     } 
-    
 
+    if(typeof requestObject.validate !== 'undefined') {
+     
+      const err = validateResponse(requestObject.validate, response.data);
+
+      if(err !== null) {
+        return { isError: true, message: err}
+      }
+    }
+
+    // if the result should be logged
+    if(requestObject.log === true) {
+      return { isError: false, message: response }
+    }
+
+    return {isError: false, message: null}
+  
   } catch(e) {
     return { isError: true, message: e}
   }
   
-  return { isError: false, message: ''}
-
 }

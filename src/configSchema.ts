@@ -12,20 +12,21 @@ const dataSchema = Joi.object().keys({
   .without('formUrlEncoded', 'raw')
   .without('raw', 'formUrlEncoded')
 
-const responseSchema = Joi.object().keys({
-  validate: Joi.object().keys({
-    code: Joi.number().optional(),
-    json: Joi.object().optional(),
-    raw: Joi.any().optional()
-  })
+const validateSchema = Joi.object().keys({
+  code: Joi.number().optional(),
+  json: Joi.object().optional(),
+  raw: Joi.string().optional()
 })
+  .without('json', 'raw')
+  .without('raw', 'json');
 
 const requestsSchema = Joi.object().keys({
   url: Joi.string().required(),
   method: Joi.string().required(),
   data: dataSchema.optional(),
   headers: Joi.object().optional(),
-  response: responseSchema.optional()
+  validate: validateSchema.optional(),
+  log: Joi.boolean().optional()
 })
 
 
@@ -48,7 +49,8 @@ export interface requestObjectSchema {
   url: string,
   data: requestObjectDataSchema,
   headers: object,
-  response: object
+  validate: any,
+  log: boolean
 }
 
 
