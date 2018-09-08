@@ -241,7 +241,7 @@ function validateObjectFunc(validateObject: any, dataObj: any, key: any) {
       } else {
         // if the validation is a custom value -> the response data at this key has to match this value
         if(validateObject[key] !== dataObj[key]) {
-          return validationError(`The value of ${chalk.bold(key)} should have been ${chalk.bold(validateObject[key])} but it was ${chalk.bold(dataObj[key])}`)
+          return validationError(`The value of ${chalk.bold(key)} should have been ${chalk.bold(validateObject[key])} but instead it was ${chalk.bold(dataObj[key])}`)
         } else {
           return null;
         }
@@ -286,7 +286,6 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
    * validate:
    *  token: Type(string | null)
    */
-  let validateCode: any = validateSchema.code;
   let proofObject: any = validateSchema.json || validateSchema.raw;
 
   if(typeof proofObject === 'object') {
@@ -296,7 +295,13 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
         return err;
       }
     }
-
+  }
+  if(typeof proofObject === 'string') {
+    if(dataToProof === proofObject) {
+      return null;
+    } else {
+      return validationError(`The response value should have been ${proofObject} but instead it was ${dataToProof}`);
+    }
   }
 
   return null;
