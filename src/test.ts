@@ -24,8 +24,9 @@ let requestReponses: any = {
 /**
  * Main handler that will perform the tests with each valid test object
  * @param testObjects 
+ * @param printAll If true, all response information will be logged in the console
  */
-export const performTests = async (testObjects: object[]) => {
+export const performTests = async (testObjects: object[], printAll: boolean) => {
   let testObject: any
   let abortBecauseTestFailed = false;
   
@@ -41,7 +42,7 @@ export const performTests = async (testObjects: object[]) => {
           const val = requests[requestName];
   
           const spinner = ora(`Testing ${chalk.bold(colorizeMain(requestName))}`).start();
-          let error = await performRequest(val, requestName);
+          let error = await performRequest(val, requestName, printAll);
           
           if(error.isError === true) {
             spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed \n\n${error.message}`))
@@ -303,10 +304,11 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
 
 /**
  * Perform the Request
- * @param requestObject 
- * @param requestName 
+ * @param requestObject All config data
+ * @param requestName Name of the request
+ * @param printAll If true, all response information will be logged in the console
  */
-const performRequest = async (requestObject: requestObjectSchema, requestName: string) => {
+const performRequest = async (requestObject: requestObjectSchema, requestName: string, printAll: boolean) => {
 
   const error = computeRequestObject(requestObject);
 
@@ -375,7 +377,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     }
 
     // if the result should be logged
-    if(requestObject.log === true) {
+    if(requestObject.log === true || printAll === true) {
       return { isError: false, message: response }
     }
 

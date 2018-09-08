@@ -10,7 +10,7 @@ import * as test from './test';
  * @param dir [optional] Target directory
  * @param cmd The command, including all flags
  */
-export const start = async (dir:string , _: any) => {
+export const start = async (dir:string , cmd: any) => {
   // use time for letting the user know how long the execution of the test took
   const executionStartedTime = new Date().getTime();
 
@@ -52,7 +52,7 @@ export const start = async (dir:string , _: any) => {
     return;
   }
   console.log();
-  await test.performTests(validTests);
+  await test.performTests(validTests, cmd.print);
   console.log();
 
   const executionEndedTime = new Date().getTime();

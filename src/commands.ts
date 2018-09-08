@@ -7,7 +7,6 @@ const initializeCommands = () => {
   program
     .usage('[targetFileOrDirectory]')
     .option('-p, --print', 'Print out all response data')
-    .option('-l, --log', 'Create a logfile including all response data')
     .action(async (dir, cmd: any) => {
       if(typeof cmd === 'undefined') {
         cmd = dir;
