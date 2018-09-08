@@ -8,7 +8,9 @@
   "license": "MIT",
   "private": false,
   "preferGlobal": true,
-  "bin": "dist/main.js",
+  "bin": {
+    "strest": "dist/main.js"
+  },
   "scripts": {
     "build": "tsc"
   },
