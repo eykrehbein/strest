@@ -13,7 +13,6 @@ const dataSchema = Joi.object().keys({
   .without('raw', 'formUrlEncoded')
 
 const validateSchema = Joi.object().keys({
-  code: Joi.number().optional(),
   json: Joi.object().optional(),
   raw: Joi.string().optional()
 })

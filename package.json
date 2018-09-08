@@ -9,6 +9,9 @@
   "private": false,
   "preferGlobal": true,
   "bin": "dist/main.js",
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "axios": "^0.18.0",
     "chalk": "^2.4.1",

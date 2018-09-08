@@ -25,6 +25,7 @@ export const start = async (dir:string , cmd: any) => {
   const colorizedTestFileAmount = colorizeMain(testFileAmount.toString());
   if(testFileAmount === 0) {
     writeMessage(chalk.gray('No testing files found'))
+    console.log()
     return;
   }
   
