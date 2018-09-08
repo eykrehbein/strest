@@ -18,7 +18,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src/**/*"
+    "src/main.ts"
   ],
   "exclude": [
     ".git",
