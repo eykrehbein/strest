@@ -1,5 +1,5 @@
 {
-  "name": "strest",
+  "name": "strest-cli",
   "version": "1.0.0",
   "description": "A new dimension of REST API testing",
   "main": "dist/main.js",
