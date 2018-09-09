@@ -183,6 +183,8 @@ const validateType = (type: string, dataToProof: any) => {
       return Joi.validate(dataToProof, Joi.number().positive()).error === null
     case "number.negative":
       return Joi.validate(dataToProof, Joi.number().negative).error === null
+    case "null":
+      return Joi.validate(dataToProof, Joi.allow(null)).error === null
     default: 
       return undefined;
   };
