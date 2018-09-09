@@ -355,11 +355,15 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     // params
     if(typeof requestObject.data.params !== 'undefined') {
       if(typeof requestObject.data.params === 'string') {
-        axiosObject.params = requestObject.data.params;
+        if(requestObject.data.params.startsWith('?')){
+          axiosObject.url += requestObject.data.params;
+        } else {
+          axiosObject.url += '?'+requestObject.data.params;
+        }
       }
       // stringify params
       if(typeof requestObject.data.params === 'object') {
-        axiosObject.params = qs.stringify(requestObject.data.params)
+        axiosObject.url += '?' + qs.stringify(requestObject.data.params)
       }
     }
 
@@ -367,7 +371,6 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
 
   try {
     const response = await axios(axiosObject)
-    
     if(typeof response.data !== 'undefined') {
       requestReponses[requestName] = response.data;
     } 
