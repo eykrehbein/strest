@@ -302,7 +302,7 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
     if(dataToProof === proofObject) {
       return null;
     } else {
-      return validationError(`The response value should have been ${proofObject} but instead it was ${dataToProof}`);
+      return validationError(`The response value should have been ${chalk.bold(proofObject)} but instead it was ${chalk.bold(dataToProof)}`);
     }
   }
 
