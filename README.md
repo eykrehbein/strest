@@ -116,7 +116,7 @@ You can find a full __Documentation__ of how to write tests [here](SCHEMA.md)
 
 ## Using & Connecting multiple requests
 
-With traditional tools like [Postman](https://www.getpostman.com/) or [Insomnia](https://insomnia.rest/) it's common to perform only a single request at a time. Moreover, you have to trigger each request on you own with a click on a button.
+With traditional tools like [Postman](https://www.getpostman.com/) or [Insomnia](https://insomnia.rest/) it's common to perform only a single request at a time. Moreover, you have to trigger each request on your own with a click on a button.
 
 With __Strest__ you're able to predefine a very well structured test file once, and every time you make any changes to your API you can test it with just one command in your terminal. Additionally, you can add hundreds or thousands of requests and endpoints which will run synchronously one after the other.
 
@@ -190,5 +190,21 @@ requests:
           iconUrl: Type(String.Url)
         someOtherData: "match this string" 
 ```
+## Errors
+**Strest** is a testing library so of course, you'll run into a few errors when testing an endpoint. Error handling is made very simple so can instantly see what caused an error and fix it. 
+
+_Example of a Validation Error_
+```
+[ Strest ] Found 1 test file(s)
+[ Strest ] Schema validation: 1 of 1 file(s) passed
+
+✖ Testing test failed
+
+[ Validation ] The required item test wasn't found in the response data
+
+[ Strest ] ✨  Done in 0.045s
+```
+
+
 ## License
 Strest is [MIT Licensed](LICENSE)
