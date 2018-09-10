@@ -42,10 +42,17 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
           const val = requests[requestName];
   
           const spinner = ora(`Testing ${chalk.bold(colorizeMain(requestName))}`).start();
+          const startTime = new Date().getTime();
+          
           let error = await performRequest(val, requestName, printAll);
           
+          const endTime = new Date().getTime();
+          const execTime = (endTime - startTime) / 1000;
+  
           if(error.isError === true) {
-            spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed \n\n${error.message}`))
+            spinner.clear();
+            console.log();
+            spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n\n${error.message}`))
             // if one test failed, don't run others
             abortBecauseTestFailed = true;
             return error.code;
@@ -66,14 +73,14 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
               }
 
               spinner.succeed(
-                `Testing ${chalk.bold(colorizeMain(requestName))} succeeded` +
+                `Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})` +
                 `\n\n${colorizeMain('Status')}: ${res.status}`+
                 `\n${colorizeMain('Status Text')}: ${res.statusText}` +
                 `\n\n${colorizeMain('Headers')}: \n\n${chalk.grey(JSON.stringify(res.headers, null ,2))}` +
                 `${dataString}`
               )
             } elseÂ {
-              spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded`)
+              spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})`)
             }
           }
     
@@ -385,7 +392,6 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     return {isError: false, message: null, code: 0}
   
   } catch(e) {
-    console.log(e.code);
     return { isError: true, message: e, code: 1}
   }
   

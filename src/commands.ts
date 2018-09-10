@@ -18,14 +18,14 @@ const initializeCommands = () => {
       const exitCode: any = await handler.start(dir,cmd);
 
       const executionEndedTime = new Date().getTime();
-      const executionTime = executionEndedTime - executionStartedTime;
+      const executionTime = (executionEndedTime - executionStartedTime) / 1000;
       if(exitCode !== 0) {
         console.log(handler.colorizeCustomRed(chalk.bold(`[ Strest ] Failed with exit code ${exitCode}`)));
         console.log();
         // exit code does only take values between 0-255 so it's impossible to set the exit code to like 404
         process.exit(1);
       } else {
-        handler.writeMessage(`✨  Done in ${chalk.bold((executionTime/1000).toString() + 's')}`, false);
+        handler.writeMessage(`✨  Done in ${chalk.bold((executionTime).toString() + 's')}`, false);
         console.log();
         process.exit(0);
       }
