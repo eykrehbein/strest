@@ -1,0 +1,6 @@
+version: 1
+
+requests:
+  notFound:
+    url: https://jsonplaceholder.typicode.com/test/
+    method: GET

@@ -88,7 +88,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>�
  * Take every curly braces and replace the value with the matching response data
  * @param obj Some Object to be tested  
  */
-const computeRequestObject = (obj: Object) => {
+export const computeRequestObject = (obj: Object, r: any) => {
   // Find everything that matches Value(someValueString)
   const reg = /Value\((.*?)\)/
   const innerReg = /\((.*?)\)/
@@ -98,7 +98,7 @@ const computeRequestObject = (obj: Object) => {
     let val = (<any>obj)[item];
     if(typeof val === 'object') {
       // be recursive
-      const step: any = computeRequestObject(val)
+      const step: any = computeRequestObject(val, r)
       if(step !== null) {
         return step;
       }
@@ -116,7 +116,7 @@ const computeRequestObject = (obj: Object) => {
 
           try {
             const index = (obj: any ,i:any) => obj[i]
-            let reducedValue = dotNotation.split('.').reduce(index, requestReponses)
+            let reducedValue = dotNotation.split('.').reduce(index, r)
 
             if(typeof reducedValue !== 'undefined') {
               // replace the string with the new value
@@ -146,7 +146,7 @@ const validationError = (message: string) => {
  * @param type 
  * @param dataToProof 
  */
-const validateType = (type: string, dataToProof: any) => {  
+export const validateType = (type: string, dataToProof: any) => {  
   
   switch(type) {
     // strings
@@ -183,7 +183,7 @@ const validateType = (type: string, dataToProof: any) => {
     case "number.positive":
       return Joi.validate(dataToProof, Joi.number().positive()).error === null
     case "number.negative":
-      return Joi.validate(dataToProof, Joi.number().negative).error === null
+      return Joi.validate(dataToProof, Joi.number().negative()).error === null
     case "null":
       return Joi.validate(dataToProof, Joi.allow(null)).error === null
     default: 
@@ -197,16 +197,6 @@ const validateType = (type: string, dataToProof: any) => {
  */
 function validateObjectFunc(validateObject: any, dataObj: any, key: any) {
 
-
-    // if(typeof validateObject[key] === 'object') {
-    //   if(typeof dataObj[key] === 'undefined') {
-    //     return validationError(`The key ${chalk.bold(key)} was defined in the validation schema but there was no equivalent found in the response data.`)
-    //   }
-    //   const err: any = validateObjectFunc(validateObject, dataObj, key)
-    //   if(err !== null) {
-    //     return err;
-    //   }
-    // } else {
       if(typeof dataObj[key] === 'undefined') {
         return validationError(`The key ${chalk.bold(key)} was defined in the validation schema but there was no equivalent found in the response data.`)
       }
@@ -318,7 +308,7 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
  */
 const performRequest = async (requestObject: requestObjectSchema, requestName: string, printAll: boolean) => {
 
-  const error = computeRequestObject(requestObject);
+  const error = computeRequestObject(requestObject, requestReponses);
 
   if(error !== null) {
     return {isError: true, message: error}
@@ -389,10 +379,10 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
 
     // if the result should be logged
     if(requestObject.log === true || printAll === true) {
-      return { isError: false, message: response }
+      return { isError: false, message: response, code: 0 }
     }
 
-    return {isError: false, message: null}
+    return {isError: false, message: null, code: 0}
   
   } catch(e) {
     console.log(e.code);
