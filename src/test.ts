@@ -48,6 +48,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
             spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed \n\n${error.message}`))
             // if one test failed, don't run others
             abortBecauseTestFailed = true;
+            return error.code;
           } else {
             if(error.message !== null) {
               // log the response info and data
@@ -74,7 +75,6 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
             } elseÂ {
               spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded`)
             }
-            
           }
     
         }
@@ -82,6 +82,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
       }
     }
   }
+  return 0;
 } 
 /**
  * Take every curly braces and replace the value with the matching response data
@@ -382,7 +383,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
       const err = validateResponse(requestObject.validate, response.data);
 
       if(err !== null) {
-        return { isError: true, message: err}
+        return { isError: true, message: err, code: 400}
       }
     }
 
@@ -394,7 +395,8 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     return {isError: false, message: null}
   
   } catch(e) {
-    return { isError: true, message: e}
+    console.log(e.code);
+    return { isError: true, message: e, code: 1}
   }
   
 }
