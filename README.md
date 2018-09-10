@@ -104,7 +104,7 @@ Data:
 }
 
 
-[ Strest ] ✨  Done in 0.046s
+[ Strest ] ✨  Done in 0.346s
 ```
 ## Writing .strest.yaml test files
 You can find a full __Documentation__ of how to write tests [here](SCHEMA.md)
@@ -143,7 +143,7 @@ Running this will result in something like
 ✔ Testing requestTwo succeeded (0.32s)
 ✔ Testing requestThree succeeded (0.11s)
 
-[ Strest ] ✨  Done in 0.12s
+[ Strest ] ✨  Done in 0.62s
 ```
 
 ### Connecting multiple requests
@@ -204,7 +204,7 @@ _Example of a Validation Error_
 
 [ Validation ] The required item test wasn't found in the response data
 
-[ Strest ] ✨  Done in 0.045s
+[ Strest ] ✨  Done in 0.245s
 ```
 
 
