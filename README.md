@@ -168,7 +168,7 @@ As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)
 You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/Value(postKey.key)/...` or as a standalone term like `Authorization: Value(login.token)`
 
 ## Response Validation
-With **Strest** you can validate respones either by a specific value or by a `Type`. _[List of all valid Types](VALIDATION.md)_
+With **Strest** you can validate responses either by a specific value or by a `Type`. _[List of all valid Types](VALIDATION.md)_
 
 #### Raw Validation
 ```yaml
@@ -193,7 +193,7 @@ requests:
 ```
 ## Errors
 **Strest** is a testing library so of course, you'll run into a few errors when testing an endpoint. Error handling is made very simple so can instantly see what caused an error and fix it.
-If a request fails, the process will be exited with _exit code 1_ and no other requests will be executed afterwords.
+If a request fails, the process will be exited with _exit code 1_ and no other requests will be executed afterwards.
 
 _Example of a Validation Error_
 ```
