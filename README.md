@@ -80,7 +80,7 @@ Success! If you've done everything correctly, you'll get a response like this
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
 
-✔ Testing userRequest succeeded
+✔ Testing userRequest succeeded (0.21s)
 Status: 200
 Status Text: OK
 
@@ -139,9 +139,9 @@ Running this will result in something like
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
 
-✔ Testing requestOne succeeded
-✔ Testing requestTwo succeeded
-✔ Testing requestThree succeeded
+✔ Testing requestOne succeeded (0.1s)
+✔ Testing requestTwo succeeded (0.32s)
+✔ Testing requestThree succeeded (0.11s)
 
 [ Strest ] ✨  Done in 0.12s
 ```
@@ -192,14 +192,15 @@ requests:
         someOtherData: "match this string" 
 ```
 ## Errors
-**Strest** is a testing library so of course, you'll run into a few errors when testing an endpoint. Error handling is made very simple so can instantly see what caused an error and fix it. 
+**Strest** is a testing library so of course, you'll run into a few errors when testing an endpoint. Error handling is made very simple so can instantly see what caused an error and fix it.
+If a request fails, the process will be exited with _exit code 1_ and no other requests will be executed afterwords.
 
 _Example of a Validation Error_
 ```
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
 
-✖ Testing test failed
+✖ Testing test failed (0.2s)
 
 [ Validation ] The required item test wasn't found in the response data
 
