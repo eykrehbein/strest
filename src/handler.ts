@@ -11,22 +11,20 @@ import * as test from './test';
  * @param cmd The command, including all flags
  */
 export const start = async (dir:string , cmd: any) => {
-  // use time for letting the user know how long the execution of the test took
-  const executionStartedTime = new Date().getTime();
 
   console.log();
   // step 1: find all test files
   const testFiles = await fsModule.findTestFiles(dir);
   if(testFiles === null) {
     writeErrorMessage(`Path ${chalk.underline(path.join(process.cwd(), dir))} does not exist`);
-    return;
+    return 1;
   }
   const testFileAmount = testFiles.length;
   const colorizedTestFileAmount = colorizeMain(testFileAmount.toString());
   if(testFileAmount === 0) {
     writeMessage(chalk.gray('No testing files found'))
     console.log()
-    return;
+    return 1;
   }
   
   writeMessage(`Found ${colorizedTestFileAmount} test file(s)`)
@@ -50,16 +48,12 @@ export const start = async (dir:string , cmd: any) => {
   const validTests = validateSchema.proofedSettings;
   if(validTests.length === 0) {
     console.log();
-    return;
+    return 1;
   }
   console.log();
-  await test.performTests(validTests, cmd.print);
+  const responseCode = await test.performTests(validTests, cmd.print) as Number;
   console.log();
-
-  const executionEndedTime = new Date().getTime();
-  const executionTime = executionEndedTime - executionStartedTime;
-  writeMessage(`✨  Done in ${chalk.bold((executionTime/1000).toString() + 's')}`, false);
-  console.log();
+  return responseCode;
 }
 
 /**

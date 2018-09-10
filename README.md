@@ -113,6 +113,7 @@ You can find a full __Documentation__ of how to write tests [here](SCHEMA.md)
 - [How to write Tests](SCHEMA.md)
 - [Validation Types](VALIDATION.md)
 - [Examples](examples/)
+- [Trello Board](https://trello.com/b/lqi6Aj9F)
 
 ## Using & Connecting multiple requests
 
