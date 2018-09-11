@@ -151,7 +151,6 @@ export const computeRequestObject = (obj: Object, r: any) => {
             }
           }
         });
-        console.log((<any>obj)[item])
       }
     }
   }
