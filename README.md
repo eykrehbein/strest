@@ -167,9 +167,8 @@ requests:
 As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `Value(requestName)` without any keys. <br><br>
 You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/Value(postKey.key)/...` or as a standalone term like `Authorization: Value(login.token)`
 
-## Using random values with faker
-If you need to generate some randon values during the tests at runtime, you are able to use and insert faker templates. 
-Using the Faker.fake api 
+## Using random values with Faker
+If you need to generate some random values during the tests at runtime, you are do so by using [Faker API](http://marak.github.io/faker.js/) templates. 
 
 **Usage**
 ```yaml
@@ -181,11 +180,11 @@ requests:
     method: GET                       
     data:                             
       params:
-        name: Fake({{name.firstName}})
+        name: Fake(name.firstName) Fake(name.lastName)
     log: true                         
     
 ```
-See the [faker docs](http://marak.github.io/faker.js/) for more examples.
+Visit [Faker.js Documentation](http://marak.github.io/faker.js/) for more methods
 
 ## Response Validation
 With **Strest** you can validate responses either by a specific value or by a `Type`. _[List of all valid Types](VALIDATION.md)_
