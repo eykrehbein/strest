@@ -47,7 +47,7 @@ app.get('/user', (req, res) => {
 
 app.listen(3001)
 ```
-Then, create a file called `tutorial.strest.yaml` _(You can name it however you want as long as it ends with `.strest.yaml`)_
+Then, create a file called `tutorial.strest.yml` _(You can name it however you want as long as it ends with `.strest.yml` or `.strest.yaml`)_
 
 ```yaml
 version: 1                            # only version at the moment
@@ -66,7 +66,7 @@ _No more configuration needed, so you're ready to go!_
 
 To run the test, open your terminal and type
 ```
-strest tutorial.strest.yaml
+strest tutorial.strest.yml
 ```
 You may also run multiple test files at the same time by pointing to the directory, where the files are stored
 ```
@@ -106,7 +106,7 @@ Data:
 
 [ Strest ] ✨  Done in 0.346s
 ```
-## Writing .strest.yaml test files
+## Writing .strest.yml test files
 You can find a full __Documentation__ of how to write tests [here](SCHEMA.md)
 
 ## Documentation
