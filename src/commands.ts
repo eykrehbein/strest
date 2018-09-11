@@ -20,7 +20,7 @@ const initializeCommands = () => {
       const executionEndedTime = new Date().getTime();
       const executionTime = (executionEndedTime - executionStartedTime) / 1000;
       if(exitCode !== 0) {
-        console.log(handler.colorizeCustomRed(chalk.bold(`[ Strest ] Failed with exit code ${exitCode}`)));
+        console.log(handler.colorizeCustomRed(chalk.bold(`[ Strest ] Failed with exit code 1 (${exitCode})`)));
         console.log();
         // exit code does only take values between 0-255 so it's impossible to set the exit code to like 404
         process.exit(1);
