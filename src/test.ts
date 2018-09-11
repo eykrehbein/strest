@@ -120,7 +120,6 @@ export const computeRequestObject = (obj: Object, r: any) => {
           const innerMatchValue = m.match(innerReg);
           if(innerMatchValue !== null) {
             try {
-              console.log(innerMatchValue[1]);
               const index = (obj: any ,i:any) => obj[i]
               let reducedValue = innerMatchValue[1].split('.').reduce(index, r)
               if(typeof reducedValue !== 'undefined') {
@@ -140,7 +139,7 @@ export const computeRequestObject = (obj: Object, r: any) => {
           return returnVal;
         }
       }
-      
+
       // find all Fake(...) strings in any item
       if(regFake.test(val) === true) {
         let outterMatch = val.match(regFake);
