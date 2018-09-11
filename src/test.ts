@@ -5,8 +5,7 @@ import axios, { AxiosResponse } from 'axios';
 import * as qs from 'qs';
 import { colorizeMain, colorizeCustomRed } from './handler';
 import { requestObjectSchema as requestObjectSchema } from './configSchema';
-
-
+import { config } from './configLoader';
 
 
 /**
@@ -67,7 +66,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
 
               let dataString = '';
               if(parsedData != '')Â {
-                dataString = `\n\n${colorizeMain('Data')}: \n\n${chalk.grey(parsedData)}\n`;
+                dataString = `\n\n${colorizeMain('Data')}: \n\n${chalk.hex(config.secondaryColor)(parsedData)}\n`;
               } else {
                 dataString = `\n\n${colorizeMain('Data')}: No data received\n`;
               }
@@ -76,7 +75,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
                 `Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})` +
                 `\n\n${colorizeMain('Status')}: ${res.status}`+
                 `\n${colorizeMain('Status Text')}: ${res.statusText}` +
-                `\n\n${colorizeMain('Headers')}: \n\n${chalk.grey(JSON.stringify(res.headers, null ,2))}` +
+                `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(res.headers, null ,2))}` +
                 `${dataString}`
               )
             } elseÂ {

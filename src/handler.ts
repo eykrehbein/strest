@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fsModule from './fs';
 import * as yamlParser from './yaml-parse';
 import * as test from './test';
-
+import { config } from './configLoader';
 /**
  * Main function. Fired when command was called
  * @param dir [optional] Target directory
@@ -22,7 +22,7 @@ export const start = async (dir:string , cmd: any) => {
   const testFileAmount = testFiles.length;
   const colorizedTestFileAmount = colorizeMain(testFileAmount.toString());
   if(testFileAmount === 0) {
-    writeMessage(chalk.gray('No testing files found'))
+    writeMessage(chalk.hex(config.secondaryColor)('No testing files found'))
     console.log()
     return 1;
   }
@@ -80,12 +80,12 @@ export const writeErrorMessage = (message: string) => {
  * @param message 
  */
 export const colorizeMain = (message: string) => {
-  return chalk.hex('#2ed573')(message);
+  return chalk.hex(config.primaryColor)(message);
 }
 /**
  * Give the given string a color of #ff4757
  * @param message 
  */
 export const colorizeCustomRed = (message: string) => {
-  return chalk.hex('#ff4757')(message);
+  return chalk.hex(config.errorColor)(message);
 }
