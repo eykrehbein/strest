@@ -28,8 +28,9 @@ export const findTestFiles = async (dir: string) => {
 
     // find all files that end with .strest.yaml
     files.map((path) => {
-      const rg = new RegExp('.*\.strest\.yaml$');
-      if(rg.test(path) === true) {
+      const rg1 = new RegExp('.*\.strest\.yaml$');
+      const rg2 = new RegExp('.*\.strest\.yml$');
+      if(rg1.test(path) === true || rg2.test(path)) {
         matchList.push(path);
       }  
     })
