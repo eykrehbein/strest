@@ -19,7 +19,6 @@ export const loadConfig = () => {
     if(fs.statSync(p).isFile()) {
       try {
         const parsed = yamlLoader.safeLoad(fs.readFileSync(p, 'utf8'));
-        console.log(parsed);
         if(typeof parsed.config !== 'undefined' && parsed.config !== null) {
           if(typeof parsed.config.primaryColor !== 'undefined' && parsed.config.primaryColor !== null){
             config.primaryColor = parsed.config.primaryColor
