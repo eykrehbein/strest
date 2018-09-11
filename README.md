@@ -207,6 +207,17 @@ _Example of a Validation Error_
 [ Strest ] ✨  Done in 0.245s
 ```
 
+## Configuration
+You can create a file in your Computer's home directory called `.strestConfig.yml` which will be the custom config for **Strest**.
+
+*Setup*
+```yaml
+config:
+  primaryColor: "#2ed573" # Hexadecimal Color Code (don't forget the quotation marks)
+  secondaryColor: "#ff4757" # Hexadecimal Color Code
+  errorColor: "#576574" # Hexadecimal Color Code
+
+```
 
 ## License
 Strest is [MIT Licensed](LICENSE)
