@@ -3,6 +3,7 @@ import * as Joi from 'joi';
 import * as ora from 'ora';
 import axios, { AxiosResponse } from 'axios';
 import * as qs from 'qs';
+import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
 import { requestObjectSchema as requestObjectSchema } from './configSchema';
 import { config } from './configLoader';
@@ -97,6 +98,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
 export const computeRequestObject = (obj: Object, r: any) => {
   // Find everything that matches Value(someValueString)
   const reg = /Value\((.*?)\)/
+  const regFake = /Fake\((.*?)\)/g
   const innerReg = /\((.*?)\)/
 
   let item: any;
@@ -134,6 +136,21 @@ export const computeRequestObject = (obj: Object, r: any) => {
           } catch(e) {
             return e;
           }
+      }
+      // find all Fake(...) strings in any item
+      if(regFake.test(val) === true) {
+        let outterMatch = val.match(regFake);
+        outterMatch.forEach((m: string) => {
+          const innerMatch = m.match(innerReg);
+          if(innerMatch !== null) {
+            try {
+              let fakerString = faker.fake(`{{${innerMatch[1]}}}`);
+              (<any>obj)[item] = (<any>obj)[item].replace(m, fakerString);
+            } catch(e) {
+              return e;
+            }
+          }
+        });
       }
     }
   }
