@@ -97,7 +97,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
  */
 export const computeRequestObject = (obj: Object, r: any) => {
   // Find everything that matches Value(someValueString)
-  const reg = /Value\((.*?)\)/
+  const regValue = /Value\((.*?)\)/g
   const regFake = /Fake\((.*?)\)/g
   const innerReg = /\((.*?)\)/
 
@@ -112,31 +112,35 @@ export const computeRequestObject = (obj: Object, r: any) => {
       }
     } else {
       // find all Value(...) strings in any item
-      if(reg.test(val) === true) {
-        // get the value out of the string
-        let fullValue = reg.exec(val)!;
-   
+      if(regValue.test(val) === true) {
 
-         // DOTNOTATION TO OBJECT REFERENCE
-          // get the dot notation string
-          let dotNotationFullMatch = innerReg.exec(fullValue[0])!;
-          const dotNotation = dotNotationFullMatch[1]!;
-
-          try {
-            const index = (obj: any ,i:any) => obj[i]
-            let reducedValue = dotNotation.split('.').reduce(index, r)
-
-            if(typeof reducedValue !== 'undefined') {
-              // replace the string with the new value
-              (<any>obj)[item] = val.replace(reg, reducedValue)
-            } else {
-              return `There is no corresponding response value to ${chalk.bold(dotNotation)}`;
+        let outterMatchValue = val.match(regValue);
+        let returnVal = null;
+        outterMatchValue.forEach((m: string) => {
+          const innerMatchValue = m.match(innerReg);
+          if(innerMatchValue !== null) {
+            try {
+              console.log(innerMatchValue[1]);
+              const index = (obj: any ,i:any) => obj[i]
+              let reducedValue = innerMatchValue[1].split('.').reduce(index, r)
+              if(typeof reducedValue !== 'undefined') {
+                // replace the string with the new value
+                (<any>obj)[item] = (<any>obj)[item].replace(m, reducedValue)
+              } else {
+                returnVal = `There is no corresponding response value to ${chalk.bold(innerMatchValue[1])}`;
+                return;
+              }
+            } catch(e) {
+              returnVal = e;
+              return;
             }
-            
-          } catch(e) {
-            return e;
           }
+        });
+        if(returnVal !== null) {
+          return returnVal;
+        }
       }
+      
       // find all Fake(...) strings in any item
       if(regFake.test(val) === true) {
         let outterMatch = val.match(regFake);
@@ -332,9 +336,8 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
 const performRequest = async (requestObject: requestObjectSchema, requestName: string, printAll: boolean) => {
 
   const error = computeRequestObject(requestObject, requestReponses);
-
   if(error !== null) {
-    return {isError: true, message: error}
+    return { isError: true, message: error, code: 1}
   }
 
   // parse the requestObject
