@@ -98,7 +98,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
 export const computeRequestObject = (obj: Object, r: any) => {
   // Find everything that matches Value(someValueString)
   const reg = /Value\((.*?)\)/
-  const regFake = /Fake\((.*?)\)/
+  const regFake = /Fake\((.*?)\)/g
   const innerReg = /\((.*?)\)/
 
   let item: any;
@@ -139,15 +139,19 @@ export const computeRequestObject = (obj: Object, r: any) => {
       }
       // find all Fake(...) strings in any item
       if(regFake.test(val) === true) {
-        let fullFakeValue = regFake.exec(val)!;
-        let fullFakeValueInner = innerReg.exec(fullFakeValue[0])!;
-        try {
-          let fakerValue = faker.fake(fullFakeValueInner[1]);
-          (<any>obj)[item] = val.replace(regFake, fakerValue)
-        }
-        catch(e) {
-          return e;
-        }
+        let outterMatch = val.match(regFake);
+        outterMatch.forEach((m: string) => {
+          const innerMatch = m.match(innerReg);
+          if(innerMatch !== null) {
+            try {
+              let fakerString = faker.fake(`{{${innerMatch[1]}}}`);
+              (<any>obj)[item] = (<any>obj)[item].replace(m, fakerString);
+            } catch(e) {
+              return e;
+            }
+          }
+        });
+        console.log((<any>obj)[item])
       }
     }
   }
