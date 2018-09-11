@@ -168,7 +168,7 @@ As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)
 You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/Value(postKey.key)/...` or as a standalone term like `Authorization: Value(login.token)`
 
 ## Using random values with Faker
-If you need to generate some random values during the tests at runtime, you are do so by using [Faker API](http://marak.github.io/faker.js/) templates. 
+If you need to generate some random values, you are able to do so by using [Faker API](http://marak.github.io/faker.js/) templates. 
 
 **Usage**
 ```yaml
