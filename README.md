@@ -159,6 +159,7 @@ requests:
     ...
 
   authNeeded:
+    delay: 2000 # Wait 2 seconds for token to become valid
     ...
     headers:
       Authorization: Bearer Value(login.token)

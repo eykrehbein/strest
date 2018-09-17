@@ -40,6 +40,17 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
         if(!abortBecauseTestFailed) {
           
           const val = requests[requestName];
+
+          // Delay for the specified number of milliseconds if given
+          if(typeof val.delay !== 'undefined') {
+            const waitSpinner = ora(`Waiting for ${chalk.bold(colorizeMain(val.delay))} milliseconds`).start();
+
+            await function() {
+              return new Promise(resolve => setTimeout(resolve, val.delay));
+            }();
+
+            waitSpinner.clear();
+          }
   
           const spinner = ora(`Testing ${chalk.bold(colorizeMain(requestName))}`).start();
           const startTime = new Date().getTime();

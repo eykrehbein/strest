@@ -20,6 +20,7 @@ const validateSchema = Joi.object().keys({
   .without('raw', 'json');
 
 const requestsSchema = Joi.object().keys({
+  delay: Joi.number().optional(),
   url: Joi.string().required(),
   method: Joi.string().required(),
   data: dataSchema.optional(),
@@ -44,6 +45,7 @@ interface requestObjectDataSchema {
 }
 
 export interface requestObjectSchema {
+  delay: number,
   method: string,
   url: string,
   data: requestObjectDataSchema,
