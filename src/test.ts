@@ -49,7 +49,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
               return new Promise(resolve => setTimeout(resolve, val.delay));
             }();
 
-            waitSpinner.clear();
+            waitSpinner.stop();
           }
   
           const spinner = ora(`Testing ${chalk.bold(colorizeMain(requestName))}`).start();
