@@ -71,6 +71,16 @@ someGetRequest:
   method: GET
 ```
 
+### `delay`
+If present, the execution of the request will be delayed by the specified number of milliseconds.
+```yaml
+# Example
+someRequest:
+  delay: 2000 # Wait 2 seconds before perfoming request
+  url: ...
+  method: ...
+```
+
 ### `data`
 Specify data that you want to be sent with the request. This data can be formatted either `raw` or as `json`. You may only use one of those keys in a request.
 
