@@ -13,6 +13,7 @@
       - [`raw`](#validate)
       - [`json`](#validate)
     - [`log`](#log)
+    - [`delay`](#delay)
 
 
 # Specifications
