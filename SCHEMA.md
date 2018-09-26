@@ -13,6 +13,7 @@
       - [`raw`](#validate)
       - [`json`](#validate)
     - [`log`](#log)
+    - [`delay`](#delay)
 
 
 # Specifications
@@ -69,6 +70,16 @@ somePostRequest:
 someGetRequest:
   url: ...
   method: GET
+```
+
+### `delay`
+If present, the execution of the request will be delayed by the specified number of milliseconds.
+```yaml
+# Example
+someRequest:
+  delay: 2000 # Wait 2 seconds before perfoming request
+  url: ...
+  method: ...
 ```
 
 ### `data`
