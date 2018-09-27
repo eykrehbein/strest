@@ -110,8 +110,9 @@ export const computeRequestObject = (obj: Object, r: any) => {
   // Find everything that matches Value(someValueString)
   const regValue = /Value\((.*?)\)/g
   const regFake = /Fake\((.*?)\)/g
+  const regEnv = /Env\((.*?)\)/g
   const innerReg = /\((.*?)\)/
-
+  
   let item: any;
   for(item in obj) {
     let val = (<any>obj)[item];
@@ -161,6 +162,20 @@ export const computeRequestObject = (obj: Object, r: any) => {
               let fakerString = faker.fake(`{{${innerMatch[1]}}}`);
               (<any>obj)[item] = (<any>obj)[item].replace(m, fakerString);
             } catch(e) {
+              return e;
+            }
+          }
+        });
+      }
+      // find all Env(...) strings in any item
+      if (regEnv.test(val) === true) {
+        let outterMatch = val.match(regEnv);
+        outterMatch.forEach((m: string) => {
+          const innerMatch = m.match(innerReg);
+          if (innerMatch !== null) {
+            try {
+              (<any>obj)[item] = (<any>obj)[item].replace(m, process.env[innerMatch[1]]);
+            } catch (e) {
               return e;
             }
           }
