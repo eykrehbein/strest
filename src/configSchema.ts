@@ -20,13 +20,14 @@ const validateSchema = Joi.object().keys({
   .without('raw', 'json');
 
 const requestsSchema = Joi.object().keys({
-  delay: Joi.number().optional(),
   url: Joi.string().required(),
   method: Joi.string().required(),
   data: dataSchema.optional(),
   headers: Joi.object().optional(),
   validate: validateSchema.optional(),
-  log: Joi.boolean().optional()
+  log: Joi.boolean().optional(),
+  delay: Joi.number().optional(),
+  repeat: Joi.number().optional(),
 })
 
 

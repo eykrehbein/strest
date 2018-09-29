@@ -38,61 +38,66 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>�
       for(let requestName in requests) {
     
         if(!abortBecauseTestFailed) {
-          
           const val = requests[requestName];
 
-          // Delay for the specified number of milliseconds if given
-          if(typeof val.delay !== 'undefined') {
-            const waitSpinner = ora(`Waiting for ${chalk.bold(colorizeMain(val.delay))} milliseconds`).start();
-
-            await function() {
-              return new Promise(resolve => setTimeout(resolve, val.delay));
-            }();
-
-            waitSpinner.stop();
+          let runTimes = 1;
+          if(typeof val.repeat !== 'undefined'){
+            runTimes = val.repeat;
           }
-  
-          const spinner = ora(`Testing ${chalk.bold(colorizeMain(requestName))}`).start();
-          const startTime = new Date().getTime();
-          
-          let error = await performRequest(val, requestName, printAll);
-          
-          const endTime = new Date().getTime();
-          const execTime = (endTime - startTime) / 1000;
-  
-          if(error.isError === true) {
-            spinner.clear();
-            console.log();
-            spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n\n${error.message}`))
-            // if one test failed, don't run others
-            abortBecauseTestFailed = true;
-            return error.code;
-          } else {
-            if(error.message !== null) {
-              // log the response info and data
-              const res: AxiosResponse<any> = error.message;
-              let parsedData = res.data;
-              if(typeof res.data === 'object') {
-                parsedData = JSON.stringify(res.data, null, 2);
-              }
+          for(let i = 0; i != runTimes; i++) {
+            // Delay for the specified number of milliseconds if given
+            if(typeof val.delay !== 'undefined') {
+              const waitSpinner = ora(`Waiting for ${chalk.bold(colorizeMain(val.delay))} milliseconds`).start();
 
-              let dataString = '';
-              if(parsedData != '') {
-                dataString = `\n\n${colorizeMain('Data')}: \n\n${chalk.hex(config.secondaryColor)(parsedData)}\n`;
-              } else {
-                dataString = `\n\n${colorizeMain('Data')}: No data received\n`;
-              }
+              await function() {
+                return new Promise(resolve => setTimeout(resolve, val.delay));
+              }();
 
-              spinner.succeed(
-                `Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})` +
-                `\n\n${colorizeMain('Status')}: ${res.status}`+
-                `\n${colorizeMain('Status Text')}: ${res.statusText}` +
-                `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(res.headers, null ,2))}` +
-                `${dataString}`
-              )
-            } else {
-              spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})`)
+              waitSpinner.stop();
             }
+    
+            const spinner = ora(`Testing ${chalk.bold(colorizeMain(requestName))}`).start();
+            const startTime = new Date().getTime();
+            
+            let error = await performRequest(val, requestName, printAll);
+            
+            const endTime = new Date().getTime();
+            const execTime = (endTime - startTime) / 1000;
+    
+            if(error.isError === true) {
+              spinner.clear();
+              console.log();
+              spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n\n${error.message}`))
+              // if one test failed, don't run others
+              abortBecauseTestFailed = true;
+              return error.code;
+            } else {
+                if(error.message !== null) {
+                  // log the response info and data
+                  const res: AxiosResponse<any> = error.message;
+                  let parsedData = res.data;
+                  if(typeof res.data === 'object') {
+                    parsedData = JSON.stringify(res.data, null, 2);
+                  }
+
+                  let dataString = '';
+                  if(parsedData != '') {
+                    dataString = `\n\n${colorizeMain('Data')}: \n\n${chalk.hex(config.secondaryColor)(parsedData)}\n`;
+                  } else {
+                    dataString = `\n\n${colorizeMain('Data')}: No data received\n`;
+                  }
+
+                  spinner.succeed(
+                    `Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})` +
+                    `\n\n${colorizeMain('Status')}: ${res.status}`+
+                    `\n${colorizeMain('Status Text')}: ${res.statusText}` +
+                    `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(res.headers, null ,2))}` +
+                    `${dataString}`
+                  )
+                } else {
+                  spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})`)
+                }
+              }
           }
     
         }
