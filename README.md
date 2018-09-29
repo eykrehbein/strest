@@ -28,39 +28,22 @@ npm i -g strest-cli
 
 To test something, you have to create a REST-API first. If you already have an API to test, you can skip this step.
 
-We'll be using [express](https://github.com/expressjs/express) in this tutorial to create a simple API endpoint but you can
-use whatever you want
+We'll be using the [postman-echo](https://docs.postman-echo.com) test API in this tutorial.
 
-Let's get started by creating a simple endpoint first
-```javascript
-const express = require('express');
-
-const app = express();
-
-app.get('/user', (req, res) => {
-  res.send({
-    username: req.query.name,
-    id: 123,
-    premium: false,
-  })
-})
-
-app.listen(3001)
-```
-Then, create a file called `tutorial.strest.yml` _(You can name it however you want as long as it ends with `.strest.yml` or `.strest.yaml`)_
+To get started, create a file called `tutorial.strest.yml` _(The extension needs to be `.strest.yml` or `.strest.yaml`)_
 
 ```yaml
 version: 1                            # only version at the moment
 
 requests:                             # all test requests will be listed here
-  userRequest:                        # name the request however you want
-    url: http://localhost:3001/user   # required
+  testRequest:                        # name the request however you want
+    url: https://postman-echo.com/get  # required
     method: GET                       # required
-    data:                             # valid data types: params, json and raw
+    data:                             # valid data types: params + json or raw
       params:
-        name: testUser
-    log: true                         # false by default. This will log all response information in the console
-    
+        foo1: bar1
+        foo2: bar2
+    # log: true # uncomment this to log the response
 ```
 _No more configuration needed, so you're ready to go!_
 
@@ -69,9 +52,9 @@ To run the test, open your terminal and type
 strest tutorial.strest.yml
 ```
 You may also run multiple test files at the same time by pointing to the directory, where the files are stored
-```
-strest
-// or
+```yaml
+strest # this will recursively search for all .strest.yml files in the cwd and it's subdirectories
+# or
 strest someDir/
 ```
 
@@ -80,31 +63,9 @@ Success! If you've done everything correctly, you'll get a response like this
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
 
-✔ Testing userRequest succeeded (0.21s)
-Status: 200
-Status Text: OK
+✔ Testing testRequest succeeded (0.457s)
 
-Headers:
-
-{
-  "x-powered-by": "Express",
-  "content-type": "application/json; charset=utf-8",
-  "content-length": "48",
-  "etag": "W/\"30-lW4maan3YXQcTCT4eKF1mDtPx3Y\"",
-  "date": "Sun, 09 Sep 2018 11:20:19 GMT",
-  "connection": "close"
-}
-
-Data:
-
-{
-  "username": "testUser",
-  "id": 123,
-  "premium": false
-}
-
-
-[ Strest ] ✨  Done in 0.346s
+[ Strest ] ✨  Done in 0.484s
 ```
 ## Writing .strest.yml test files
 You can find a full __Documentation__ of how to write tests [here](SCHEMA.md)
