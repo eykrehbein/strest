@@ -1,0 +1,23 @@
+{
+  "name": "express-server-example",
+  "version": "1.0.0",
+  "description": "An example of how to use Strest to test an express-server endpoint",
+  "main": "index.js",
+  "scripts": {
+    "test": "strest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eykrehbein/strest.git"
+  },
+  "author": "Eyk Rehbein <eykjs@gmail.com> (https://twitter.com/eykjs)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eykrehbein/strest/issues"
+  },
+  "homepage": "https://github.com/eykrehbein/strest#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3"
+  }
+}
