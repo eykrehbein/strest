@@ -203,6 +203,22 @@ _Example of a Validation Error_
 [ Strest ] ✨  Done in 0.245s
 ```
 
+## Allow Insecure certs
+
+Boolean to allow:
+
+- insecure certificates
+- self-signed certificates
+- expired certificates
+
+```yaml
+# Example
+someRequest:
+  url: ...
+  method: ...
+  allowInsecure: true
+```
+
 ## Configuration
 You can create a file in your Computer's home directory called `.strestConfig.yml` which will be the custom config for **Strest**.
 
