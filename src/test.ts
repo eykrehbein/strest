@@ -371,18 +371,22 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   }
 
   // parse the requestObject
-  // let requestMethod: string, requestData: any, requestUrl: string, requestHeaders: any, requestParams: string;
+  // let requestMethod: string, requestData: any, requestUrl: string, requestHeaders: any, requestParams: string, allowInsecure: boolean;
   interface AxiosObject {
     url?: any,
     method?: any,
     data?: any,
     params?: any,
-    headers?: any
+    headers?: any,
+    allowInsecure?: boolean
   }
 
   let axiosObject: AxiosObject = {};
   // optional keys 
   
+  if(requestObject.allowInsecure){
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  }
   axiosObject.url = requestObject.url;
   axiosObject.method = requestObject.method;
 
