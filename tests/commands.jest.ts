@@ -1,5 +1,5 @@
-import { spawnSync, SpawnOptions } from 'child_process';
-import * as path from 'path';
+// import { spawnSync, SpawnOptions } from 'child_process';
+// import * as path from 'path';
 
 test('Strest Command Line', async () => {
 
