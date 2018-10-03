@@ -1,6 +1,7 @@
 # How to write Test? The Schema
 
 - [`version`](#version) _Required_
+- [`allowInsecure`](#allowInsecure)
 - [`requests`](#requests) _Required_
   - [`request`](#request)
     - [`url`](#url) _Required_
@@ -24,6 +25,22 @@
 Property specifying the version of the schema. Available versions:
 
 - `1`
+
+### `allowInsecure`
+
+Boolean to allow:
+
+- insecure certificates
+- self-signed certificates
+- expired certificates
+
+```yaml
+# Example
+allowInsecure: true
+someRequest:
+  url: ...
+  method: ...
+```
 
 ### `requests` **_Required_**
 
@@ -176,22 +193,6 @@ someRequest:
 
 Validate the incoming response either by a specific value or by a [`Type`](VALIDATION.md).
 [More information](README.md#ResponseValidation) about how to validate responses.
-
-### `allowInsecure`
-
-Boolean to allow:
-
-- insecure certificates
-- self-signed certificates
-- expired certificates
-
-```yaml
-# Example
-someRequest:
-  url: ...
-  method: ...
-  allowInsecure: true
-```
 
 ### `log`
 

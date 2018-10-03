@@ -213,10 +213,10 @@ Boolean to allow:
 
 ```yaml
 # Example
+allowInsecure: true
 someRequest:
   url: ...
   method: ...
-  allowInsecure: true
 ```
 
 ## Configuration

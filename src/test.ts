@@ -30,8 +30,12 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
   let testObject: any
   let abortBecauseTestFailed = false;
   
-  for(testObject of testObjects){ 
-    
+  for(testObject of testObjects){
+
+    if(testObject['allowInsecure']){
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
+
     if(!abortBecauseTestFailed){
     
       const requests = testObject['requests'];
@@ -371,22 +375,18 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   }
 
   // parse the requestObject
-  // let requestMethod: string, requestData: any, requestUrl: string, requestHeaders: any, requestParams: string, allowInsecure: boolean;
+  // let requestMethod: string, requestData: any, requestUrl: string, requestHeaders: any, requestParams: string;
   interface AxiosObject {
     url?: any,
     method?: any,
     data?: any,
     params?: any,
-    headers?: any,
-    allowInsecure?: boolean
+    headers?: any
   }
 
   let axiosObject: AxiosObject = {};
   // optional keys 
   
-  if(requestObject.allowInsecure){
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-  }
   axiosObject.url = requestObject.url;
   axiosObject.method = requestObject.method;
 
