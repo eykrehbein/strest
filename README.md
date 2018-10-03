@@ -8,7 +8,6 @@
   <img src="https://img.shields.io/github/package-json/v/eykhagen/strest.svg" alt="License: MIT">
 </p>
 
-
 **:link: Connect multiple requests**: _Example_ Embed an authorization token you got as a response from a login request in your following requests automatically
 
 **:memo: YAML Syntax**: Write all of your tests in YAML files
@@ -18,11 +17,14 @@
 ## Getting Started
 
 Install Strest using `yarn`
-```
+
+```bash
 yarn global add strest-cli
 ```
+
 Or via `npm`
-```
+
+```bash
 npm i -g strest-cli
 ```
 
@@ -45,13 +47,17 @@ requests:                             # all test requests will be listed here
         foo2: bar2
     # log: true # uncomment this to log the response
 ```
+
 _No more configuration needed, so you're ready to go!_
 
 To run the test, open your terminal and type
-```
+
+```bash
 strest tutorial.strest.yml
 ```
+
 You may also run multiple test files at the same time by pointing to the directory, where the files are stored
+
 ```yaml
 strest # this will recursively search for all .strest.yml files in the cwd and it's subdirectories
 # or
@@ -59,6 +65,7 @@ strest someDir/
 ```
 
 Success! If you've done everything correctly, you'll get a response like this
+
 ```
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
@@ -67,10 +74,13 @@ Success! If you've done everything correctly, you'll get a response like this
 
 [ Strest ] ✨  Done in 0.484s
 ```
+
 ## Writing .strest.yml test files
+
 You can find a full __Documentation__ of how to write tests [here](SCHEMA.md)
 
 ## Documentation
+
 - [How to write Tests](SCHEMA.md)
 - [Validation Types](VALIDATION.md)
 - [Examples](examples/)
@@ -83,6 +93,7 @@ With traditional tools like [Postman](https://www.getpostman.com/) or [Insomnia]
 With __Strest__ you're able to predefine a very well structured test file once, and every time you make any changes to your API you can test it with just one command in your terminal. Additionally, you can add hundreds or thousands of requests and endpoints which will run synchronously one after the other.
 
 To create multiple requests, simply add multiple entries into the `requests` yaml object.
+
 ```yaml
 version: 1
 
@@ -93,9 +104,10 @@ requests:
     ...
   requestThree:
     ...
-
 ```
+
 Running this will result in something like
+
 ```
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
@@ -109,10 +121,12 @@ Running this will result in something like
 
 ### Connecting multiple requests
 
-**What is meant by _connecting multiple requests_?**<br/>
+**What is meant by _connecting multiple requests_?**
+
 Connecting multiple requests means that you write a request and in each of the following requests you are able to use and insert any of the data that was responded by this request.
 
 **Usage**
+
 ```yaml
 requests:
   
@@ -126,47 +140,54 @@ requests:
       Authorization: Bearer Value(login.token)
 
 ```
-As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `Value(requestName)` without any keys. <br><br>
+
+As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `Value(requestName)` without any keys.
+
 You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/Value(postKey.key)/...` or as a standalone term like `Authorization: Value(login.token)`
 
 ## Using random values with Faker
+
 If you need to generate some random values, you are able to do so by using [Faker API](http://marak.github.io/faker.js/) templates. 
 
 **Usage**
-```yaml
-version: 1                            
 
-requests:                             
-  userRequest:                        
-    url: http://localhost:3001/user   
-    method: GET                       
-    data:                             
+```yaml
+version: 1
+
+requests:
+  userRequest:
+    url: http://localhost:3001/user
+    method: GET
+    data:
       params:
         name: Fake(name.firstName) Fake(name.lastName)
-    log: true                         
-    
+    log: true
 ```
+
 Visit [Faker.js Documentation](http://marak.github.io/faker.js/) for more methods
 
 ## Replacing values with predefined environment variables
+
 **Usage**
+
 ```yaml
-version: 1                            
+version: 1
 
-requests:                             
-  userRequest:                        
-    url: Env(MY_TEST_URL)/user   
-    method: GET                       
-    data:                             
+requests:
+  userRequest:
+    url: Env(MY_TEST_URL)/user
+    method: GET
+    data:
       params:
-        fromEnvironment: Env(MY_ENV_VAR)                         
-
+        fromEnvironment: Env(MY_ENV_VAR)
 ```
 
 ## Response Validation
+
 With **Strest** you can validate responses either by a specific value or by a `Type`. _[List of all valid Types](VALIDATION.md)_
 
 #### Raw Validation
+
 ```yaml
 requests:
   example:
@@ -174,7 +195,9 @@ requests:
     validate:
       raw: "the response has to match this string exactly"
 ```
+
 #### JSON Validation
+
 ```yaml
 requests:
   example:
@@ -187,11 +210,14 @@ requests:
           iconUrl: Type(String.Url)
         someOtherData: "match this string" 
 ```
+
 ## Errors
+
 **Strest** is a testing library so of course, you'll run into a few errors when testing an endpoint. Error handling is made very simple so can instantly see what caused an error and fix it.
 If a request fails, the process will be exited with _exit code 1_ and no other requests will be executed afterwards.
 
 _Example of a Validation Error_
+
 ```
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
@@ -220,9 +246,11 @@ someRequest:
 ```
 
 ## Configuration
+
 You can create a file in your Computer's home directory called `.strestConfig.yml` which will be the custom config for **Strest**.
 
 *Setup*
+
 ```yaml
 config:
   primaryColor: "#2ed573" # Hexadecimal Color Code (don't forget the quotation marks)
@@ -231,5 +259,15 @@ config:
 
 ```
 
+## Docker
+
+Use docker instead of setting up node.
+
+```bash
+docker build -t strest:dev .
+docker run --env testURL=https://jsonplaceholder.typicode.com -v $(PWD):/data strest:dev /data/tests/success/successRequestEnv.strest.yaml
+```
+
 ## License
+
 Strest is [MIT Licensed](LICENSE)
