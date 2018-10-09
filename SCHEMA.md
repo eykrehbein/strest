@@ -12,11 +12,11 @@
       - [`raw`](#data)
     - [`headers`](#headers)
     - [`validate`](#validate)
+      - ['max_retries'](#validate)
       - [`raw`](#validate)
       - [`json`](#validate)
     - [`log`](#log)
     - [`delay`](#delay)
-    - [`repeat`](#repeat)
 
 ## Specifications
 
@@ -175,18 +175,6 @@ someRequest:
     Authorization: Bearer Value(login.token)
     ...
 
-```
-
-### `repeat`
-
-The following example request will be executed 5 times in a row
-
-```yaml
-# Example
-someRequest:
-  url: ...
-  method: ...
-  repeat: 5
 ```
 
 ### `validate`

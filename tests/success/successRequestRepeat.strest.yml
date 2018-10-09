@@ -1,8 +1,0 @@
-version: 1
-
-requests:
-  repeater:
-    url: https://github.com/eykrehbein/strest
-    method: GET
-    delay: 1000
-    repeat: 10

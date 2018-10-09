@@ -1,0 +1,11 @@
+version: 1
+# This test is currently run manually.  Set the validate.raw data to some time in the future.
+requests:
+  waiter:
+    url: https://postman-echo.com/time/now
+    method: GET
+    delay: 900
+    validate:
+      max_retries: 30
+      raw: "Tue, 09 Oct 2018 03:07:20 GMT"
+    log: true
