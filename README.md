@@ -138,6 +138,10 @@ requests:
     ...
     headers:
       Authorization: Bearer Value(login.token)
+    ...
+    validation:
+      json:
+        id: Value(login.users[0].id) # use arrays like you would in javascript
 
 ```
 
@@ -209,6 +213,33 @@ requests:
           id: Type(Null | Number | String) # id has to be of type Number, String or Null
           iconUrl: Type(String.Url)
         someOtherData: "match this string" 
+```
+
+#### Header Validation
+
+```yaml
+requests:
+  example:
+    ...
+    validate:
+      headers:
+        content-type: application/json; charset=utf-8
+        access-control-allow-credentials: Type(Boolean | String)
+```
+
+#### Response-Code Validation
+
+```yaml
+requests:
+  example:
+    ...
+    validate:
+      code: 200 # only allow code 200 (default)
+  ...
+  advanced:
+    ...
+    validate:
+      code: 2xx # allow all numbers in range of 200-299
 ```
 
 ## Errors
