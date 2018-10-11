@@ -4,3 +4,5 @@ requests:
   notFound:
     url: https://jsonplaceholder.typicode.com/test/
     method: GET
+    validate:
+      code: 2xx
