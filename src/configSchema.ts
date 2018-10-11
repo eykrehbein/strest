@@ -27,7 +27,7 @@ const requestsSchema = Joi.object().keys({
   data: dataSchema.optional(),
   headers: Joi.object().optional(),
   validate: validateSchema.optional(),
-  log: Joi.boolean().optional(),
+  log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
   delay: Joi.number().optional(),
   repeat: Joi.number().optional(),
 })
@@ -55,7 +55,7 @@ export interface requestObjectSchema {
   data: requestObjectDataSchema,
   headers: object,
   validate: any,
-  log: boolean
+  log: boolean | string,
 }
 
 
