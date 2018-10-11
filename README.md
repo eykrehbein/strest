@@ -265,7 +265,7 @@ Use docker instead of setting up node.
 
 ```bash
 docker build -t strest:dev .
-docker run --env testURL=https://jsonplaceholder.typicode.com -v $(PWD):/data strest:dev /data/tests/success/successRequestEnv.strest.yaml
+docker run --env testURL=https://jsonplaceholder.typicode.com -v ${PWD}:/data strest:dev /data/tests/success/successRequestEnv.strest.yaml
 ```
 
 ## License
