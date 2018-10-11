@@ -1,6 +1,6 @@
 {
   "name": "strest-cli",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A new dimension of REST API testing",
   "main": "dist/main.js",
   "repository": "https://github.com/eykhagen/strest",
