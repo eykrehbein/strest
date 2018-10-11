@@ -1,5 +1,7 @@
 # How to write Test? The Schema
+
 - [`version`](#version) _Required_
+- [`allowInsecure`](#allowInsecure)
 - [`requests`](#requests) _Required_
   - [`request`](#request)
     - [`url`](#url) _Required_
@@ -17,16 +19,34 @@
     - [`delay`](#delay)
     - [`repeat`](#repeat)
 
+## Specifications
 
-# Specifications
-### `version`
-**_Required_**<br>
+### `version` **_Required_**
+
 Property specifying the version of the schema. Available versions:
+
 - `1`
 
-### `requests`
-**_Required_**<br>
+### `allowInsecure`
+
+Boolean to allow:
+
+- insecure certificates
+- self-signed certificates
+- expired certificates
+
+```yaml
+# Example
+allowInsecure: true
+someRequest:
+  url: ...
+  method: ...
+```
+
+### `requests` **_Required_**
+
 Array which holds all the requests that are going to be tested
+
 ```yaml
 # Example
 requests:
@@ -37,20 +57,23 @@ requests:
   request1000:
     ..
 ```
-### `request`
-**_At least one request is required_**<br>
+
+### `request` **_At least one request is required_**
 
 A single request. You can name the request however you want. Try not to overwrite names because
 this will also overwrite the response data and you'll no longer be able to retrieve the data from the overwritten request.
+
 ```yaml
 # Example
 requests:
   someRequestName: # <- a Request
     ..
 ```
-### `url`
-**_Required_**<br>
+
+### `url` **_Required_**
+
 The target URL to which the request will be sent to. _Needs to start with `http` or `https`_
+
 ```yaml
 # Basic Example
 someRequestName:
@@ -60,9 +83,11 @@ someRequestName:
 someConnectedRequest:
   url: http://localhost:3000/api/user/Value(getUser.id)/friends
 ```
-### `method`
-**_Required_**<br>
+
+### `method` **_Required_**
+
 The HTTP request method that will be used Strest to perform the request. All strings are accepted but consider to use one of the requests listed in the [Mozilla Developer Docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+
 ```yaml
 # Example
 somePostRequest:
@@ -75,7 +100,9 @@ someGetRequest:
 ```
 
 ### `delay`
+
 If present, the execution of the request will be delayed by the specified number of milliseconds.
+
 ```yaml
 # Example
 someRequest:
@@ -85,6 +112,7 @@ someRequest:
 ```
 
 ### `data`
+
 Specify data that you want to be sent with the request. This data can be formatted either `raw` or as `json`. You may only use one of those keys in a request.
 
 However, `params` can always be added. They'll be added to the request's URL.
@@ -126,8 +154,11 @@ someRequest:
       name: testUser
       password: test123
 ```
+
 ### `headers`
+
 Specify HTTP headers that you want to be sent with the request. Formatted as an Object.
+
 ```yaml
 # Basic Example
 someRequest:
@@ -146,7 +177,9 @@ someRequest:
     ...
 
 ```
+
 ### `repeat`
+
 The following example request will be executed 5 times in a row
 
 ```yaml
@@ -158,6 +191,7 @@ someRequest:
 ```
 
 ### `validate`
+
 Validate the incoming response either by a specific value or by a [`Type`](VALIDATION.md).
 [More information](README.md#ResponseValidation) about how to validate responses.
 
@@ -179,7 +213,9 @@ someRequest:
 ```
 
 ### `log`
+
 If set to `true`, the following information will be logged into the console for this request.
+
 - Response Code
 - Response Text
 - HTTP Headers

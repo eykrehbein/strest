@@ -34,7 +34,8 @@ const requestsSchema = Joi.object().keys({
 
 export const Schema = Joi.object({
   version: Joi.number().min(1).max(1),
-  requests: Joi.object({}).pattern(/([^\s]+)/, requestsSchema)
+  requests: Joi.object({}).pattern(/([^\s]+)/, requestsSchema),
+  allowInsecure: Joi.boolean().optional()
 });
 
 

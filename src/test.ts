@@ -30,8 +30,12 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
   let testObject: any
   let abortBecauseTestFailed = false;
   
-  for(testObject of testObjects){ 
-    
+  for(testObject of testObjects){
+
+    if(testObject['allowInsecure']){
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
+
     if(!abortBecauseTestFailed){
     
       const requests = testObject['requests'];
