@@ -14,6 +14,7 @@ const dataSchema = Joi.object().keys({
 
 const validateSchema = Joi.object().keys({
   code: Joi.alternatives().try(Joi.string(), Joi.number()).optional(),
+  headers: Joi.object().optional(),
   json: Joi.object().optional(),
   raw: Joi.string().optional()
 })
