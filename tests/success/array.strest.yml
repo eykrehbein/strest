@@ -1,0 +1,13 @@
+version: 1
+
+requests:
+  arr:
+    url: https://jsonplaceholder.typicode.com/todos
+    method: GET
+  arr1: 
+    url: https://jsonplaceholder.typicode.com/todos/Value(arr[0].id)
+    method: GET
+    validate:
+      json:
+        title: "delectus aut autem"
+        id: 1

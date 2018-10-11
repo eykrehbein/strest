@@ -141,7 +141,27 @@ export const computeRequestObject = (obj: Object, r: any) => {
           const innerMatchValue = m.match(innerReg);
           if(innerMatchValue !== null) {
             try {
-              const index = (obj: any ,i:any) => obj[i]
+              const index = (obj:any, i:any) => {
+                const arrIndexReg = /\[(.*?)\]/gm;
+                const arrNameReg = /^[^\[]*/gm;
+                let m;
+                const arrIndices = [];
+
+                do {
+                  m = arrIndexReg.exec(i);
+                  if (m !== null) {
+                    arrIndices.push(parseInt(m[1]));
+                  }
+                } while(m !== null);
+
+                if (arrIndices.length) {
+                  const name = i.match(arrNameReg)[0];
+                  return arrIndices.reduce((agg:any, i:any) => agg[i], obj[name]);
+                }
+
+                return obj[i];
+              }
+
               let reducedValue = innerMatchValue[1].split('.').reduce(index, r)
               if(typeof reducedValue !== 'undefined') {
                 // replace the string with the new value
