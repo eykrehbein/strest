@@ -342,6 +342,22 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
    *  token: Type(string | null)
    */
   let proofObject: any = validateSchema.json || validateSchema.raw;
+  let codeProofValue: any = validateSchema.code;
+  if (codeProofValue) {
+    if (!dataToProof.code) {
+      return validationError(`The key ${chalk.bold('code')} was defined in the validation schema but there the response did not contain a valid status code.`)
+    }
+
+    const codeChars = codeProofValue.toString().split('');
+    const dataChars = dataToProof.code.toString().split('');
+    for (let i = 0; i < codeChars.length; i++) {
+      const ch = codeChars[i];
+      const dataCh = dataChars[i];
+      if (ch !== 'x' && dataCh !== ch) {
+        return validationError(`The response status code should be ${chalk.bold(codeProofValue)} but the request returned code ${chalk.bold(dataToProof.code)}`);
+      }
+    }
+  }
 
   if(typeof proofObject === 'object') {
     for(let key in proofObject) {
@@ -431,6 +447,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
 
     if(typeof requestObject.validate !== 'undefined') {
      
+      response.data.code = response.status;
       const err = validateResponse(requestObject.validate, response.data);
 
       if(err !== null) {

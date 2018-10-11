@@ -14,6 +14,7 @@ const dataSchema = Joi.object().keys({
 
 const validateSchema = Joi.object().keys({
   max_retries: Joi.number().optional(),
+  code: Joi.alternatives().try(Joi.string(), Joi.number()).optional(),
   json: Joi.object().optional(),
   raw: Joi.string().optional()
 })

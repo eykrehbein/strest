@@ -13,6 +13,7 @@
     - [`headers`](#headers)
     - [`validate`](#validate)
       - ['max_retries'](#validate)
+      - [`code`](#code)
       - [`raw`](#validate)
       - [`json`](#validate)
     - [`log`](#log)
@@ -181,6 +182,23 @@ someRequest:
 
 Validate the incoming response either by a specific value or by a [`Type`](VALIDATION.md).
 [More information](README.md#ResponseValidation) about how to validate responses.
+
+### `code` 
+Expect the returned status code to be a specific number or in a range of numbers.
+```yaml
+# Example (simple)
+someRequest:
+  url: ...
+  method: ...
+  validate:
+    code: 200 # expect the request to return the response code 200
+# Example (range)
+someRequest:
+  url: ...
+  method: ...
+  validate:
+    code: 2xx # expect the request to return a response code which is in the range of 200-299
+```
 
 ### `log`
 
