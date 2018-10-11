@@ -178,6 +178,7 @@ requests:
     validate:
       raw: "the response has to match this string exactly"
 ```
+
 #### JSON Validation
 ```yaml
 requests:
@@ -191,6 +192,7 @@ requests:
           iconUrl: Type(String.Url)
         someOtherData: "match this string" 
 ```
+
 #### Header Validation
 ```yaml
 requests:
@@ -201,6 +203,21 @@ requests:
         content-type: application/json; charset=utf-8
         access-control-allow-credentials: Type(Boolean | String)
 ```
+
+#### Response-Code Validation
+```yaml
+requests:
+  example:
+    ...
+    validate:
+      code: 200 # only allow code 200 (default)
+  ...
+  advanced:
+    ...
+    validate:
+      code: 2xx # allow all numbers in range of 200-299
+```
+
 ## Errors
 **Strest** is a testing library so of course, you'll run into a few errors when testing an endpoint. Error handling is made very simple so can instantly see what caused an error and fix it.
 If a request fails, the process will be exited with _exit code 1_ and no other requests will be executed afterwards.
