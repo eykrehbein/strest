@@ -487,7 +487,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     }
 
     // if the result should be logged
-    if(requestObject.log === true || printAll === true) {
+    if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
       return { isError: false, message: response, code: 0 }
     }
 
