@@ -156,7 +156,6 @@ export const computeRequestObject = (obj: Object, r: any) => {
 
                 if (arrIndices.length) {
                   const name = i.match(arrNameReg)[0];
-                  console.log(name);
                   return arrIndices.reduce((agg:any, i:any) => agg[i], obj[name]);
                 }
 
