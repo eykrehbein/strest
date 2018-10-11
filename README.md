@@ -124,6 +124,10 @@ requests:
     ...
     headers:
       Authorization: Bearer Value(login.token)
+    ...
+    validation:
+      json:
+        id: Value(login.users[0].id) # use arrays like you would in javascript
 
 ```
 As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `Value(requestName)` without any keys. <br><br>
