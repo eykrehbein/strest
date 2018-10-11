@@ -361,6 +361,7 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
    *  token: Type(string | null)
    */
   let proofObject: any = validateSchema.json || validateSchema.raw;
+  let headersProofObject: any = validateSchema.headers;
   let codeProofValue: any = validateSchema.code;
   if (codeProofValue) {
     if (!dataToProof.code) {
@@ -381,6 +382,14 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
   if(typeof proofObject === 'object') {
     for(let key in proofObject) {
       let err = createValidationLoop(proofObject, dataToProof, key)
+      if(err !== null) {
+        return err;
+      }
+    }
+  }
+  if(typeof headersProofObject === 'object') {
+    for(let key in headersProofObject) {
+      let err = createValidationLoop(headersProofObject, dataToProof.headers, key)
       if(err !== null) {
         return err;
       }
@@ -467,6 +476,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(typeof requestObject.validate !== 'undefined') {
      
       response.data.code = response.status;
+      response.data.headers = response.headers;
       const err = validateResponse(requestObject.validate, response.data);
 
       if(err !== null) {
