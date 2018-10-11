@@ -360,7 +360,7 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
    * validate:
    *  token: Type(string | null)
    */
-  let proofObject: any = validateSchema.json || validateSchema.raw;
+  let proofObject: any = validateSchema.json || validateSchema.raw || null;
   let codeProofValue: any = validateSchema.code;
   if (codeProofValue) {
     if (!dataToProof.code) {
@@ -470,7 +470,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
       const err = validateResponse(requestObject.validate, response.data);
 
       if(err !== null) {
-        return { isError: true, message: err, code: 400}
+        return { isError: true, message: err, code: 1 }
       }
     }
 
@@ -479,10 +479,29 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
       return { isError: false, message: response, code: 0 }
     }
 
-    return {isError: false, message: null, code: 0}
+    return { isError: false, message: null, code: 0 }
   
   } catch(e) {
-    return { isError: true, message: e, code: 1}
+    if(typeof requestObject.validate !== 'undefined') {
+      if(typeof requestObject.validate.code !== 'undefined') {
+        const vErr = validateResponse({code: requestObject.validate.code}, {code: e.response.status});
+        if(vErr === null) {
+          return { 
+            isError: false, 
+            message: null,
+            code: 0,
+          };
+        } else {
+          return { 
+            isError: true, 
+            message: validationError(`The response status code should be ${chalk.bold(requestObject.validate.code)} but the request returned code ${chalk.bold(e.response.status)}`), 
+            code: 1,
+          };
+        }
+      }
+    }
+
+    return { isError: true, message: e, code: 1 }
   }
   
 }
