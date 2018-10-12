@@ -1,7 +1,6 @@
 # Valid Types for Validation
 - `String`
   - `String.Hex`
-  - `String.Url`
   - `String.Email`
   - `String.IP`  :arrow_right: _IP Address_
   - `String.Url`
