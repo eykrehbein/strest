@@ -15,6 +15,7 @@ const dataSchema = Joi.object().keys({
 const validateSchema = Joi.object().keys({
   max_retries: Joi.number().optional(),
   code: Joi.alternatives().try(Joi.string(), Joi.number()).optional(),
+  headers: Joi.object().optional(),
   json: Joi.object().optional(),
   raw: Joi.string().optional()
 })
@@ -27,7 +28,7 @@ const requestsSchema = Joi.object().keys({
   data: dataSchema.optional(),
   headers: Joi.object().optional(),
   validate: validateSchema.optional(),
-  log: Joi.boolean().optional(),
+  log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
   delay: Joi.number().optional(),
 })
 
@@ -54,7 +55,7 @@ export interface requestObjectSchema {
   data: requestObjectDataSchema,
   headers: object,
   validate: any,
-  log: boolean
+  log: boolean | string,
 }
 
 

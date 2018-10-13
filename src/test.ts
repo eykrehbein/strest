@@ -145,7 +145,27 @@ export const computeRequestObject = (obj: Object, r: any) => {
           const innerMatchValue = m.match(innerReg);
           if(innerMatchValue !== null) {
             try {
-              const index = (obj: any ,i:any) => obj[i]
+              const index = (obj:any, i:any) => {
+                const arrIndexReg = /\[(.*?)\]/gm;
+                const arrNameReg = /^[^\[]*/gm;
+                let m;
+                const arrIndices = [];
+
+                do {
+                  m = arrIndexReg.exec(i);
+                  if (m !== null) {
+                    arrIndices.push(parseInt(m[1]));
+                  }
+                } while(m !== null);
+
+                if (arrIndices.length) {
+                  const name = i.match(arrNameReg)[0];
+                  return arrIndices.reduce((agg:any, i:any) => agg[i], obj[name]);
+                }
+
+                return obj[i];
+              }
+
               let reducedValue = innerMatchValue[1].split('.').reduce(index, r)
               if(typeof reducedValue !== 'undefined') {
                 // replace the string with the new value
@@ -341,8 +361,11 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
    * validate:
    *  token: Type(string | null)
    */
-  let proofObject: any = validateSchema.json || validateSchema.raw;
+  
+  let proofObject: any = validateSchema.json || validateSchema.raw || null;
+  let headersProofObject: any = validateSchema.headers;
   let codeProofValue: any = validateSchema.code;
+  
   if (codeProofValue) {
     if (!dataToProof.code) {
       return validationError(`The key ${chalk.bold('code')} was defined in the validation schema but there the response did not contain a valid status code.`)
@@ -362,6 +385,14 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
   if(typeof proofObject === 'object') {
     for(let key in proofObject) {
       let err = createValidationLoop(proofObject, dataToProof, key)
+      if(err !== null) {
+        return err;
+      }
+    }
+  }
+  if(typeof headersProofObject === 'object') {
+    for(let key in headersProofObject) {
+      let err = createValidationLoop(headersProofObject, dataToProof.headers, key)
       if(err !== null) {
         return err;
       }
@@ -448,22 +479,42 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(typeof requestObject.validate !== 'undefined') {
      
       response.data.code = response.status;
+      response.data.headers = response.headers;
       const err = validateResponse(requestObject.validate, response.data);
 
       if(err !== null) {
-        return { isError: true, message: err, code: 400}
+        return { isError: true, message: err, code: 1 }
       }
     }
 
     // if the result should be logged
-    if(requestObject.log === true || printAll === true) {
+    if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
       return { isError: false, message: response, code: 0 }
     }
 
-    return {isError: false, message: null, code: 0}
+    return { isError: false, message: null, code: 0 }
   
   } catch(e) {
-    return { isError: true, message: e, code: 1}
+    if(typeof requestObject.validate !== 'undefined') {
+      if(typeof requestObject.validate.code !== 'undefined') {
+        const vErr = validateResponse({code: requestObject.validate.code}, {code: e.response.status});
+        if(vErr === null) {
+          return { 
+            isError: false, 
+            message: null,
+            code: 0,
+          };
+        } else {
+          return { 
+            isError: true, 
+            message: validationError(`The response status code should be ${chalk.bold(requestObject.validate.code)} but the request returned code ${chalk.bold(e.response.status)}`), 
+            code: 1,
+          };
+        }
+      }
+    }
+
+    return { isError: true, message: e, code: 1 }
   }
   
 }

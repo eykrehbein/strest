@@ -10,7 +10,6 @@ max_retries is best when combined with delay.  The request continues to execute 
 
 - `String`
   - `String.Hex`
-  - `String.Url`
   - `String.Email`
   - `String.IP`  :arrow_right: _IP Address_
   - `String.Url`
