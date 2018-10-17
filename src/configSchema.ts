@@ -13,6 +13,7 @@ const dataSchema = Joi.object().keys({
   .without('raw', 'formUrlEncoded')
 
 const validateSchema = Joi.object().keys({
+  max_retries: Joi.number().optional(),
   code: Joi.alternatives().try(Joi.string(), Joi.number()).optional(),
   headers: Joi.object().optional(),
   json: Joi.object().optional(),
@@ -29,7 +30,6 @@ const requestsSchema = Joi.object().keys({
   validate: validateSchema.optional(),
   log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
   delay: Joi.number().optional(),
-  repeat: Joi.number().optional(),
 })
 
 

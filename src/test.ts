@@ -45,8 +45,10 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>�
           const val = requests[requestName];
 
           let runTimes = 1;
-          if(typeof val.repeat !== 'undefined'){
-            runTimes = val.repeat;
+          if(typeof val.validate !== 'undefined'){
+            if(typeof val.validate.max_retries !== 'undefined'){
+              runTimes = val.validate.max_retries;
+            }
           }
           for(let i = 0; i != runTimes; i++) {
             // Delay for the specified number of milliseconds if given
@@ -59,53 +61,55 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>�
 
               waitSpinner.stop();
             }
-    
+
             const spinner = ora(`Testing ${chalk.bold(colorizeMain(requestName))}`).start();
             const startTime = new Date().getTime();
             
             let error = await performRequest(val, requestName, printAll);
-            
+
             const endTime = new Date().getTime();
             const execTime = (endTime - startTime) / 1000;
-    
+
             if(error.isError === true) {
               spinner.clear();
               console.log();
               spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n\n${error.message}`))
-              // if one test failed, don't run others
-              abortBecauseTestFailed = true;
-              return error.code;
-            } else {
-                if(error.message !== null) {
-                  // log the response info and data
-                  const res: AxiosResponse<any> = error.message;
-                  let parsedData = res.data;
-                  if(typeof res.data === 'object') {
-                    parsedData = JSON.stringify(res.data, null, 2);
-                  }
-
-                  let dataString = '';
-                  if(parsedData != '') {
-                    dataString = `\n\n${colorizeMain('Data')}: \n\n${chalk.hex(config.secondaryColor)(parsedData)}\n`;
-                  } else {
-                    dataString = `\n\n${colorizeMain('Data')}: No data received\n`;
-                  }
-
-                  spinner.succeed(
-                    `Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})` +
-                    `\n\n${colorizeMain('Status')}: ${res.status}`+
-                    `\n${colorizeMain('Status Text')}: ${res.statusText}` +
-                    `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(res.headers, null ,2))}` +
-                    `${dataString}`
-                  )
-                } else {
-                  spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})`)
-                }
+              // if validate.max_retries is set, continue otherwise fail
+              if(runTimes === i){
+                console.log(colorizeCustomRed(chalk.bold(`[ Validation ] Failed to validate within max_retries`)));
+                abortBecauseTestFailed = true;
+                return error.code;
               }
+            } else {
+              if(error.message !== null) {
+                // log the response info and data
+                const res: AxiosResponse<any> = error.message;
+                let parsedData = res.data;
+                if(typeof res.data === 'object') {
+                  parsedData = JSON.stringify(res.data, null, 2);
+                }
+
+                let dataString = '';
+                if(parsedData != '') {
+                  dataString = `\n\n${colorizeMain('Data')}: \n\n${chalk.hex(config.secondaryColor)(parsedData)}\n`;
+                } else {
+                  dataString = `\n\n${colorizeMain('Data')}: No data received\n`;
+                }
+
+                spinner.succeed(
+                  `Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})` +
+                  `\n\n${colorizeMain('Status')}: ${res.status}`+
+                  `\n${colorizeMain('Status Text')}: ${res.statusText}` +
+                  `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(res.headers, null ,2))}` +
+                  `${dataString}`
+                )
+              } else {
+                spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})`)
+              }
+              break
+            }
           }
-    
         }
-    
       }
     }
   }
@@ -311,7 +315,6 @@ function validateObjectFunc(validateObject: any, dataObj: any, key: any) {
         if(confirmCounter === 0) {
           return validationError(`The value of ${chalk.bold(key)} doesn't match with any of the given types`);
         }
-
       } else {
         // if the validation is a custom value -> the response data at this key has to match this value
         if(validateObject[key] !== dataObj[key]) {
@@ -320,9 +323,7 @@ function validateObjectFunc(validateObject: any, dataObj: any, key: any) {
           return null;
         }
       }
-    
   return null;
-
 }
 /**
  * Loop recursively through all object
