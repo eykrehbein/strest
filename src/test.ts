@@ -7,7 +7,7 @@ import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
 import { requestObjectSchema as requestObjectSchema } from './configSchema';
 import { config } from './configLoader';
-
+import * as fs from 'fs';
 
 /**
  * All Data that any request returns, will be stored here. After that it can be used in the following methods
@@ -487,8 +487,16 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
       }
     }
 
+    // if the result should be logged to file
+    if(requestObject.log.response_to_file === true || requestObject.log.response_to_file == 'true') {
+      if(typeof response.data === 'object') {
+        fs.writeFileSync(requestName + ".json", JSON.stringify(response.data, null, 2))
+        console.log("\nThe file " + requestName + ".json was saved!");
+      }
+    }
+
     // if the result should be logged
-    if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
+    if(requestObject.log.response_to_console === true || requestObject.log.response_to_console == 'true' || printAll === true) {
       return { isError: false, message: response, code: 0 }
     }
 

@@ -45,7 +45,8 @@ requests:                             # all test requests will be listed here
       params:
         foo1: bar1
         foo2: bar2
-    # log: true # uncomment this to log the response
+    # log:
+      # response_to_console: true # uncomment this to log the response
 ```
 
 _No more configuration needed, so you're ready to go!_
@@ -165,7 +166,8 @@ requests:
     data:
       params:
         name: Fake(name.firstName) Fake(name.lastName)
-    log: true
+    log:
+      response_to_console: true
 ```
 
 Visit [Faker.js Documentation](http://marak.github.io/faker.js/) for more methods

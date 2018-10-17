@@ -22,23 +22,26 @@ const validateSchema = Joi.object().keys({
   .without('json', 'raw')
   .without('raw', 'json');
 
+const logSchema = Joi.object().keys({
+  response_to_console: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
+  response_to_file: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
+})
+
 const requestsSchema = Joi.object().keys({
   url: Joi.string().required(),
   method: Joi.string().required(),
   data: dataSchema.optional(),
   headers: Joi.object().optional(),
   validate: validateSchema.optional(),
-  log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
+  log: logSchema.optional(),
   delay: Joi.number().optional(),
 })
-
 
 export const Schema = Joi.object({
   version: Joi.number().min(1).max(1),
   requests: Joi.object({}).pattern(/([^\s]+)/, requestsSchema),
   allowInsecure: Joi.boolean().optional()
 });
-
 
 // Typescript Schemas
 
@@ -48,6 +51,11 @@ interface requestObjectDataSchema {
   raw: string
 }
 
+interface logObjectDataSchema {
+  response_to_console: boolean | string,
+  response_to_file: boolean | string
+}
+
 export interface requestObjectSchema {
   delay: number,
   method: string,
@@ -55,7 +63,5 @@ export interface requestObjectSchema {
   data: requestObjectDataSchema,
   headers: object,
   validate: any,
-  log: boolean | string,
+  log: logObjectDataSchema,
 }
-
-
