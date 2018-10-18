@@ -190,7 +190,7 @@ requests:
 
 With **Strest** you can validate responses either by a specific value or by a `Type`. _[List of all valid Types](VALIDATION.md)_
 
-#### Raw Validation
+### Raw Validation
 
 ```yaml
 requests:
@@ -200,7 +200,7 @@ requests:
       raw: "the response has to match this string exactly"
 ```
 
-#### JSON Validation
+### JSON Validation
 
 ```yaml
 requests:
@@ -212,10 +212,10 @@ requests:
           name: Type(String) # name has to be of type String
           id: Type(Null | Number | String) # id has to be of type Number, String or Null
           iconUrl: Type(String.Url)
-        someOtherData: "match this string" 
+        someOtherData: "match this string"
 ```
 
-#### Header Validation
+### Header Validation
 
 ```yaml
 requests:
@@ -227,7 +227,7 @@ requests:
         access-control-allow-credentials: Type(Boolean | String)
 ```
 
-#### Response-Code Validation
+### Response-Code Validation
 
 ```yaml
 requests:
@@ -240,6 +240,27 @@ requests:
     ...
     validate:
       code: 2xx # allow all numbers in range of 200-299
+```
+
+### Retry until validation succeeds
+
+```yaml
+requests:
+  waiter:
+    url: https://postman-echo.com/time/now
+    method: GET
+    delay: 900
+    validate:
+      code: 200
+      max_retries: 30
+      raw: "Tue, 09 Oct 2018 03:07:20 GMT"
+```
+
+```bash
+STREST_GMT_DATE=$(TZ=GMT-0 date --date='15 seconds' --rfc-2822 | sed "s/+0000/GMT/g")
+# strest tests/success/validateMaxRetries.strest.yaml
+node dist/main.js tests/success/validateMaxRetries.strest.yaml
+
 ```
 
 ## Errors

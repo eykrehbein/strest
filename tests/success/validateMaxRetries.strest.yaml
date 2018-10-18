@@ -4,8 +4,9 @@ requests:
   waiter:
     url: https://postman-echo.com/time/now
     method: GET
-    delay: 900
+    # delay: 900
     validate:
-      max_retries: 30
-      raw: "Tue, 09 Oct 2018 03:07:20 GMT"
-    log: true
+      code: 200
+    #   max_retries: 30
+    #   raw: "Tue, 09 Oct 2018 03:07:20 GMT"
+    # log: true

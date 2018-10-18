@@ -17,7 +17,7 @@ const validateSchema = Joi.object().keys({
   code: Joi.alternatives().try(Joi.string(), Joi.number()).optional(),
   headers: Joi.object().optional(),
   json: Joi.object().optional(),
-  raw: Joi.string().optional()
+  raw: Joi.alternatives().try(Joi.string().optional(), Joi.string().regex(/^ENV/gmi)).optional()
 })
   .without('json', 'raw')
   .without('raw', 'json');
