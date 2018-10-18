@@ -258,9 +258,7 @@ requests:
 
 ```bash
 STREST_GMT_DATE=$(TZ=GMT-0 date --date='15 seconds' --rfc-2822 | sed "s/+0000/GMT/g")
-# strest tests/success/validateMaxRetries.strest.yaml
-node dist/main.js tests/success/validateMaxRetries.strest.yaml
-
+strest tests/success/validate/maxRetries.strest.yaml
 ```
 
 ## Errors
