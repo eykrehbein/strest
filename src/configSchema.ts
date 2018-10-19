@@ -25,6 +25,11 @@ const validateSchema = Joi.object().keys({
   .without('raw', 'jsonpath')
   .without('jsonpath', 'raw');
 
+const ifSchema = Joi.object().keys({
+  operand: Joi.string().required(),
+  equals: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
+})
+
 const requestsSchema = Joi.object().keys({
   url: Joi.string().required(),
   method: Joi.string().required(),
@@ -33,8 +38,8 @@ const requestsSchema = Joi.object().keys({
   validate: validateSchema.optional(),
   log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
   delay: Joi.number().optional(),
+  if: ifSchema.optional()
 })
-
 
 export const Schema = Joi.object({
   version: Joi.number().min(1).max(1),
@@ -54,6 +59,7 @@ interface requestObjectDataSchema {
 
 export interface requestObjectSchema {
   delay: number,
+  if: object,
   method: string,
   url: string,
   data: requestObjectDataSchema,

@@ -1,7 +1,7 @@
 version: 1
 
 requests:
-  notFound:
+  codeFailure:
     url: https://jsonplaceholder.typicode.com/test/
     method: GET
     validate:

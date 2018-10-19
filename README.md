@@ -60,7 +60,7 @@ strest tests/success/postman.strest.yml
 
 You may also run multiple test files at the same time by pointing to the directory, where the files are stored
 
-```yaml
+```bash
 strest # this will recursively search for all .strest.yml files in the cwd and it's subdirectories
 # or
 strest tests/success/chaining
@@ -211,6 +211,34 @@ requests:
     validate:
       json: 
         id: Variable(example_id) # Both, Var() and Variable() are allowed
+```
+
+## Only Execute If
+
+With **Strest** you can skip a response by setting a match criteria
+
+```yaml
+version: 1
+
+requests:
+  if_Set:
+    url: https://jsonplaceholder.typicode.com/posts
+    method: POST
+    data:
+      json:
+        foo: 1
+  skipped:
+    if:
+      operand: Value(if_Set.foo)
+      equals: 2
+    url: https://jsonplaceholder.typicode.com/todos/2
+    method: GET
+  executed:
+    if:
+      operand: Value(if_Set.foo)
+      equals: 1
+    url: https://jsonplaceholder.typicode.com/todos/2
+    method: GET
 ```
 
 ## Response Validation
