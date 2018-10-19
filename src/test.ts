@@ -21,6 +21,12 @@ let requestReponses: any = {
   // rawDataExample: 'asdaasds'
 }
 
+// The manually defined variables 
+// Usable throught Variable(variableName) or Var(variableName)
+let definedVariables: any = {
+
+}
+
 /**
  * Main handler that will perform the tests with each valid test object
  * @param testObjects 
@@ -32,8 +38,17 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
   
   for(testObject of testObjects){
 
-    if(testObject['allowInsecure']){
+    if(testObject['allowInsecure']) {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
+
+    if(testObject['variables']) {
+      // merge the existing variables with the new to allow multiple testfiles
+      // to use variables from previous files
+      definedVariables = {
+        ...definedVariables,
+        ...testObject['variables']
+      }
     }
 
     if(!abortBecauseTestFailed){
@@ -124,6 +139,8 @@ export const computeRequestObject = (obj: Object, r: any) => {
   const regValue = /Value\((.*?)\)/g
   const regFake = /Fake\((.*?)\)/g
   const regEnv = /Env\((.*?)\)/g
+  const regLongVar = /Variable\((.*?)\)/g
+  const regShortVar = /Var\((.*?)\)/g
   const innerReg = /\((.*?)\)/
   
   let item: any;
@@ -208,6 +225,22 @@ export const computeRequestObject = (obj: Object, r: any) => {
           if (innerMatch !== null) {
             try {
               (<any>obj)[item] = (<any>obj)[item].replace(m, process.env[innerMatch[1]]);
+            } catch (e) {
+              return e;
+            }
+          }
+        });
+      }
+      // find all Variable(...) or Var(...) strings in any item
+      if (regLongVar.test(val) === true || regShortVar.test(val) === true) {
+        let outterMatch = val.match(regLongVar) || val.match(regShortVar);
+        outterMatch.forEach((m: string) => {
+          const innerMatch = m.match(innerReg);
+          if (innerMatch !== null) {
+            try {
+              let correspondingItem = definedVariables[innerMatch[1]];
+
+              (<any>obj)[item] = (<any>obj)[item].replace(m, correspondingItem);
             } catch (e) {
               return e;
             }

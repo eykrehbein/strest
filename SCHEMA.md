@@ -2,6 +2,7 @@
 
 - [`version`](#version) _Required_
 - [`allowInsecure`](#allowInsecure)
+- [`variables`](#variables)
 - [`requests`](#requests) _Required_
   - [`request`](#request)
     - [`url`](#url) _Required_
@@ -26,6 +27,24 @@
 Property specifying the version of the schema. Available versions:
 
 - `1`
+
+### `variables`
+You can define custom variables to use them later in a request. They work across files, so you can define them in one file and use them in an other.
+
+```yml
+# Example
+variables:
+  example_url: https://jsonplaceholder.typicode.com/todos/1
+  example_id: 1
+
+requests:
+  test:
+    url: Var(example_url)
+    ...
+    validate:
+      json: 
+        id: Variable(example_id) # Both, Var() and Variable() are allowed
+```
 
 ### `allowInsecure`
 
