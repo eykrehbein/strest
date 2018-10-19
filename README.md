@@ -6,6 +6,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
   <img src="https://img.shields.io/github/package-json/v/eykhagen/strest.svg" alt="License: MIT">
+  <img src="https://badge.fury.io/js/strest-cli.svg" alt="npm version">
 </p>
 
 **:link: Connect multiple requests**: _Example_ Embed an authorization token you got as a response from a login request in your following requests automatically
