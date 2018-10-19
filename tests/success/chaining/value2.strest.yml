@@ -1,0 +1,12 @@
+version: 1
+
+requests:
+  verify_login:
+    url: https://jsonplaceholder.typicode.com/posts
+    method: POST
+    data:
+      json:
+        expect: Value(login.authenticated)
+    validate:
+      json:
+        expect: "true"

@@ -1,0 +1,8 @@
+version: 1
+
+requests:
+  login:
+    url: https://postman-echo.com/basic-auth
+    headers:
+      Authorization: Basic cG9zdG1hbjpwYXNzd29yZA==
+    method: GET

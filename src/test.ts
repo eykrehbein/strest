@@ -386,7 +386,35 @@ const createValidationLoop = (proofObject: any, dataToProof: any, key: any) => {
 
 /**
  * Validate a response with the given schema
+ * @param validateSchema
+ * @param headers
+ */
+const validateHeaders = (validateSchema: any, headers: any) => {
+  /**
+   * Example:
+   * validate:
+   *  headers:
+   *    content-type: application/json; charset=utf-8
+   */
+  let headersProofObject: any = validateSchema.headers;
+
+  if(typeof headersProofObject === 'object') {
+    for(let key in headersProofObject) {
+      let err = createValidationLoop(headersProofObject, headers, key)
+      if(err !== null) {
+        return err;
+      }
+    }
+  }
+
+  return null;
+}
+
+
+/**
+ * Validate a response with the given schema
  * @param validateSchema 
+ * @param dataToProof
  */
 const validateResponse = (validateSchema: any, dataToProof: any) => {
   /**
@@ -394,38 +422,12 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
    * validate:
    *  token: Type(string | null)
    */
-  
+
   let proofObject: any = validateSchema.json || validateSchema.raw || null;
-  let headersProofObject: any = validateSchema.headers;
-  let codeProofValue: any = validateSchema.code;
   
-  if (codeProofValue) {
-    if (!dataToProof.code) {
-      return validationError(`The key ${chalk.bold('code')} was defined in the validation schema but there the response did not contain a valid status code.`)
-    }
-
-    const codeChars = codeProofValue.toString().split('');
-    const dataChars = dataToProof.code.toString().split('');
-    for (let i = 0; i < codeChars.length; i++) {
-      const ch = codeChars[i];
-      const dataCh = dataChars[i];
-      if (ch !== 'x' && dataCh !== ch) {
-        return validationError(`The response status code should be ${chalk.bold(codeProofValue)} but the request returned code ${chalk.bold(dataToProof.code)}`);
-      }
-    }
-  }
-
   if(typeof proofObject === 'object') {
     for(let key in proofObject) {
       let err = createValidationLoop(proofObject, dataToProof, key)
-      if(err !== null) {
-        return err;
-      }
-    }
-  }
-  if(typeof headersProofObject === 'object') {
-    for(let key in headersProofObject) {
-      let err = createValidationLoop(headersProofObject, dataToProof.headers, key)
       if(err !== null) {
         return err;
       }
@@ -439,6 +441,32 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
     }
   }
 
+  return null;
+}
+
+/**
+ * Validate a response with the given schema
+ * @param validateSchema
+ * @param code
+ */
+const validateCode = (validateSchema: any, code: any) => {
+  /**
+   * Example:
+   * validate:
+   *  code: 200
+   */
+
+  let codeProofValue: any = validateSchema.code;
+  
+  const codeChars = codeProofValue.toString().split('');
+  const dataChars = code.toString().split('');
+  for (let i = 0; i < codeChars.length; i++) {
+    const ch = codeChars[i];
+    const dataCh = dataChars[i];
+    if (ch !== 'x' && dataCh !== ch) {
+      return validationError(`The response status code should be ${chalk.bold(codeProofValue)} but the request returned code ${chalk.bold(code)}`);
+    }
+  }
   return null;
 }
 
@@ -510,13 +538,24 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     } 
 
     if(typeof requestObject.validate !== 'undefined') {
-     
-      response.data.code = response.status;
-      response.data.headers = response.headers;
-      const err = validateResponse(requestObject.validate, response.data);
+      if(requestObject.validate.code){
+        const err = validateCode(requestObject.validate, response.status);
+        if(err !== null) {
+          return { isError: true, message: err, code: 1 }
+        }
+      }
+      if(requestObject.validate.headers){
+        const err = validateHeaders(requestObject.validate, response.headers);
+        if(err !== null) {
+          return { isError: true, message: err, code: 1 }
+        }
+      }
+      if(requestObject.validate.raw || requestObject.validate.json){
+        const err = validateResponse(requestObject.validate, response.data);
 
-      if(err !== null) {
-        return { isError: true, message: err, code: 1 }
+        if(err !== null) {
+          return { isError: true, message: err, code: 1 }
+        }
       }
     }
 
