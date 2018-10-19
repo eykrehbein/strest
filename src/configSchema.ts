@@ -17,10 +17,13 @@ const validateSchema = Joi.object().keys({
   code: Joi.alternatives().try(Joi.string(), Joi.number()).optional(),
   headers: Joi.object().optional(),
   json: Joi.object().optional(),
-  raw: Joi.alternatives().try(Joi.string().optional(), Joi.string().regex(/^ENV/gmi)).optional()
+  raw: Joi.alternatives().try(Joi.string().optional(), Joi.string().regex(/^ENV/gmi)).optional(),
+  jsonpath: Joi.object().optional(),
 })
   .without('json', 'raw')
-  .without('raw', 'json');
+  .without('raw', 'json')
+  .without('raw', 'jsonpath')
+  .without('jsonpath', 'raw');
 
 const requestsSchema = Joi.object().keys({
   url: Joi.string().required(),

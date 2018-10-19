@@ -7,7 +7,7 @@ import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
 import { requestObjectSchema as requestObjectSchema } from './configSchema';
 import { config } from './configLoader';
-
+import * as jp from 'jsonpath';
 
 /**
  * All Data that any request returns, will be stored here. After that it can be used in the following methods
@@ -447,6 +447,32 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
 /**
  * Validate a response with the given schema
  * @param validateSchema
+ * @param response
+ */
+const validateJp = (validateSchema: any, dataToProof: any) => {
+  /**
+   * Example:
+   * validate:
+   *  jq:
+   *    foo.bar: 1
+   */
+
+  let proofObject: any = validateSchema;
+
+  for (let key in proofObject) {
+    let value = proofObject[key];
+    let jsonPathValue = jp.value(dataToProof, key)
+    if(jsonPathValue === value){
+      } else {
+        return validationError(`The JSON response value should have been ${chalk.bold(value)} but instead it was ${chalk.bold(jsonPathValue)}`);
+      }
+    }
+  return null;
+}
+
+/**
+ * Validate a response with the given schema
+ * @param validateSchema
  * @param code
  */
 const validateCode = (validateSchema: any, code: any) => {
@@ -540,6 +566,12 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(typeof requestObject.validate !== 'undefined') {
       if(requestObject.validate.code){
         const err = validateCode(requestObject.validate, response.status);
+        if(err !== null) {
+          return { isError: true, message: err, code: 1 }
+        }
+      }
+      if(requestObject.validate.jsonpath){
+        const err = validateJp(requestObject.validate.jsonpath, response.data);
         if(err !== null) {
           return { isError: true, message: err, code: 1 }
         }

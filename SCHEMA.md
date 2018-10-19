@@ -17,6 +17,7 @@
       - [`code`](#code)
       - [`raw`](#validate)
       - [`json`](#validate)
+      - ['jsonpath'](#validate)
     - [`log`](#log)
     - [`delay`](#delay)
 
@@ -202,8 +203,10 @@ someRequest:
 Validate the incoming response either by a specific value or by a [`Type`](VALIDATION.md).
 [More information](README.md#ResponseValidation) about how to validate responses.
 
-### `code` 
+#### `code`
+
 Expect the returned status code to be a specific number or in a range of numbers.
+
 ```yaml
 # Example (simple)
 someRequest:
@@ -218,6 +221,31 @@ someRequest:
   validate:
     code: 2xx # expect the request to return a response code which is in the range of 200-299
 ```
+
+#### `jsonpath`
+
+Specify a [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) lookup.  The first match from the jsonpath is evaluated.  This currently deos not support objects.
+
+```yml
+version: 1
+
+requests:
+  jsonpath:
+    url: https://jsonplaceholder.typicode.com/posts
+    method: POST
+    data:
+      json:
+        myArray:
+        - foo: 1
+          bar: 1
+        - foo: 2
+          bar: 2
+    validate:
+      jsonpath:
+        myArray.1.foo: 2
+```
+
+Read [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) for more info and see [this file](tests/success/validate/jsonpath.strest.yml) for more complex example
 
 ### `log`
 

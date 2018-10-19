@@ -6,3 +6,12 @@ requests:
     headers:
       Authorization: Basic cG9zdG1hbjpwYXNzd29yZA==
     method: GET
+  verify_login:
+    url: https://jsonplaceholder.typicode.com/posts
+    method: POST
+    data:
+      json:
+        expect: Value(login.authenticated)
+    validate:
+      json:
+        expect: "true"
