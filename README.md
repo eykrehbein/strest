@@ -186,6 +186,26 @@ requests:
         fromEnvironment: Env(MY_ENV_VAR)
 ```
 
+## Replacing values with predefined custom variables
+
+**Usage**
+
+```yml
+version: 1
+# Define variables here
+variables:
+  example_url: https://jsonplaceholder.typicode.com/todos/1
+  example_id: 1
+
+requests:
+  test:
+    url: Var(example_url) # Use them in any field
+    ...
+    validate:
+      json: 
+        id: Variable(example_id) # Both, Var() and Variable() are allowed
+```
+
 ## Response Validation
 
 With **Strest** you can validate responses either by a specific value or by a `Type`. _[List of all valid Types](VALIDATION.md)_
