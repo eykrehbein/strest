@@ -30,6 +30,13 @@ const ifSchema = Joi.object().keys({
   equals: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
 })
 
+const authSchema = Joi.object().keys({
+  basic: Joi.object().keys({
+    username: Joi.string().required(),
+    password: Joi.string().required(),
+  }).optional()
+})
+
 const requestsSchema = Joi.object().keys({
   url: Joi.string().required(),
   method: Joi.string().required(),
@@ -38,7 +45,8 @@ const requestsSchema = Joi.object().keys({
   validate: validateSchema.optional(),
   log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
   delay: Joi.number().optional(),
-  if: ifSchema.optional()
+  if: ifSchema.optional(),
+  auth: authSchema.optional(),
 })
 
 export const Schema = Joi.object({
@@ -56,10 +64,19 @@ interface requestObjectDataSchema {
   params: object | string ,
   raw: string
 }
+interface basicObjectSchema {
+  username: string,
+  password: string
+}
+
+interface authObjectSchema {
+  basic: basicObjectSchema
+}
 
 export interface requestObjectSchema {
   delay: number,
   if: object,
+  auth: authObjectSchema,
   method: string,
   url: string,
   data: requestObjectDataSchema,
