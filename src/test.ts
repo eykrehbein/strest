@@ -499,8 +499,12 @@ const validateCode = (validateSchema: any, code: any) => {
    */
 
   let codeProofValue: any = validateSchema.code;
-  
-  const codeChars = codeProofValue.toString().split('');
+
+  if(typeof code === 'object') {
+    code = code.code;
+  }
+
+  const codeChars = validateSchema.code.split('');
   const dataChars = code.toString().split('');
   for (let i = 0; i < codeChars.length; i++) {
     const ch = codeChars[i];
@@ -636,7 +640,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
         } else {
           return { 
             isError: true, 
-            message: validationError(`The response status code should be ${chalk.bold(requestObject.validate.code)} but the request returned code ${chalk.bold(e.response.status)}`), 
+            message: vErr,
             code: 1,
           };
         }
