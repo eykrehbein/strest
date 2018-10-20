@@ -9,6 +9,8 @@ import { requestObjectSchema as requestObjectSchema } from './configSchema';
 import { config } from './configLoader';
 import * as jp from 'jsonpath';
 
+require('request-to-curl');
+
 /**
  * All Data that any request returns, will be stored here. After that it can be used in the following methods
  */
@@ -32,10 +34,14 @@ let definedVariables: any = {
  * @param testObjects 
  * @param printAll If true, all response information will be logged in the console
  */
-export const performTests = async (testObjects: object[], printAll: boolean) => {
+export const performTests = async (testObjects: object[], cmd: any) => {
   let testObject: any
   let abortBecauseTestFailed = false;
   
+  const printAll = cmd.print;
+
+  // true if the --output curl option was set
+  const toCurl = cmd.output == 'curl';
   for(testObject of testObjects){
 
     if(testObject['allowInsecure']) {
@@ -115,7 +121,7 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>�
                 return error.code;
               }
             } else {
-              if(error.message !== null) {
+              if(error.message !== null) {  
                 // log the response info and data
                 const res: AxiosResponse<any> = error.message;
                 let parsedData = res.data;
@@ -140,8 +146,11 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>�
               } else {
                 spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})`)
               }
-              break
             }
+            if(toCurl === true){
+              console.log(`\n${colorizeMain('Curl Equivalent: ')}${chalk.grey(error.curl)}\n`);
+            }
+            break
           }
         }
       }
@@ -593,6 +602,8 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(typeof response.data !== 'undefined') {
       requestReponses[requestName] = response.data;
     } 
+    
+    const req = response.request;
 
     if(typeof requestObject.validate !== 'undefined') {
 
@@ -625,10 +636,10 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
 
     // if the result should be logged
     if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
-      return { isError: false, message: response, code: 0 }
+      return { isError: false, message: response, code: 0, curl: req.toCurl() }
     }
 
-    return { isError: false, message: null, code: 0 }
+    return { isError: false, message: null, code: 0, curl: req.toCurl() }
   
   } catch(e) {
     if(typeof requestObject.validate !== 'undefined') {
@@ -638,7 +649,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
           return { 
             isError: false, 
             message: null,
-            code: 0,
+            code: 0
           };
         } else {
           return { 
