@@ -107,7 +107,10 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
               spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n\n${error.message}`))
               // if validate.max_retries is set, continue otherwise fail
               if(runTimes-1 === i){
-                console.log(colorizeCustomRed(chalk.bold(`[ Validation ] Failed to validate within max_retries`)));
+                // only show this message if max_retries is greater than 1
+                if(runTimes !== 1) {
+                  console.log(colorizeCustomRed(chalk.bold(`[ Validation ] Failed to validate within max_retries`)));
+                }
                 abortBecauseTestFailed = true;
                 return error.code;
               }
