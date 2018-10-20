@@ -373,6 +373,13 @@ someRequest:
   method: ...
 ```
 
+## Print out the equivalent curl commands
+
+To print out the equivalent curl commands for each request, add the following flag to the command
+```bash
+strest ... --output curl
+```
+
 ## Configuration
 
 You can create a file in your Computer's home directory called `.strestConfig.yml` which will be the custom config for **Strest**.
