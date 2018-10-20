@@ -8,6 +8,7 @@ const initializeCommands = () => {
   program
     .usage('[targetFileOrDirectory]')
     .option('-p, --print', 'Print out all response data')
+    .option('-o, --output <type>', 'Output the test as a specific equivalent')
     .action(async (dir, cmd: any) => {
       // use time to inform the user about how long the execution of the test took
       const executionStartedTime = new Date().getTime();
@@ -19,6 +20,7 @@ const initializeCommands = () => {
 
       const executionEndedTime = new Date().getTime();
       const executionTime = (executionEndedTime - executionStartedTime) / 1000;
+
       if(exitCode !== 0) {
         console.log(handler.colorizeCustomRed(chalk.bold(`[ Strest ] Failed before finishing all requests`)));
         console.log();
