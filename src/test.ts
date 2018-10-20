@@ -541,6 +541,19 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     axiosObject.headers = requestObject.headers;
   }
 
+  if(typeof requestObject.auth !== 'undefined') {
+    if(typeof requestObject.auth.basic !== 'undefined') {
+      const username = requestObject.auth.basic.username;
+      const password = requestObject.auth.basic.password;
+
+      const encoded = Buffer.from(username + ':' + password).toString('base64');
+      if(typeof axiosObject.headers === 'undefined') {
+        axiosObject.headers = {Authorization:null}
+      }
+      axiosObject.headers.Authorization = `Basic ${encoded}`;
+    }
+  }
+
   // data
   if(typeof requestObject.data !== 'undefined') {
     // json data
