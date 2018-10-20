@@ -7,15 +7,17 @@
 - [`allowInsecure`](#allowinsecure)
 - [`requests` **_Required_**](#requests-_required_)
     - [`request` **_At least one request is required_**](#request-_at-least-one-request-is-required_)
-        - [`if`](#if)
         - [`url` **_Required_**](#url-_required_)
         - [`method` **_Required_**](#method-_required_)
+        - [`if`](#if)
         - [`delay`](#delay)
         - [`data`](#data)
             - [`json`](#json)
             - [`raw`](#raw)
             - [`params`](#params)
         - [`headers`](#headers)
+        - [`auth`](#auth)
+          - [`basic`](#basic)
         - [`validate`](#validate)
             - [`raw`](#raw-1)
             - [`json`](#json-1)
@@ -236,6 +238,25 @@ someRequest:
     Authorization: Bearer Value(login.token)
     ...
 
+```
+#### `auth`
+
+Predefined authentication methods which will set the `Authorization` header automatically
+
+#### `basic`
+
+HTTP Basic Authentication. Requires username and password.
+
+```yaml
+# Example
+someRequest:
+  url:
+  method:
+  auth:
+    basic:
+      username: myusername
+      password: test123
+  ...
 ```
 
 #### `validate`
