@@ -7,7 +7,13 @@ import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
 import { requestObjectSchema as requestObjectSchema } from './configSchema';
 import { config } from './configLoader';
+<<<<<<< HEAD
 import * as fs from 'fs';
+=======
+import * as jp from 'jsonpath';
+
+require('request-to-curl');
+>>>>>>> upstream/master
 
 /**
  * All Data that any request returns, will be stored here. After that it can be used in the following methods
@@ -21,19 +27,38 @@ let requestReponses: any = {
   // rawDataExample: 'asdaasds'
 }
 
+// The manually defined variables 
+// Usable throught Variable(variableName) or Var(variableName)
+let definedVariables: any = {
+
+}
+
 /**
  * Main handler that will perform the tests with each valid test object
  * @param testObjects 
  * @param printAll If true, all response information will be logged in the console
  */
-export const performTests = async (testObjects: object[], printAll: boolean) =>Â {
+export const performTests = async (testObjects: object[], cmd: any) =>Â {
   let testObject: any
   let abortBecauseTestFailed = false;
   
+  const printAll = cmd.print;
+
+  // true if the --output curl option was set
+  const toCurl = cmd.output == 'curl';
   for(testObject of testObjects){
 
-    if(testObject['allowInsecure']){
+    if(testObject['allowInsecure']) {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    }
+
+    if(testObject['variables']) {
+      // merge the existing variables with the new to allow multiple testfiles
+      // to use variables from previous files
+      definedVariables = {
+        ...definedVariables,
+        ...testObject['variables']
+      }
     }
 
     if(!abortBecauseTestFailed){
@@ -64,8 +89,24 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
 
             const spinner = ora(`Testing ${chalk.bold(colorizeMain(requestName))}`).start();
             const startTime = new Date().getTime();
-            
-            let error = await performRequest(val, requestName, printAll);
+            let result = "succeeded"
+
+            let error = computeRequestObject(val, requestReponses);
+
+            if(error !== null) {
+              // pass
+            } else {
+              if(typeof val.if !== 'undefined'){
+                if(val.if.operand == val.if.equals){
+                  error = await performRequest(val, requestName, printAll);
+                } else {
+                  result = "skipped"
+                  error = { isError: false, message: null, code: 0 }
+                }
+              } else {
+                error = await performRequest(val, requestName, printAll);
+              }
+            }
 
             const endTime = new Date().getTime();
             const execTime = (endTime - startTime) / 1000;
@@ -75,13 +116,16 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
               console.log();
               spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n\n${error.message}`))
               // if validate.max_retries is set, continue otherwise fail
-              if(runTimes === i){
-                console.log(colorizeCustomRed(chalk.bold(`[ Validation ] Failed to validate within max_retries`)));
+              if(runTimes-1 === i){
+                // only show this message if max_retries is greater than 1
+                if(runTimes !== 1) {
+                  console.log(colorizeCustomRed(chalk.bold(`[ Validation ] Failed to validate within max_retries`)));
+                }
                 abortBecauseTestFailed = true;
                 return error.code;
               }
             } else {
-              if(error.message !== null) {
+              if(error.message !== null) {  
                 // log the response info and data
                 const res: AxiosResponse<any> = error.message;
                 let parsedData = res.data;
@@ -97,17 +141,20 @@ export const performTests = async (testObjects: object[], printAll: boolean) =>Â
                 }
 
                 spinner.succeed(
-                  `Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})` +
+                  `Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})` +
                   `\n\n${colorizeMain('Status')}: ${res.status}`+
                   `\n${colorizeMain('Status Text')}: ${res.statusText}` +
                   `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(res.headers, null ,2))}` +
                   `${dataString}`
                 )
               } elseÂ {
-                spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} succeeded (${chalk.bold(`${execTime.toString()}s`)})`)
+                spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})`)
               }
-              break
             }
+            if(toCurl === true){
+              console.log(`\n${colorizeMain('Curl Equivalent: ')}${chalk.grey(error.curl)}\n`);
+            }
+            break
           }
         }
       }
@@ -124,6 +171,8 @@ export const computeRequestObject = (obj: Object, r: any) => {
   const regValue = /Value\((.*?)\)/g
   const regFake = /Fake\((.*?)\)/g
   const regEnv = /Env\((.*?)\)/g
+  const regLongVar = /Variable\((.*?)\)/g
+  const regShortVar = /Var\((.*?)\)/g
   const innerReg = /\((.*?)\)/
   
   let item: any;
@@ -208,6 +257,22 @@ export const computeRequestObject = (obj: Object, r: any) => {
           if (innerMatch !== null) {
             try {
               (<any>obj)[item] = (<any>obj)[item].replace(m, process.env[innerMatch[1]]);
+            } catch (e) {
+              return e;
+            }
+          }
+        });
+      }
+      // find all Variable(...) or Var(...) strings in any item
+      if (regLongVar.test(val) === true || regShortVar.test(val) === true) {
+        let outterMatch = val.match(regLongVar) || val.match(regShortVar);
+        outterMatch.forEach((m: string) => {
+          const innerMatch = m.match(innerReg);
+          if (innerMatch !== null) {
+            try {
+              let correspondingItem = definedVariables[innerMatch[1]];
+
+              (<any>obj)[item] = (<any>obj)[item].replace(m, correspondingItem);
             } catch (e) {
               return e;
             }
@@ -353,7 +418,35 @@ const createValidationLoop = (proofObject: any, dataToProof: any, key: any) => {
 
 /**
  * Validate a response with the given schema
+ * @param validateSchema
+ * @param headers
+ */
+const validateHeaders = (validateSchema: any, headers: any) => {
+  /**
+   * Example:
+   * validate:
+   *  headers:
+   *    content-type: application/json; charset=utf-8
+   */
+  let headersProofObject: any = validateSchema.headers;
+
+  if(typeof headersProofObject === 'object') {
+    for(let key in headersProofObject) {
+      let err = createValidationLoop(headersProofObject, headers, key)
+      if(err !== null) {
+        return err;
+      }
+    }
+  }
+
+  return null;
+}
+
+
+/**
+ * Validate a response with the given schema
  * @param validateSchema 
+ * @param dataToProof
  */
 const validateResponse = (validateSchema: any, dataToProof: any) => {
   /**
@@ -361,38 +454,12 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
    * validate:
    *  token: Type(string | null)
    */
-  
+
   let proofObject: any = validateSchema.json || validateSchema.raw || null;
-  let headersProofObject: any = validateSchema.headers;
-  let codeProofValue: any = validateSchema.code;
   
-  if (codeProofValue) {
-    if (!dataToProof.code) {
-      return validationError(`The key ${chalk.bold('code')} was defined in the validation schema but there the response did not contain a valid status code.`)
-    }
-
-    const codeChars = codeProofValue.toString().split('');
-    const dataChars = dataToProof.code.toString().split('');
-    for (let i = 0; i < codeChars.length; i++) {
-      const ch = codeChars[i];
-      const dataCh = dataChars[i];
-      if (ch !== 'x' && dataCh !== ch) {
-        return validationError(`The response status code should be ${chalk.bold(codeProofValue)} but the request returned code ${chalk.bold(dataToProof.code)}`);
-      }
-    }
-  }
-
   if(typeof proofObject === 'object') {
     for(let key in proofObject) {
       let err = createValidationLoop(proofObject, dataToProof, key)
-      if(err !== null) {
-        return err;
-      }
-    }
-  }
-  if(typeof headersProofObject === 'object') {
-    for(let key in headersProofObject) {
-      let err = createValidationLoop(headersProofObject, dataToProof.headers, key)
       if(err !== null) {
         return err;
       }
@@ -410,17 +477,68 @@ const validateResponse = (validateSchema: any, dataToProof: any) => {
 }
 
 /**
+ * Validate a response with the given schema
+ * @param validateSchema
+ * @param response
+ */
+const validateJp = (validateSchema: any, dataToProof: any) => {
+  /**
+   * Example:
+   * validate:
+   *  jq:
+   *    foo.bar: 1
+   */
+
+  let proofObject: any = validateSchema;
+
+  for (let key in proofObject) {
+    let value = proofObject[key];
+    let jsonPathValue = jp.value(dataToProof, key)
+    if(jsonPathValue === value){
+      } else {
+        return validationError(`The JSON response value should have been ${chalk.bold(value)} but instead it was ${chalk.bold(jsonPathValue)}`);
+      }
+    }
+  return null;
+}
+
+/**
+ * Validate a response with the given schema
+ * @param validateSchema
+ * @param code
+ */
+const validateCode = (validateSchema: any, code: any) => {
+  /**
+   * Example:
+   * validate:
+   *  code: 200
+   */
+
+  let codeProofValue: any = validateSchema.code;
+
+  if(typeof code === 'object') {
+    code = code.code;
+  }
+
+  const codeChars = validateSchema.code.split('');
+  const dataChars = code.toString().split('');
+  for (let i = 0; i < codeChars.length; i++) {
+    const ch = codeChars[i];
+    const dataCh = dataChars[i];
+    if (ch !== 'x' && dataCh !== ch) {
+      return validationError(`The response status code should be ${chalk.bold(codeProofValue)} but the request returned code ${chalk.bold(code)}`);
+    }
+  }
+  return null;
+}
+
+/**
  * Perform the Request
  * @param requestObject All config data
  * @param requestName Name of the request
  * @param printAll If true, all response information will be logged in the console
  */
 const performRequest = async (requestObject: requestObjectSchema, requestName: string, printAll: boolean) => {
-
-  const error = computeRequestObject(requestObject, requestReponses);
-  if(error !== null) {
-    return { isError: true, message: error, code: 1}
-  }
 
   // parse the requestObject
   // let requestMethod: string, requestData: any, requestUrl: string, requestHeaders: any, requestParams: string;
@@ -441,6 +559,19 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   // headers 
   if(typeof requestObject.headers !== 'undefined') {
     axiosObject.headers = requestObject.headers;
+  }
+
+  if(typeof requestObject.auth !== 'undefined') {
+    if(typeof requestObject.auth.basic !== 'undefined') {
+      const username = requestObject.auth.basic.username;
+      const password = requestObject.auth.basic.password;
+
+      const encoded = Buffer.from(username + ':' + password).toString('base64');
+      if(typeof axiosObject.headers === 'undefined') {
+        axiosObject.headers = {Authorization:null}
+      }
+      axiosObject.headers.Authorization = `Basic ${encoded}`;
+    }
   }
 
   // data
@@ -475,15 +606,35 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(typeof response.data !== 'undefined') {
       requestReponses[requestName] = response.data;
     } 
+    
+    const req = response.request;
 
     if(typeof requestObject.validate !== 'undefined')Â {
-     
-      response.data.code = response.status;
-      response.data.headers = response.headers;
-      const err = validateResponse(requestObject.validate, response.data);
 
-      if(err !== null) {
-        return { isError: true, message: err, code: 1 }
+      if(typeof requestObject.validate.code !== 'undefined'){
+        const err = validateCode(requestObject.validate, response.status);
+        if(err !== null) {
+          return { isError: true, message: err, code: 1 }
+        }
+      }
+      if(requestObject.validate.jsonpath){
+        const err = validateJp(requestObject.validate.jsonpath, response.data);
+        if(err !== null) {
+          return { isError: true, message: err, code: 1 }
+        }
+      }
+      if(requestObject.validate.headers){
+        const err = validateHeaders(requestObject.validate, response.headers);
+        if(err !== null) {
+          return { isError: true, message: err, code: 1 }
+        }
+      }
+      if(requestObject.validate.raw || requestObject.validate.json){
+        const err = validateResponse(requestObject.validate, response.data);
+
+        if(err !== null) {
+          return { isError: true, message: err, code: 1 }
+        }
       }
     }
 
@@ -497,25 +648,25 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
 
     // if the result should be logged
     if(requestObject.log.response_to_console === true || requestObject.log.response_to_console == 'true' || printAll === true) {
-      return { isError: false, message: response, code: 0 }
+      return { isError: false, message: response, code: 0, curl: req.toCurl() }
     }
 
-    return { isError: false, message: null, code: 0 }
+    return { isError: false, message: null, code: 0, curl: req.toCurl() }
   
   } catch(e) {
     if(typeof requestObject.validate !== 'undefined') {
       if(typeof requestObject.validate.code !== 'undefined') {
-        const vErr = validateResponse({code: requestObject.validate.code}, {code: e.response.status});
+        const vErr = validateCode({code: requestObject.validate.code}, {code: e.response.status});
         if(vErr === null) {
           return { 
             isError: false, 
             message: null,
-            code: 0,
+            code: 0
           };
         } else {
           return { 
             isError: true, 
-            message: validationError(`The response status code should be ${chalk.bold(requestObject.validate.code)} but the request returned code ${chalk.bold(e.response.status)}`), 
+            message: vErr,
             code: 1,
           };
         }

@@ -1,0 +1,8 @@
+version: 1
+variables:
+  testUrl: https://jsonplaceholder.typicode.com/todos/1
+
+requests:
+  todoOne:
+    url: Var(testUrl)
+    method: GET

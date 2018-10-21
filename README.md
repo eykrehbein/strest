@@ -6,6 +6,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
   <img src="https://img.shields.io/github/package-json/v/eykhagen/strest.svg" alt="License: MIT">
+  <img src="https://badge.fury.io/js/strest-cli.svg" alt="npm version">
 </p>
 
 **:link: Connect multiple requests**: _Example_ Embed an authorization token you got as a response from a login request in your following requests automatically
@@ -16,23 +17,26 @@
 
 ## Getting Started
 
-Install Strest using `yarn`
-
 ```bash
+# Via Yarn
 yarn global add strest-cli
 ```
 
-Or via `npm`
-
 ```bash
+# Via npm
 npm i -g strest-cli
 ```
 
-To test something, you have to create a REST-API first. If you already have an API to test, you can skip this step.
+```bash
+# Via Docker
+docker build -t strest:dev .
+docker run --env STREST_URL=https://jsonplaceholder.typicode.com -v ${PWD}:/data strest:dev /data/tests/success/Env/
+docker run -v ${PWD}:/data strest:dev /data/tests/success/chaining/
+```
 
 We'll be using the [postman-echo](https://docs.postman-echo.com) test API in this tutorial.
 
-To get started, create a file called `tutorial.strest.yml` _(The extension needs to be `.strest.yml` or `.strest.yaml`)_
+To get started, we're using [this file](tests/success/postman.strest.yml) _(The extension needs to be `.strest.yml` or `.strest.yaml`)_
 
 ```yaml
 version: 1                            # only version at the moment
@@ -49,31 +53,30 @@ requests:                             # all test requests will be listed here
       # response_to_console: true # uncomment this to log the response
 ```
 
-_No more configuration needed, so you're ready to go!_
-
 To run the test, open your terminal and type
 
 ```bash
-strest tutorial.strest.yml
+strest tests/success/postman.strest.yml
 ```
 
 You may also run multiple test files at the same time by pointing to the directory, where the files are stored
 
-```yaml
+```bash
 strest # this will recursively search for all .strest.yml files in the cwd and it's subdirectories
 # or
-strest someDir/
+strest tests/success/chaining
 ```
 
 Success! If you've done everything correctly, you'll get a response like this
 
 ```
-[ Strest ] Found 1 test file(s)
-[ Strest ] Schema validation: 1 of 1 file(s) passed
+[ Strest ] Found 2 test file(s)
+[ Strest ] Schema validation: 2 of 2 file(s) passed
 
-✔ Testing testRequest succeeded (0.457s)
+✔ Testing login succeeded (0.378s)
+✔ Testing verify_login succeeded (0.334s)
 
-[ Strest ] ✨  Done in 0.484s
+[ Strest ] ✨  Done in 0.757s
 ```
 
 ## Writing .strest.yml test files
@@ -84,7 +87,7 @@ You can find a full __Documentation__ of how to write tests [here](SCHEMA.md)
 
 - [How to write Tests](SCHEMA.md)
 - [Validation Types](VALIDATION.md)
-- [Examples](examples/)
+- [Examples](tests/success/)
 - [Trello Board](https://trello.com/b/lqi6Aj9F)
 
 ## Using & Connecting multiple requests
@@ -150,6 +153,8 @@ As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)
 
 You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/Value(postKey.key)/...` or as a standalone term like `Authorization: Value(login.token)`
 
+This can also be used across files as demonstrated [here](tests/success/chaining)
+
 ## Using random values with Faker
 
 If you need to generate some random values, you are able to do so by using [Faker API](http://marak.github.io/faker.js/) templates. 
@@ -161,7 +166,7 @@ version: 1
 
 requests:
   userRequest:
-    url: http://localhost:3001/user
+    url: https://postman-echo.com/get
     method: GET
     data:
       params:
@@ -176,23 +181,73 @@ Visit [Faker.js Documentation](http://marak.github.io/faker.js/) for more method
 
 **Usage**
 
+```bash
+export STREST_URL=https://jsonplaceholder.typicode.com
+strest tests/success/Env/environ.strest.yml
+```
+
+```yaml
+version: 1
+# ensure the ENV var is set: `export STREST_URL=https://jsonplaceholder.typicode.com`
+requests:
+  environment:
+    url: Env(STREST_URL)/todos/1
+    method: GET
+```
+
+## Replacing values with predefined custom variables
+
+**Usage**
+
+```yml
+version: 1
+# Define variables here
+variables:
+  example_url: https://jsonplaceholder.typicode.com/todos/1
+  example_id: 1
+
+requests:
+  test:
+    url: Var(example_url) # Use them in any field
+    ...
+    validate:
+      json: 
+        id: Variable(example_id) # Both, Var() and Variable() are allowed
+```
+
+## Only Execute If
+
+With **Strest** you can skip a response by setting a match criteria
+
 ```yaml
 version: 1
 
 requests:
-  userRequest:
-    url: Env(MY_TEST_URL)/user
-    method: GET
+  if_Set:
+    url: https://jsonplaceholder.typicode.com/posts
+    method: POST
     data:
-      params:
-        fromEnvironment: Env(MY_ENV_VAR)
+      json:
+        foo: 1
+  skipped:
+    if:
+      operand: Value(if_Set.foo)
+      equals: 2
+    url: https://jsonplaceholder.typicode.com/todos/2
+    method: GET
+  executed:
+    if:
+      operand: Value(if_Set.foo)
+      equals: 1
+    url: https://jsonplaceholder.typicode.com/todos/2
+    method: GET
 ```
 
 ## Response Validation
 
 With **Strest** you can validate responses either by a specific value or by a `Type`. _[List of all valid Types](VALIDATION.md)_
 
-#### Raw Validation
+### Raw Validation
 
 ```yaml
 requests:
@@ -202,7 +257,7 @@ requests:
       raw: "the response has to match this string exactly"
 ```
 
-#### JSON Validation
+### JSON Validation
 
 ```yaml
 requests:
@@ -210,14 +265,37 @@ requests:
     ...
     validate:
       json:
-        user: 
+        user:
           name: Type(String) # name has to be of type String
           id: Type(Null | Number | String) # id has to be of type Number, String or Null
           iconUrl: Type(String.Url)
-        someOtherData: "match this string" 
+        someOtherData: "match this string"
 ```
 
-#### Header Validation
+### JSON Path Validation
+
+```yml
+version: 1
+
+requests:
+  jsonpath:
+    url: https://jsonplaceholder.typicode.com/posts
+    method: POST
+    data:
+      json:
+        myArray:
+        - foo: 1
+          bar: 1
+        - foo: 2
+          bar: 2
+    validate:
+      jsonpath:
+        myArray.1.foo: 2
+```
+
+Read [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) for more info and see [this file](tests/success/validate/jsonpath.strest.yml) for more complex example
+
+### Header Validation
 
 ```yaml
 requests:
@@ -229,7 +307,7 @@ requests:
         access-control-allow-credentials: Type(Boolean | String)
 ```
 
-#### Response-Code Validation
+### Response-Code Validation
 
 ```yaml
 requests:
@@ -242,6 +320,25 @@ requests:
     ...
     validate:
       code: 2xx # allow all numbers in range of 200-299
+```
+
+### Retry until validation succeeds
+
+```yaml
+requests:
+  waiter:
+    url: https://postman-echo.com/time/now
+    method: GET
+    delay: 900
+    validate:
+      code: 200
+      max_retries: 30
+      raw: "Tue, 09 Oct 2018 03:07:20 GMT"
+```
+
+```bash
+STREST_GMT_DATE=$(TZ=GMT-0 date --date='15 seconds' --rfc-2822 | sed "s/+0000/GMT/g")
+strest tests/success/validate/maxRetries.strest.yaml
 ```
 
 ## Errors
@@ -278,6 +375,13 @@ someRequest:
   method: ...
 ```
 
+## Print out the equivalent curl commands
+
+To print out the equivalent curl commands for each request, add the following flag to the command
+```bash
+strest ... --output curl
+```
+
 ## Configuration
 
 You can create a file in your Computer's home directory called `.strestConfig.yml` which will be the custom config for **Strest**.
@@ -290,15 +394,6 @@ config:
   secondaryColor: "#ff4757" # Hexadecimal Color Code
   errorColor: "#576574" # Hexadecimal Color Code
 
-```
-
-## Docker
-
-Use docker instead of setting up node.
-
-```bash
-docker build -t strest:dev .
-docker run --env testURL=https://jsonplaceholder.typicode.com -v ${PWD}:/data strest:dev /data/tests/success/successRequestEnv.strest.yaml
 ```
 
 ## License

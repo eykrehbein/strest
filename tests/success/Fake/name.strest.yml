@@ -1,0 +1,10 @@
+version: 1
+
+requests:
+  userRequest:
+    url: https://postman-echo.com/get
+    method: GET
+    data:
+      params:
+        name: Fake(name.firstName) Fake(name.lastName)
+    log: true

@@ -1,0 +1,10 @@
+version: 1
+requests:
+  maxRetries:
+    url: https://postman-echo.com/time/now
+    method: GET
+    delay: 900
+    validate:
+      code: 200
+      max_retries: 30
+      raw: Env(STREST_GMT_DATE)
