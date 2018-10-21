@@ -7,13 +7,10 @@ import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
 import { requestObjectSchema as requestObjectSchema } from './configSchema';
 import { config } from './configLoader';
-<<<<<<< HEAD
 import * as fs from 'fs';
-=======
 import * as jp from 'jsonpath';
 
 require('request-to-curl');
->>>>>>> upstream/master
 
 /**
  * All Data that any request returns, will be stored here. After that it can be used in the following methods
