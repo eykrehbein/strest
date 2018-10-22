@@ -1,6 +1,7 @@
 import * as recursiveWalk from 'recursive-readdir';
 import * as path from 'path';
 import * as fs from 'fs';
+var sortPaths = require('sort-paths');
 
 
 /**
@@ -22,7 +23,7 @@ export const findTestFiles = async (dir: string) => {
   if(!isFile) {
     // get all files paths (except those in .git and node_modules folder)
     const files = await recursiveWalk(cwd, ['node_modules', '.git']);
-    
+
     // all matching file paths will be stored here
     let matchList: string[] = [];
 
@@ -34,7 +35,7 @@ export const findTestFiles = async (dir: string) => {
         matchList.push(path);
       }  
     })
-    return matchList;
+    return sortPaths(matchList, "/");
   }
   // return just the file that was specified
   return [cwd];

@@ -1,6 +1,6 @@
 {
   "name": "strest-cli",
-  "version": "1.14.4",
+  "version": "1.14.5",
   "description": "A new dimension of REST API testing",
   "main": "dist/main.js",
   "repository": "https://github.com/eykhagen/strest",
@@ -28,7 +28,8 @@
     "ora": "^3.0.0",
     "qs": "^6.5.2",
     "recursive-readdir": "^2.2.2",
-    "request-to-curl": "^0.1.1"
+    "request-to-curl": "^0.1.1",
+    "sort-paths": "^1.1.1"
   },
   "jest": {
     "transform": {

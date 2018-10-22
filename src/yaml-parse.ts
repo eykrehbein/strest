@@ -9,13 +9,16 @@ import { Schema as joiSchema } from './configSchema';
 /**
  * Read and parse the test files to JSON
  * @param pathArray Array of the test-config files
+ * @param dir Directory for execution
  */
-export const parseTestingFiles = (pathArray: string[]) => {
+export const parseTestingFiles = (pathArray: string[], dir: string) => {
   let responseData: object[] = [];
   pathArray.map((filePath: any) => {
     try {
       const data = fs.readFileSync(filePath, 'utf8');
-      const parsed: object = yaml.safeLoad(data)
+      const parsed: any = yaml.safeLoad(data)
+      const removeFilename = filePath.substring(0, filePath.lastIndexOf("/") + 1);
+      parsed.relativePath = removeFilename.replace(path.join(process.cwd(), dir), "./")
       responseData.push(parsed);
     } catch(e) {
       writeErrorMessage(`An error occured while parsing ${path.relative(process.cwd(), filePath)}`)

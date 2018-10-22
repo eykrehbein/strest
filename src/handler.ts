@@ -32,7 +32,7 @@ export const start = async (dir:string , cmd: any) => {
   // step 2 :read the test files
 
   // Array of yaml-to-json parsed config data of how to perform the requests
-  const testSettings = yamlParser.parseTestingFiles(testFiles)
+  const testSettings = yamlParser.parseTestingFiles(testFiles, dir)
 
   // proof/check that all necessary config arguments are passed 
   const validateSchema = yamlParser.validateSchema(testSettings);

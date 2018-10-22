@@ -42,8 +42,12 @@ export const performTests = async (testObjects: object[], cmd: any) => {
 
   // true if the --output curl option was set
   const toCurl = cmd.output == 'curl';
+  let curPath = "./";
+  if(testObjects.length > 1){
+    console.log(chalk.blueBright("Executing tests in " + curPath));
+  }
   for(testObject of testObjects){
-
+  
     if(testObject['allowInsecure']) {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     }
@@ -56,7 +60,11 @@ export const performTests = async (testObjects: object[], cmd: any) => {
         ...testObject['variables']
       }
     }
-
+  
+    if (curPath != testObject.relativePath && testObjects.length > 1){
+      console.log(chalk.blueBright("Executing tests in: " + testObject.relativePath));
+    }
+    curPath = testObject.relativePath
     if(!abortBecauseTestFailed){
     
       const requests = testObject['requests'];
@@ -159,6 +167,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
   }
   return 0;
 } 
+
 /**
  * Take every curly braces and replace the value with the matching response data
  * @param obj Some Object to be tested  
