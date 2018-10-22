@@ -4,6 +4,6 @@ variables:
   testUrl: https://jsonplaceholder.typicode.com/todos/1
 
 requests:
-  todoOne:
+  my_variable_request:
     url: Var(testUrl)
     method: GET

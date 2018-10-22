@@ -1,7 +1,6 @@
 version: 1
 
 requests:
-  todoTwo:
+  chaining_var2:
     url: Var(testUrl)
     method: GET
-    log: true

@@ -13,4 +13,7 @@ requests:
     data:
       params:
         baz: Value(value1.args.foo)
-    log: true
+    validate:
+      json:
+        args:
+          baz: bar

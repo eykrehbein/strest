@@ -1,0 +1,8 @@
+version: 1
+
+requests:
+  code404:
+    url: https://jsonplaceholder.typicode.com/test/
+    method: GET
+    validate:
+      code: 404

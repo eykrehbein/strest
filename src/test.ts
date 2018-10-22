@@ -108,20 +108,21 @@ export const performTests = async (testObjects: object[], cmd: any) => {
             const execTime = (endTime - startTime) / 1000;
 
             if(error.isError === true) {
-              spinner.clear();
-              console.log();
-              spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n\n${error.message}`))
-              // if validate.max_retries is set, continue otherwise fail
-              if(runTimes-1 === i){
-                // only show this message if max_retries is greater than 1
-                if(runTimes !== 1) {
-                  console.log(colorizeCustomRed(chalk.bold(`[ Validation ] Failed to validate within max_retries`)));
+              if(runTimes === 1){
+                spinner.clear();
+                spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
+              } else {
+                if(runTimes - 1 === i){
+                  spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate within ${chalk.bold(colorizeCustomRed(runTimes.toString()))} (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
+                  abortBecauseTestFailed = true;
+                  return error.code;
+                } else {
+                  spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate. Retrying (${chalk.bold((runTimes -i).toString())})... (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
+                  continue
                 }
-                abortBecauseTestFailed = true;
-                return error.code;
               }
             } else {
-              if(error.message !== null) {  
+              if(error.message !== null) {
                 // log the response info and data
                 const res: AxiosResponse<any> = error.message;
                 let parsedData = res.data;
@@ -503,26 +504,20 @@ const validateJp = (validateSchema: any, dataToProof: any) => {
  * @param validateSchema
  * @param code
  */
-const validateCode = (validateSchema: any, code: any) => {
+const validateCode = (validateSchema: number | string, code: number) => {
   /**
    * Example:
    * validate:
    *  code: 200
    */
 
-  let codeProofValue: any = validateSchema.code;
-
-  if(typeof code === 'object') {
-    code = code.code;
-  }
-
-  const codeChars = validateSchema.code.split('');
+  const codeChars = validateSchema.toString().split('');
   const dataChars = code.toString().split('');
   for (let i = 0; i < codeChars.length; i++) {
     const ch = codeChars[i];
     const dataCh = dataChars[i];
     if (ch !== 'x' && dataCh !== ch) {
-      return validationError(`The response status code should be ${chalk.bold(codeProofValue)} but the request returned code ${chalk.bold(code)}`);
+      return validationError(`The response status code should be ${chalk.bold(validateSchema.toString())} but the request returned code ${chalk.bold(code.toString())}`);
     }
   }
   return null;
@@ -608,7 +603,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(typeof requestObject.validate !== 'undefined') {
 
       if(typeof requestObject.validate.code !== 'undefined'){
-        const err = validateCode(requestObject.validate, response.status);
+        const err = validateCode(requestObject.validate.code.toString(), response.status);
         if(err !== null) {
           return { isError: true, message: err, code: 1 }
         }
@@ -644,7 +639,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   } catch(e) {
     if(typeof requestObject.validate !== 'undefined') {
       if(typeof requestObject.validate.code !== 'undefined') {
-        const vErr = validateCode({code: requestObject.validate.code}, {code: e.response.status});
+        const vErr = validateCode(requestObject.validate.code, e.response.status);
         if(vErr === null) {
           return { 
             isError: false, 
