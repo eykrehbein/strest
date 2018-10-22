@@ -177,10 +177,11 @@ export const computeRequestObject = (obj: Object, r: any) => {
   const regValue = /Value\((.*?)\)/g
   const regFake = /Fake\((.*?)\)/g
   const regEnv = /Env\((.*?)\)/g
+  const regJsonPath = /JsonPath\{\{(.*?)\}\}/g
   const regLongVar = /Variable\((.*?)\)/g
   const regShortVar = /Var\((.*?)\)/g
   const innerReg = /\((.*?)\)/
-  
+  const innerHandlebarReg = /\{\{(.*?)\}\}/
   let item: any;
   for(item in obj) {
     let val = (<any>obj)[item];
@@ -264,6 +265,21 @@ export const computeRequestObject = (obj: Object, r: any) => {
             try {
               (<any>obj)[item] = (<any>obj)[item].replace(m, process.env[innerMatch[1]]);
             } catch (e) {
+              return e;
+            }
+          }
+        });
+      }
+      // find all JsonPath(...) strings in any item
+      if (regJsonPath.test(val) === true) {
+        let outterMatch = val.match(regJsonPath);
+        outterMatch.forEach((m: string) => {
+          const innerMatch = m.match(innerHandlebarReg);
+          if (innerMatch !== null) {
+            let jsonPathValue = jp.value(r, innerMatch[1].toString())
+            try {
+              (<any>obj)[item] = (<any>obj)[item].replace(m, jsonPathValue.toString())
+            } catch(e) {
               return e;
             }
           }
