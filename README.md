@@ -69,13 +69,18 @@ strest tests/success/chaining
 Success! If you've done everything correctly, you'll get a response like this
 
 ```
-[ Strest ] Found 2 test file(s)
-[ Strest ] Schema validation: 2 of 2 file(s) passed
+[ Strest ] Found 4 test file(s)
+[ Strest ] Schema validation: 4 of 4 file(s) passed
 
-✔ Testing login succeeded (0.378s)
-✔ Testing verify_login succeeded (0.334s)
+Executing tests in ./
+✔ Testing login succeeded (0.463s)
+✔ Testing verify_login succeeded (0.32s)
+✔ Testing verify_login_chained succeeded (0.233s)
+Executing tests in: ./var/
+✔ Testing chaining_var1 succeeded (0.128s)
+✔ Testing chaining_var2 succeeded (0.131s)
 
-[ Strest ] ✨  Done in 0.757s
+[ Strest ] ✨  Done in 1.337s
 ```
 
 ## Writing .strest.yml test files
@@ -153,6 +158,37 @@ As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)
 You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/Value(postKey.key)/...` or as a standalone term like `Authorization: Value(login.token)`
 
 This can also be used across files as demonstrated [here](tests/success/chaining)
+
+### JsonPath
+
+Using JsonPath is similar to using Value() but the queries can be more complex.  [This](https://github.com/dchester/jsonpath) library is used.
+
+> Note: The syntax is *not* `JsonPath()` it is `JsonPath{{}}`  This is because json path uses () in string matches
+
+```yaml
+version: 1
+requests:
+  set_JsonPath:
+    url: https://jsonplaceholder.typicode.com/posts
+    method: POST
+    data:
+      json:
+        phoneNumbers:
+            - {type: iPhone, number: 0123-4567-8888}
+            - {type: home, number: 0123-4567-8910}
+  JsonPath:
+    url: https://postman-echo.com/get
+    method: GET
+    data:
+      params:
+        foo: JsonPath{{set_JsonPath.phoneNumbers[?(@.type == "home")].number}}
+    validate:
+      json:
+        args:
+          foo: 0123-4567-8910
+```
+
+Practice [here](http://jsonpath.com/)
 
 ## Using random values with Faker
 
