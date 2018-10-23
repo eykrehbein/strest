@@ -30,7 +30,7 @@ npm i -g strest-cli
 ```bash
 # Via Docker
 # The image contains everything in tests
-docker run eykrehbein/strest:latest tests/success/chaining/
+docker run -it eykrehbein/strest:latest tests/success/chaining/
 
 # Bring your own test and environment
 docker run --env STREST_URL=https://jsonplaceholder.typicode.com -v ${PWD}:/data strest:dev /data/tests/success/Env/
