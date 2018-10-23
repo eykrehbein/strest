@@ -1,0 +1,11 @@
+version: 1
+
+requests:
+  requestHeaders:
+    url: https://postman-echo.com/headers
+    method: GET
+    headers:
+      exampleHeader: "Lorem ipsum dolor sit amet"
+    validate:
+      jsonpath:
+        headers.exampleheader: "Lorem ipsum dolor sit amet"

@@ -1,0 +1,10 @@
+version: 1
+
+requests:
+  deleteRequest:
+    url: Var(baseUrl)/delete
+    method: DELETE
+    data:
+      raw: Var(exampleData)
+    validate:
+      code: 200

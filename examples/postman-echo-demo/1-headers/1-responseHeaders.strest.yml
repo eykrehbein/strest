@@ -1,0 +1,14 @@
+version: 1
+
+requests:
+  responseHeaders:
+    url: https://postman-echo.com/response-headers
+    method: GET
+    data:
+      params:
+        foo1: bar1
+        foo2: bar2
+    validate:
+      headers:
+        foo1: bar1
+        foo2: bar2

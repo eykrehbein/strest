@@ -1,0 +1,10 @@
+version: 1
+
+requests:
+  patchRequest:
+    url: Var(baseUrl)/patch
+    method: PATCH
+    data:
+      raw: Var(exampleData)
+    validate:
+      code: 200
