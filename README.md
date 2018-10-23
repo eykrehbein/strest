@@ -416,6 +416,12 @@ To print out the equivalent curl commands for each request, add the following fl
 strest ... --output curl
 ```
 
+## Exiting on a failed request
+
+By default, **Strest** will exit the process with an exit code 1 if any request failed. 
+But you can also manipulate this by adding the `-n` or `--no-exit` flag into the command. This will instruct the program to go on
+with the following request if the request failed.
+
 ## Configuration
 
 You can create a file in your Computer's home directory called `.strestConfig.yml` which will be the custom config for **Strest**.

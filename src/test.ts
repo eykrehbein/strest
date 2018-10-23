@@ -119,11 +119,16 @@ export const performTests = async (testObjects: object[], cmd: any) => {
               if(runTimes === 1){
                 spinner.clear();
                 spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
+                if(!cmd.noExit) {
+                  return 1;
+                } 
               } else {
                 if(runTimes - 1 === i){
                   spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate within ${chalk.bold(colorizeCustomRed(runTimes.toString()))} (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
                   abortBecauseTestFailed = true;
-                  return error.code;
+                  if(!cmd.noExit) {
+                    return 1;
+                  }
                 } else {
                   spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate. Retrying (${chalk.bold((runTimes -i).toString())})... (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
                   continue
