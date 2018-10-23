@@ -52,7 +52,6 @@ export const start = async (dir:string , cmd: any) => {
   }
   console.log();
   const responseCode = await test.performTests(validTests, cmd) as Number;
-  console.log();
   return responseCode;
 }
 

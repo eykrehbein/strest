@@ -9,6 +9,7 @@ const initializeCommands = () => {
     .usage('[targetFileOrDirectory]')
     .option('-p, --print', 'Print out all response data')
     .option('-o, --output <type>', 'Output the test as a specific equivalent')
+    .option('-n, --no-exit', `Don't exit with code 1 when a request failed`)
     .action(async (dir, cmd: any) => {
       // use time to inform the user about how long the execution of the test took
       const executionStartedTime = new Date().getTime();
@@ -16,6 +17,9 @@ const initializeCommands = () => {
         cmd = dir;
         dir = null;
       }
+      // workaround for --no-exit option because options with hyphens can't be read
+      cmd.noExit = cmd.rawArgs.includes('-n') || cmd.rawArgs.includes('--no-exit');
+      
       const exitCode: any = await handler.start(dir,cmd);
 
       const executionEndedTime = new Date().getTime();
@@ -27,6 +31,7 @@ const initializeCommands = () => {
         // exit code does only take values between 0-255 so it's impossible to set the exit code to like 404
         process.exit(1);
       } else {
+        console.log();
         handler.writeMessage(`✨  Done in ${chalk.bold((executionTime).toString() + 's')}`, false);
         console.log();
         process.exit(0);
