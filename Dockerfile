@@ -1,5 +1,7 @@
 FROM node:8.12-alpine
 
-RUN npm i -g strest-cli
+RUN yarn global add strest-cli
+COPY /tests /app/tests
+WORKDIR /app
 
 ENTRYPOINT ["strest"]
