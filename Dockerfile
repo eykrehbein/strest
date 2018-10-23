@@ -1,7 +1,13 @@
-FROM node:8.12-alpine
+FROM node:8.12-alpine as builder
 
-RUN yarn global add strest-cli
-COPY /tests /app/tests
+COPY . /app
 WORKDIR /app
 
-ENTRYPOINT ["strest"]
+RUN npm i
+RUN npm run build
+
+FROM node:8.12-alpine
+COPY --from=builder /app /app
+WORKDIR /app
+
+ENTRYPOINT ["node", "dist/main.js"]

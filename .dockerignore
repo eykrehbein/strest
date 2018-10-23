@@ -1,0 +1,4 @@
+node_modules/
+yarn.lock
+validTypes.md
+package-lock.json
