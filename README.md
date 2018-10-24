@@ -29,11 +29,11 @@ npm i -g strest-cli
 
 ```bash
 # Via Docker
-# The image contains everything in tests
+# The image contains everything in the tests directory
 docker run -it eykrehbein/strest:latest tests/success/chaining/
 
 # Bring your own test and environment
-docker run --env STREST_URL=https://jsonplaceholder.typicode.com -v ${PWD}:/data strest:dev /data/tests/success/Env/
+docker run -it --env STREST_URL=https://jsonplaceholder.typicode.com -v ${PWD}:/app/data eykrehbein/strest:latest /data/tests/success/Env/
 ```
 
 We'll be using the [postman-echo](https://docs.postman-echo.com) test API in this tutorial.
