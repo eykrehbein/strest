@@ -1,6 +1,10 @@
 import * as recursiveWalk from 'recursive-readdir';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as Joi from 'joi';
+import * as yaml from 'js-yaml';
+import { writeErrorMessage } from './handler';
+import { BulkSchema as bulkSchema } from './configSchema';
 var sortPaths = require('sort-paths');
 
 
@@ -39,4 +43,35 @@ export const findTestFiles = async (dir: string) => {
   }
   // return just the file that was specified
   return [cwd];
+}
+
+/**
+ * Recurse all .strest.yaml files based on bulk definition
+ * @param bulk file containing all executions
+ */
+export const getBulk = async (bulk: string) => {
+  let cwd = process.cwd();
+  let allTests: string[] = [];
+  // if a custom path was defined
+  cwd = path.join(process.cwd(), bulk);
+  if(!fs.existsSync(cwd)){
+    return [];
+  }
+  const data = fs.readFileSync(bulk, 'utf8');
+  const files: any = yaml.safeLoad(data)
+  const test = Joi.validate(files, bulkSchema);
+  if(test.error === null) {
+    for (const file of files) {
+      const newTests = await findTestFiles(file)
+      if(newTests == null){
+        writeErrorMessage(`Path from bulk tests ${file} does not exist`)
+        allTests = []
+      }else{
+        allTests = allTests.concat(newTests)
+      }
+    }
+  } else {
+    writeErrorMessage(`Validation failed of bulk file ${bulk}`)
+  }
+  return allTests
 }

@@ -86,4 +86,4 @@ export interface requestObjectSchema {
   log: boolean | string,
 }
 
-
+export const BulkSchema = Joi.array().items(Joi.string());

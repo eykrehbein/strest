@@ -6,10 +6,12 @@ import * as handler from './handler';
 const initializeCommands = () => {
   // main command
   program
+    .version(require('../package.json').version)
     .usage('[targetFileOrDirectory]')
     .option('-p, --print', 'Print out all response data')
     .option('-o, --output <type>', 'Output the test as a specific equivalent')
     .option('-n, --no-exit', `Don't exit with code 1 when a request failed`)
+    .option('-b, --bulk', 'Execute Tests and directories defined in the specified yml')
     .action(async (dir, cmd: any) => {
       // use time to inform the user about how long the execution of the test took
       const executionStartedTime = new Date().getTime();

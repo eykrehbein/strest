@@ -373,8 +373,8 @@ requests:
 ```
 
 ```bash
-STREST_GMT_DATE=$(TZ=GMT-0 date --date='15 seconds' --rfc-2822 | sed "s/+0000/GMT/g")
-strest tests/success/validate/maxRetries.strest.yaml
+export STREST_GMT_DATE=$(TZ=GMT-0 date --date='15 seconds' --rfc-2822 | sed "s/+0000/GMT/g")
+strest tests/success/validate/maxRetries.strest.yml
 ```
 
 ## Errors
@@ -423,6 +423,21 @@ strest ... --output curl
 By default, **Strest** will exit the process with an exit code 1 if any request failed. 
 But you can also manipulate this by adding the `-n` or `--no-exit` flag into the command. This will instruct the program to go on
 with the following request if the request failed.
+
+## Bulk tests
+
+Specify a list of tests or directories to execute.
+
+`strest tests/success/bulk.yml -b`
+
+Contents of bulk.yml:
+
+```yaml
+---
+- tests/success/postman.strest.yml
+- tests/success/two.strest.yml
+- tests/success/chaining/
+```
 
 ## Configuration
 

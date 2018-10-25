@@ -14,7 +14,12 @@ export const start = async (dir:string , cmd: any) => {
 
   console.log();
   // step 1: find all test files
-  const testFiles = await fsModule.findTestFiles(dir);
+  let testFiles
+  if(cmd.bulk){
+    testFiles = await fsModule.getBulk(dir);
+  }else{
+    testFiles = await fsModule.findTestFiles(dir);
+  }
   if(testFiles === null) {
     writeErrorMessage(`Path ${chalk.underline(path.join(process.cwd(), dir))} does not exist`);
     return 1;
