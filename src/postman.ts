@@ -104,7 +104,10 @@ const buildDirs = async (items: Array<any>, working_dir: any, result: any[]) =>Â
       try {
         const script = i.event[0].script.exec.toString();
         
-        const codeReg = /response\.to\.have\.status\(\d+\)/gm;
+        const codeReg = /pm\.response\.to\.have\.status\(\d+\)/gm;
+        const rawBodyReg = /pm\.response\.to\.have\.body\(.*\);/gm;
+        const marksReg1 = /\"(.*?)\"/;
+        const marksReg2 = /\`(.*?)\`/;
         const innerReg = /\((.*?)\)/
 
         const codeMatch = codeReg.exec(script);
@@ -116,6 +119,29 @@ const buildDirs = async (items: Array<any>, working_dir: any, result: any[]) =>Â
           }
           request[request_name].validate.code = codeToProof;
         }
+
+        const rawBodyMatch = rawBodyReg.exec(script);
+        if(rawBodyMatch !== null) {
+          const innerVal = innerReg.exec(rawBodyMatch[0]);
+          const rawWithQuo = innerVal![1]
+          let rawToProof
+
+          const quoMatch1 = marksReg2.exec(rawWithQuo);
+          // check for ` marks 
+          if(quoMatch1 !== null)Â {
+            rawToProof = quoMatch1[1];
+          } else {
+            // if there are no ` marks, check for normal "" quotation marks
+            const quoMatch2 = marksReg1.exec(rawWithQuo);
+            rawToProof = quoMatch2![1];
+          }
+
+          if(typeof request[request_name].validate === 'undefined')Â {
+            request[request_name].validate = {};
+          }
+          request[request_name].validate.raw = rawToProof;
+        }
+
 
       } catch(e) {
         // no scripts found

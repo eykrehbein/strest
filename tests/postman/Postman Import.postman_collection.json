@@ -170,6 +170,7 @@
 								"exec": [
 									"pm.test(\"response is ok\", function () {",
 									"    pm.response.to.have.status(201);",
+									"    pm.response.to.have.body(`my test boood`)",
 									"});",
 									"console.log(responseBody)",
 									"pm.test(\"response body has json with request body\", function () {",
