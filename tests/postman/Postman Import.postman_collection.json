@@ -126,7 +126,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
+									
 									"});",
 									"",
 									"pm.test(\"response body has json with request body\", function () {",
@@ -169,7 +169,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test(\"response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
+									"    pm.response.to.have.status(201);",
 									"});",
 									"console.log(responseBody)",
 									"pm.test(\"response body has json with request body\", function () {",

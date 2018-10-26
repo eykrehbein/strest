@@ -86,7 +86,7 @@ const buildDirs = async (items: Array<any>, working_dir: any, result: any[]) =>Â
       request[request_name].method = i.request.method
       if (i.request.header){
         for (let header of i.request.header){
-          console.log(header)
+   //       console.log(header)
         }
       }
       if (i.request.body){
@@ -99,6 +99,28 @@ const buildDirs = async (items: Array<any>, working_dir: any, result: any[]) =>Â
           }
         }
       }
+
+      // convert scripts
+      try {
+        const script = i.event[0].script.exec.toString();
+        
+        const codeReg = /response\.to\.have\.status\(\d+\)/gm;
+        const innerReg = /\((.*?)\)/
+
+        const codeMatch = codeReg.exec(script);
+        if(codeMatch !== null) {
+          const innerVal = innerReg.exec(codeMatch[0]);
+          const codeToProof = innerVal![1];
+          if(typeof request[request_name].validate === 'undefined')Â {
+            request[request_name].validate = {};
+          }
+          request[request_name].validate.code = codeToProof;
+        }
+
+      } catch(e) {
+        // no scripts found
+      }
+
       result.push(request)
     }
   }
