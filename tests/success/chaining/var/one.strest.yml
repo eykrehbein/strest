@@ -4,5 +4,5 @@ variables:
 
 requests:
   chaining_var1:
-    url: Var(testUrl)
+    url: "{{ testUrl }}"
     method: GET

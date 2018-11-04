@@ -19,6 +19,11 @@ nunjucksEnv.addGlobal('Faker', function(faked: string) {
   return faker.fake(`{{${faked}}}`);
 })
 
+nunjucksEnv.addGlobal('Env', function(envi: string) {
+  let environ = process.env[envi]
+  return environ;
+})
+
 /**
  * All Data that any request returns, will be stored here. After that it can be used in the following methods
  */
@@ -200,36 +205,6 @@ export const computeRequestObject = (requestName: string, raw: string, r: any) =
   } catch(e) {
     throw e;
   }
-
-  //     // find all Env(...) strings in any item
-  //     if (regEnv.test(val) === true) {
-  //       let outterMatch = val.match(regEnv);
-  //       outterMatch.forEach((m: string) => {
-  //         const innerMatch = m.match(innerReg);
-  //         if (innerMatch !== null) {
-  //           try {
-  //             (<any>obj)[item] = (<any>obj)[item].replace(m, process.env[innerMatch[1]]);
-  //           } catch (e) {
-  //             return e;
-  //           }
-  //         }
-  //       });
-  //     }
-  //     // find all JsonPath(...) strings in any item
-  //     if (regJsonPath.test(val) === true) {
-  //       let outterMatch = val.match(regJsonPath);
-  //       outterMatch.forEach((m: string) => {
-  //         const innerMatch = m.match(innerHandlebarReg);
-  //         if (innerMatch !== null) {
-  //           let jsonPathValue = jp.value(r, innerMatch[1].toString())
-  //           try {
-  //             (<any>obj)[item] = (<any>obj)[item].replace(m, jsonPathValue.toString())
-  //           } catch(e) {
-  //             return e;
-  //           }
-  //         }
-  //       });
-  //     }
 }
 
 /**
