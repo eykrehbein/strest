@@ -6,4 +6,6 @@ requests:
     method: GET
     data:
       params:
-        name: Fake(name.firstName) Fake(name.lastName)
+        first: '{{ Faker("name.firstName") }}'
+        first_last: '{{ Faker("name.firstName")}} {{ Faker("name.lastName")}}'
+    log: true

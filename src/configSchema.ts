@@ -50,6 +50,7 @@ const requestsSchema = Joi.object().keys({
 })
 
 export const Schema = Joi.object({
+  raw: Joi.string().required(),
   relativePath: Joi.string().required(),
   version: Joi.number().min(1).max(1),
   requests: Joi.object({}).pattern(/([^\s]+)/, requestsSchema),
