@@ -29,7 +29,7 @@ requests:
     method: GET
     data:
       params:
-        foo: JsonPath{{set_JsonPath.phoneNumbers[?(@.type == "home")].number}}
+        foo: '{{ JsonPath("set_JsonPath.phoneNumbers[?(@.type == \"home\")].number") }}'
     validate:
       json:
         args:

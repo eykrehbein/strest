@@ -15,8 +15,8 @@ require('request-to-curl');
 
 const nunjucksEnv = new nunjucks.Environment();
 
-nunjucksEnv.addGlobal('Faker', function(foo: string) {
-  return faker.fake(`{{${foo}}}`);
+nunjucksEnv.addGlobal('Faker', function(faked: string) {
+  return faker.fake(`{{${faked}}}`);
 })
 
 /**
@@ -181,21 +181,17 @@ export const performTests = async (testObjects: object[], cmd: any) => {
 } 
 
 /**
- * Take every curly braces and replace the value with the matching response data
+ * Use nunjucks to replace and update the object
  * @param obj working obj
  */
 export const computeRequestObject = (requestName: string, raw: string, r: any) => {
-  // Find everything that matches Value(someValueString)
-  // const regValue = /Value\((.*?)\)/g
-  // const regLongVar = /Variable\((.*?)\)/g
-  // const regShortVar = /Var\((.*?)\)/g
 
-  // const regEnv = /Env\((.*?)\)/g
-  // const regJsonPath = /JsonPath\{\{(.*?)\}\}/g
-  // const innerReg = /\((.*?)\)/
-  // const innerHandlebarReg = /\{\{(.*?)\}\}/
-  // let item: any;
   let merged = {...r, ...definedVariables};
+
+  nunjucksEnv.addGlobal('JsonPath', function(path: string) {
+    return jp.value(r, path)
+  })
+
   // Parse obj using nunjucks
   try {
     let converted = nunjucksEnv.renderString(raw, merged)
@@ -204,64 +200,6 @@ export const computeRequestObject = (requestName: string, raw: string, r: any) =
   } catch(e) {
     throw e;
   }
-  // console.log(JSON.stringify(foo))
-  // for(item in obj) {
-  //   let val = (<any>obj)[item];
-  //   if(typeof val === 'object') {
-  //     // be recursive
-  //     const step: any = computeRequestObject(val, r)
-  //     if(step !== null) {
-  //       return step;
-  //     }
-  //   } else {
-  //     // find all Value(...) strings in any item
-  //     if(regValue.test(val) === true) {
-
-  //       let outterMatchValue = val.match(regValue);
-  //       let returnVal = null;
-  //       outterMatchValue.forEach((m: string) => {
-  //         const innerMatchValue = m.match(innerReg);
-  //         if(innerMatchValue !== null) {
-  //           try {
-  //             const index = (obj:any, i:any) => {
-  //               const arrIndexReg = /\[(.*?)\]/gm;
-  //               const arrNameReg = /^[^\[]*/gm;
-  //               let m;
-  //               const arrIndices = [];
-
-  //               do {
-  //                 m = arrIndexReg.exec(i);
-  //                 if (m !== null) {
-  //                   arrIndices.push(parseInt(m[1]));
-  //                 }
-  //               } while(m !== null);
-
-  //               if (arrIndices.length) {
-  //                 const name = i.match(arrNameReg)[0];
-  //                 return arrIndices.reduce((agg:any, i:any) => agg[i], obj[name]);
-  //               }
-
-  //               return obj[i];
-  //             }
-
-  //             let reducedValue = innerMatchValue[1].split('.').reduce(index, r)
-  //             if(typeof reducedValue !== 'undefined') {
-  //               // replace the string with the new value
-  //               (<any>obj)[item] = (<any>obj)[item].replace(m, reducedValue)
-  //             } else {
-  //               returnVal = `There is no corresponding response value to ${chalk.bold(innerMatchValue[1])}`;
-  //               return;
-  //             }
-  //           } catch(e) {
-  //             returnVal = e;
-  //             return;
-  //           }
-  //         }
-  //       });
-  //       if(returnVal !== null) {
-  //         return returnVal;
-  //       }
-  //     }
 
   //     // find all Env(...) strings in any item
   //     if (regEnv.test(val) === true) {
@@ -292,24 +230,6 @@ export const computeRequestObject = (requestName: string, raw: string, r: any) =
   //         }
   //       });
   //     }
-  //     // find all Variable(...) or Var(...) strings in any item
-  //     if (regLongVar.test(val) === true || regShortVar.test(val) === true) {
-  //       let outterMatch = val.match(regLongVar) || val.match(regShortVar);
-  //       outterMatch.forEach((m: string) => {
-  //         const innerMatch = m.match(innerReg);
-  //         if (innerMatch !== null) {
-  //           try {
-  //             let correspondingItem = definedVariables[innerMatch[1]];
-
-  //             (<any>obj)[item] = (<any>obj)[item].replace(m, correspondingItem);
-  //           } catch (e) {
-  //             return e;
-  //           }
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
 }
 
 /**
