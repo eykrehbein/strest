@@ -5,7 +5,7 @@ import axios, { AxiosResponse } from 'axios';
 import * as qs from 'qs';
 import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
-import { requestObjectSchema as requestObjectSchema } from './configSchema';
+import { requestsObjectSchema as requestObjectSchema } from './configSchema';
 import { config } from './configLoader';
 import * as jp from 'jsonpath';
 import * as nunjucks from 'nunjucks';
@@ -469,13 +469,12 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
 
   let axiosObject: AxiosObject = {};
   // optional keys 
-  
-  axiosObject.url = requestObject.url;
-  axiosObject.method = requestObject.method;
+  axiosObject.url = requestObject.request.url;
+  axiosObject.method = requestObject.request.method;
 
   // headers 
-  if(typeof requestObject.headers !== 'undefined') {
-    axiosObject.headers = requestObject.headers;
+  if(typeof requestObject.request.headers !== 'undefined') {
+    axiosObject.headers = requestObject.request.headers;
   }
 
   if(typeof requestObject.auth !== 'undefined') {
@@ -492,30 +491,20 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   }
 
   // data
-  if(typeof requestObject.data !== 'undefined') {
+  if(typeof requestObject.request.postData !== 'undefined') {
     // json data
-    if(typeof requestObject.data.json !== 'undefined') {
-      axiosObject.data = requestObject.data.json;
+    if(requestObject.request.postData.params) {
+      axiosObject.data = requestObject.request.postData.params;
     }
-    // raw data
-    if(typeof requestObject.data.raw !== 'undefined') {
-      axiosObject.data  = requestObject.data.raw;
+    // text data
+    if(requestObject.request.postData.text) {
+      axiosObject.data = requestObject.request.postData.text;
     }
-    // params
-    if(typeof requestObject.data.params !== 'undefined') {
-      if(typeof requestObject.data.params === 'string') {
-        if(requestObject.data.params.startsWith('?')){
-          axiosObject.url += requestObject.data.params;
-        } else {
-          axiosObject.url += '?'+requestObject.data.params;
-        }
-      }
-      // stringify params
-      if(typeof requestObject.data.params === 'object') {
-        axiosObject.url += '?' + qs.stringify(requestObject.data.params)
-      }
+    // queryString
+    if(typeof requestObject.request.queryString !== 'undefined') {
+      // stringify queryString
+      axiosObject.url += '?' + qs.stringify(requestObject.request.queryString)
     }
-
   }
 
   try {
@@ -525,30 +514,27 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     } 
     
     const req = response.request;
-
-    if(typeof requestObject.validate !== 'undefined') {
-
-      if(typeof requestObject.validate.code !== 'undefined'){
-        const err = validateCode(requestObject.validate.code.toString(), response.status);
+    if(requestObject.response){
+      if(typeof requestObject.response._validateStatus !== 'undefined'){
+        const err = validateCode(requestObject.response._validateStatus.toString(), response.status);
         if(err !== null) {
           return { isError: true, message: err, code: 1 }
         }
       }
-      if(requestObject.validate.jsonpath){
-        const err = validateJp(requestObject.validate.jsonpath, response.data);
+      if(requestObject.response._validateJsonPath){
+        const err = validateJp(requestObject.response._validateJsonPath, response.data);
         if(err !== null) {
           return { isError: true, message: err, code: 1 }
         }
       }
-      if(requestObject.validate.headers){
-        const err = validateHeaders(requestObject.validate, response.headers);
+      if(requestObject.response._validateHeaders){
+        const err = validateHeaders(requestObject.response._validateHeaders, response.headers);
         if(err !== null) {
           return { isError: true, message: err, code: 1 }
         }
       }
-      if(requestObject.validate.raw || requestObject.validate.json){
-        const err = validateResponse(requestObject.validate, response.data);
-
+      if(requestObject.response._validateContent){
+        const err = validateResponse(requestObject.response._validateContent, response.data);
         if(err !== null) {
           return { isError: true, message: err, code: 1 }
         }
@@ -563,9 +549,9 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     return { isError: false, message: null, code: 0, curl: req.toCurl() }
   
   } catch(e) {
-    if(typeof requestObject.validate !== 'undefined') {
-      if(typeof requestObject.validate.code !== 'undefined') {
-        const vErr = validateCode(requestObject.validate.code, e.response.status);
+    if(typeof requestObject.response !== 'undefined') {
+      if(typeof requestObject.response._validateStatus !== 'undefined') {
+        const vErr = validateCode(requestObject.response._validateStatus, e.response.status);
         if(vErr === null) {
           return { 
             isError: false, 
@@ -573,7 +559,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
             code: 0
           };
         } else {
-          return { 
+          return {
             isError: true, 
             message: vErr,
             code: 1,
@@ -581,7 +567,6 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
         }
       }
     }
-
     return { isError: true, message: e, code: 1 }
   }
   

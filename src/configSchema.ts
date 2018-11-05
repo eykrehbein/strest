@@ -1,29 +1,5 @@
 import * as Joi from 'joi';
-
-const dataSchema = Joi.object().keys({
-  json: Joi.object().optional(), // data as JSON Body
-  params: Joi.alternatives().try(Joi.string(), Joi.object()).optional(), // data as url-params
-  raw: Joi.string().optional()
-}).min(1).max(2)
-  .without('json', 'formUrlEncoded')
-  .without('formUrlEncoded', 'json')
-  .without('json', 'raw')
-  .without('raw', 'json')
-  .without('formUrlEncoded', 'raw')
-  .without('raw', 'formUrlEncoded')
-
-const validateSchema = Joi.object().keys({
-  max_retries: Joi.number().optional(),
-  code: Joi.alternatives().try(Joi.string(), Joi.number()).optional(),
-  headers: Joi.object().optional(),
-  json: Joi.object().optional(),
-  raw: Joi.alternatives().try(Joi.string().optional(), Joi.string().regex(/^ENV/gmi)).optional(),
-  jsonpath: Joi.object().optional(),
-})
-  .without('json', 'raw')
-  .without('raw', 'json')
-  .without('raw', 'jsonpath')
-  .without('jsonpath', 'raw');
+// Uses spec from: http://www.softwareishard.com/blog/har-12-spec/
 
 const ifSchema = Joi.object().keys({
   operand: Joi.string().required(),
@@ -37,54 +13,143 @@ const authSchema = Joi.object().keys({
   }).optional()
 })
 
-const requestsSchema = Joi.object().keys({
+const cookieSchema = Joi.object().keys({
+  name: Joi.string().required(),
+  value: Joi.string().required(),
+  path: Joi.string().optional(),
+  domain: Joi.string().optional(),
+  expires: Joi.string().optional(),
+  httpOnly: Joi.boolean().optional(),
+  secure: Joi.boolean().optional(),
+  comment: Joi.string().optional()
+})
+
+const headerSchema = Joi.object().keys({
+  name: Joi.string().required(),
+  value: Joi.string().required(),
+  // comment: Joi.string().optional()
+})
+
+const queryStringSchema = Joi.object().keys({
+  name: Joi.string().required(),
+  value: Joi.string().required(),
+  // comment: Joi.string().optional()
+})
+
+const postDataSchema = Joi.object().keys({
+  mimeType: Joi.string().required(),
+  params: Joi.object().optional(),
+  text : Joi.string().optional(),
+  comment: Joi.string().optional(),
+}).without('text', 'params')
+  .without('params', 'text')
+
+const requestSchema = Joi.object().keys({
   url: Joi.string().required(),
   method: Joi.string().required(),
-  data: dataSchema.optional(),
-  headers: Joi.object().optional(),
-  validate: validateSchema.optional(),
-  log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
+  postData: postDataSchema.optional(),
+  // httpVersion: Joi.string().optional(),
+  headers: Joi.array().items(headerSchema).optional(),
+  queryString: Joi.array().items(queryStringSchema).optional(),
+  cookies: Joi.array().items(cookieSchema).optional(),
+})
+
+const jsonPathSchema = Joi.object().pattern(/\w+/, Joi.string());
+
+export const responseSchema = Joi.object().keys({
+  // This is the strict response schema.  It can be used to validate and log responses
+  status: Joi.number().required(),
+  _validateStatus: Joi.alternatives().try(Joi.number(), Joi.string()).optional(),
+  statusText: Joi.string().optional(),
+  _validateStatusText: Joi.string().optional(),
+  httpVersion: Joi.string().optional(),
+  _validateHttpVersion: Joi.string().optional(),
+  cookies: Joi.array().items(cookieSchema).optional(),
+  headers: Joi.array().items(headerSchema).optional(),
+  content: Joi.alternatives().try(Joi.object(), Joi.string()).optional(),
+  redirectURL: Joi.string().optional(),
+  headersSize: Joi.number().optional(),
+  bodySize: Joi.number().optional(),
+  comment: Joi.string().optional(),
+  _validateJsonPath: Joi.array().items(jsonPathSchema),
+})
+
+const requestsSchema = Joi.object().keys({
   delay: Joi.number().optional(),
+  maxRetries: Joi.number().optional(),
   if: ifSchema.optional(),
+  request: requestSchema.required(),
+  response: responseSchema.optional(),
+  log: Joi.alternatives().try(Joi.boolean(), Joi.string().optional()),
   auth: authSchema.optional(),
 })
 
+const requestNameSchema = Joi.object().pattern(/\w+/, requestsSchema);
+
 export const Schema = Joi.object({
+  version: Joi.number().min(1).max(1),
+  requests: requestNameSchema,
+  allowInsecure: Joi.boolean().optional(),
+  variables: Joi.object().optional(),
+  // Created dynamically
   raw: Joi.string().required(),
   relativePath: Joi.string().required(),
-  version: Joi.number().min(1).max(1),
-  requests: Joi.object({}).pattern(/([^\s]+)/, requestsSchema),
-  allowInsecure: Joi.boolean().optional(),
-  variables: Joi.object().optional()
 });
 
+export const BulkSchema = Joi.array().items(Joi.string());
 
 // Typescript Schemas
 
-interface requestObjectDataSchema {
-  json: object,
-  params: object | string ,
-  raw: string
+interface requestObjectSchema {
+  url: string,
+  method: string,
+  postData: postDataObjectSchema,
+  headers: Array<Object>,
+  queryString: Array<Object>,
+  cookies: Array<Object>,
 }
-interface basicObjectSchema {
-  username: string,
-  password: string
+
+interface postDataObjectSchema {
+  mimeType: string,
+  params: object,
+  text : string,
+  comment: string,
 }
 
 interface authObjectSchema {
-  basic: basicObjectSchema
+  basic: {
+    username: string,
+    password: string,
+  }
 }
 
-export interface requestObjectSchema {
+interface responseObjectSchema {
+  // This is the strict response schema.  It can be used to validate and log responses
+  status: number,
+  _validateStatus: string | number,
+  statusText: string,
+  _validateStatusText: string,
+  httpVersion: string,
+  _validateHttpVersion: string,
+  cookies: Array<Object>,
+  _validateCookies: Array<Object>,
+  headers: Array<Object>,
+  _validateHeaders: Array<Object>,
+  content: any,
+  _validateContent: any,
+  redirectURL: string,
+  headersSize: string,
+  bodySize: string,
+  comment: string,
+  _validateJsonPath: Array<Object>,
+}
+
+export interface requestsObjectSchema {
   delay: number,
+  maxRetries: number,
   if: object,
-  auth: authObjectSchema,
-  method: string,
-  url: string,
-  data: requestObjectDataSchema,
-  headers: object,
-  validate: any,
+  request: requestObjectSchema,
+  response: responseObjectSchema,
   log: boolean | string,
+  auth: authObjectSchema,
 }
-
-export const BulkSchema = Joi.array().items(Joi.string());

@@ -42,7 +42,7 @@ export const validateSchema = (testSettings: object[]) => {
     if(test.error === null) {
       proofedSettings.push(fileSetting);
     } else {
-      errors.push(test.error.message);
+      errors.push(JSON.stringify(test.error));
     }
   });
   return { proofedSettings, errors};

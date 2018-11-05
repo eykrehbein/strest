@@ -1,11 +1,17 @@
 version: 1                            # only version at the moment
 
 requests:                             # all test requests will be listed here
-  postman:                        # name the request however you want
-    url: https://postman-echo.com/get  # required
-    method: GET                       # required
-    data:                             # valid data types: params + json or raw
-      params:
-        foo1: bar1
-        foo2: bar2
-    # log: true # uncomment this to log the response
+  postman:                       # name the request however you want
+    request:
+      url: https://postman-echo.com/get  # required
+      method: GET                       # required
+      # postData:
+        # mimeType: application/json
+      #   params:
+      #     foo: bar
+      # queryString:
+      # - foo1: bar1
+      #   foo2: bar2
+    # response:
+    #   _validateStatus: 2xx
+    # log: true
