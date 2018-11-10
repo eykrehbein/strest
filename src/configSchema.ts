@@ -43,7 +43,7 @@ const requestsSchema = Joi.object().keys({
   data: dataSchema.optional(),
   headers: Joi.object().optional(),
   validate: validateSchema.optional(),
-  log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi)).optional(),
+  log: Joi.alternatives().try(Joi.boolean(), Joi.string().regex(/^ENV/gmi), Joi.string().regex(/^Var/gmi)).optional(),
   delay: Joi.number().optional(),
   if: ifSchema.optional(),
   auth: authSchema.optional(),
