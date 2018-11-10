@@ -356,11 +356,22 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     let message = ""
     for (let validate of requestObject.validate){
       let jsonPathValue = jp.value(har, validate.jsonpath)
-      if(jsonPathValue !== validate.expect){
-        let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);
-        return { isError: true, har: har, message: err, code: 1 }
-      }else{
-        message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " equals " + validate.expect + "\n"
+      if (validate.expect){
+        if(jsonPathValue !== validate.expect){
+          let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);
+          return { isError: true, har: har, message: err, code: 1 }
+        }else{
+          message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " equals " + validate.expect + "\n"
+        }
+      }
+      if (validate.type){
+        let validated = validateType(validate.type, jsonPathValue)
+        if (validated){
+          let err = validationError(`The Type should have been ${chalk.bold(validate.type)} but instead it was ${chalk.bold(jsonPathValue)}`);
+          return { isError: true, har: har, message: err, code: 1 }
+        }else{
+          message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " type equals " + validate.type + "\n"
+        }
       }
     }
 
