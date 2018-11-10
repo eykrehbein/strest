@@ -379,7 +379,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
       return { isError: false, har: har, message: message, code: 0, curl: req.toCurl() }
     }
-    return { isError: false, har: har, message: message, code: 0, curl: req.toCurl() }
+    return { isError: false, har: null, message: message, code: 0, curl: req.toCurl() }
   } catch(e) {
     return { isError: true, har: null, message: e, code: 1 }
   }

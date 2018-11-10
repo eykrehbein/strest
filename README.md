@@ -147,25 +147,23 @@ requests:
     delay: 2000 # Wait 2 seconds for token to become valid
     ...
     headers:
-      Authorization: Bearer Value(login.token)
+      Authorization: Bearer <% login.token %>
     ...
     validation:
       json:
-        id: Value(login.users[0].id) # use arrays like you would in javascript
+        id: <% login.users[0].id %> # use arrays like you would in javascript
 
 ```
 
-As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `Value(requestName)` without any keys.
+As you could see, the usage is very simple. Just use `<% requestName.jsonKey %>` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `<% requestName %>` without any keys.
 
-You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/Value(postKey.key)/...` or as a standalone term like `Authorization: Value(login.token)`
+You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/<% postKey.key %>/...` or as a standalone term like `Authorization: <% login.token %>`
 
 This can also be used across files as demonstrated [here](tests/success/chaining)
 
 ### JsonPath
 
-Using JsonPath is similar to using Value() but the queries can be more complex.  [This](https://github.com/dchester/jsonpath) library is used.
-
-> Note: The syntax is *not* `JsonPath()` it is `JsonPath{{}}`  This is because json path uses () in string matches
+Use JsonPath to extract specific data from previous.  [This](https://github.com/dchester/jsonpath) library is used.
 
 ```yaml
 version: 1
@@ -183,7 +181,7 @@ requests:
     method: GET
     data:
       params:
-        foo: JsonPath{{set_JsonPath.phoneNumbers[?(@.type == "home")].number}}
+        foo: <% JsonPath(set_JsonPath.phoneNumbers[?(@.type == "home")].number) %>
     validate:
       json:
         args:
@@ -207,7 +205,7 @@ requests:
     method: GET
     data:
       params:
-        name: Fake(name.firstName) Fake(name.lastName)
+        name: <% Fake(name.firstName) %> <% Fake(name.lastName) %>
     log: true
 ```
 
@@ -227,7 +225,7 @@ version: 1
 # ensure the ENV var is set: `export STREST_URL=https://jsonplaceholder.typicode.com`
 requests:
   environment:
-    url: Env(STREST_URL)/todos/1
+    url: <% Env(STREST_URL) %>/todos/1
     method: GET
 ```
 
@@ -244,11 +242,11 @@ variables:
 
 requests:
   test:
-    url: Var(example_url) # Use them in any field
+    url: <% example_url %> # Use them in any field
     ...
     validate:
-      json: 
-        id: Variable(example_id) # Both, Var() and Variable() are allowed
+      json:
+        id: <% example_id %>
 ```
 
 ## Only Execute If
@@ -267,13 +265,13 @@ requests:
         foo: 1
   skipped:
     if:
-      operand: Value(if_Set.foo)
+      operand: <% if_Set.foo %>
       equals: 2
     url: https://jsonplaceholder.typicode.com/todos/2
     method: GET
   executed:
     if:
-      operand: Value(if_Set.foo)
+      operand: <% if_Set.foo %>
       equals: 1
     url: https://jsonplaceholder.typicode.com/todos/2
     method: GET
@@ -300,12 +298,14 @@ requests:
   example:
     ...
     validate:
-      json:
-        user:
-          name: Type(String) # name has to be of type String
-          id: Type(Null | Number | String) # id has to be of type Number, String or Null
-          iconUrl: Type(String.Url)
-        someOtherData: "match this string"
+    - jsonpath: user.someOtherData
+      expect: match this string
+    - jsonpath: content.user.name
+      type: String # name has to be of type String
+    - jsonpath: content.user.id
+      type: Null | Number | String # id has to be of type Number, String or Null
+    - jsonpath: content.user.iconUrl
+      type: String.Url
 ```
 
 ### JSON Path Validation
@@ -350,7 +350,7 @@ requests:
   example:
     ...
     validate:
-      code: 200 # only allow code 200 (default)
+      status: 200 # only allow code 200 (default)
   ...
   advanced:
     ...
