@@ -1,4 +1,5 @@
 import * as Joi from 'joi';
+// import { validateSchema } from './yaml-parse';
 // Uses spec from: http://www.softwareishard.com/blog/har-12-spec/
 
 const ifSchema = Joi.object().keys({
@@ -54,16 +55,18 @@ const requestSchema = Joi.object().keys({
   cookies: Joi.array().items(cookieSchema).optional(),
 })
 
-const jsonPathSchema = Joi.object().pattern(/\w+/, Joi.string());
+const validateSchema = Joi.object().keys({
+  jsonpath: Joi.string().required(),
+  expect: Joi.alternatives().try(Joi.number(), Joi.object(), Joi.string()).optional(),
+  type: Joi.string().optional(),
+}).without('type', 'expect')
+  .without('expect', 'type')
 
 export const responseSchema = Joi.object().keys({
   // This is the strict response schema.  It can be used to validate and log responses
   status: Joi.number().required(),
-  _validateStatus: Joi.alternatives().try(Joi.number(), Joi.string()).optional(),
   statusText: Joi.string().optional(),
-  _validateStatusText: Joi.string().optional(),
   httpVersion: Joi.string().optional(),
-  _validateHttpVersion: Joi.string().optional(),
   cookies: Joi.array().items(cookieSchema).optional(),
   headers: Joi.array().items(headerSchema).optional(),
   content: Joi.alternatives().try(Joi.object(), Joi.string()).optional(),
@@ -71,7 +74,6 @@ export const responseSchema = Joi.object().keys({
   headersSize: Joi.number().optional(),
   bodySize: Joi.number().optional(),
   comment: Joi.string().optional(),
-  _validateJsonPath: Joi.array().items(jsonPathSchema),
 })
 
 const requestsSchema = Joi.object().keys({
@@ -79,7 +81,7 @@ const requestsSchema = Joi.object().keys({
   maxRetries: Joi.number().optional(),
   if: ifSchema.optional(),
   request: requestSchema.required(),
-  response: responseSchema.optional(),
+  validate: Joi.array().items(validateSchema.optional()),
   log: Joi.alternatives().try(Joi.boolean(), Joi.string().optional()),
   auth: authSchema.optional(),
 })
@@ -105,8 +107,18 @@ interface requestObjectSchema {
   method: string,
   postData: postDataObjectSchema,
   headers: Array<Object>,
-  queryString: Array<Object>,
-  cookies: Array<Object>,
+  queryString: queryStringObjectSchema,
+  cookies: cookiesObjectSchema,
+}
+
+interface queryStringObjectSchema {
+  name: string,
+  value: string,
+}
+
+interface cookiesObjectSchema {
+  name: string,
+  value: string,
 }
 
 interface postDataObjectSchema {
@@ -123,25 +135,24 @@ interface authObjectSchema {
   }
 }
 
-interface responseObjectSchema {
-  // This is the strict response schema.  It can be used to validate and log responses
+export interface responseObjectSchema {
+  // This is the strict response schema.
   status: number,
-  _validateStatus: string | number,
   statusText: string,
-  _validateStatusText: string,
   httpVersion: string,
-  _validateHttpVersion: string,
   cookies: Array<Object>,
-  _validateCookies: Array<Object>,
   headers: Array<Object>,
-  _validateHeaders: Array<Object>,
   content: any,
-  _validateContent: any,
   redirectURL: string,
   headersSize: string,
   bodySize: string,
   comment: string,
-  _validateJsonPath: Array<Object>,
+}
+
+interface validateObjectSchema {
+  jsonpath: string,
+  expect: any,
+  type: string
 }
 
 export interface requestsObjectSchema {
@@ -149,7 +160,7 @@ export interface requestsObjectSchema {
   maxRetries: number,
   if: object,
   request: requestObjectSchema,
-  response: responseObjectSchema,
+  validate: Array<validateObjectSchema>,
   log: boolean | string,
   auth: authObjectSchema,
 }

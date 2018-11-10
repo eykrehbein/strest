@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import * as Joi from 'joi';
 import * as ora from 'ora';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import * as qs from 'qs';
 import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
@@ -12,6 +12,15 @@ import * as nunjucks from 'nunjucks';
 import * as yaml from 'js-yaml';
 
 require('request-to-curl');
+
+nunjucks.configure( { tags: {
+  blockStart: '<%',
+  blockEnd: '%>',
+  variableStart: '<$',
+  variableEnd: '$>',
+  commentStart: '<#',
+  commentEnd: '#>'
+}})
 
 const nunjucksEnv = new nunjucks.Environment();
 
@@ -117,7 +126,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
                   error = await performRequest(computed, requestName, printAll);
                 } else {
                   result = "skipped"
-                  error = { isError: false, message: null, code: 0 }
+                  error = { isError: false, message: null, har: null, code: 0 }
                 }
               } else {
                 error = await performRequest(computed, requestName, printAll);
@@ -147,30 +156,26 @@ export const performTests = async (testObjects: object[], cmd: any) => {
                 }
               }
             } else {
-              if(error.message !== null) {
+              let har = error.har
+              if(har) {
                 // log the response info and data
-                const res: AxiosResponse<any> = error.message;
-                let parsedData = res.data;
-                if(typeof res.data === 'object') {
-                  parsedData = JSON.stringify(res.data, null, 2);
-                }
-
+                // let parsedData = JSON.stringify(error.har, null, 2);
                 let dataString = '';
-                if(parsedData != '') {
-                  dataString = `\n\n${colorizeMain('Data')}: \n\n${chalk.hex(config.secondaryColor)(parsedData)}\n`;
+                if('content' in har) {
+                  dataString = `\n\n${colorizeMain('Content')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(har.content))}\n`;
                 } else {
-                  dataString = `\n\n${colorizeMain('Data')}: No data received\n`;
+                  dataString = `\n\n${colorizeMain('Content')}: No Content received\n`;
                 }
-
+                if ('status')
                 spinner.succeed(
                   `Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})` +
-                  `\n\n${colorizeMain('Status')}: ${res.status}`+
-                  `\n${colorizeMain('Status Text')}: ${res.statusText}` +
-                  `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(res.headers, null ,2))}` +
+                  `\n\n${colorizeMain('Status')}: ${har.status}`+
+                  `\n${colorizeMain('Status Text')}: ${har.statusText}` +
+                  `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(har.headers, null ,2))}` +
                   `${dataString}`
                 )
               } else {
-                spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})`)
+                spinner.succeed(`Skipped ${chalk.bold(colorizeMain(requestName))} (${chalk.bold(`${execTime.toString()}s`)})`)
               }
             }
             if(toCurl === true){
@@ -265,191 +270,6 @@ export const validateType = (type: string, dataToProof: any) => {
 } 
 
 /**
- * Validate one object
- * @param obj 
- */
-function validateObjectFunc(validateObject: any, dataObj: any, key: any) {
-
-      if(typeof dataObj[key] === 'undefined') {
-        return validationError(`The key ${chalk.bold(key)} was defined in the validation schema but there was no equivalent found in the response data.`)
-      }
-
-      const regex = /Type\((.*?)\)/
-      // test if the validation schema is a custom Type validation e.g. username: Type(String)
-      if(regex.test(validateObject[key])) {
-        const fullValue: any = regex.exec(validateObject[key]);
-          
-        let types = fullValue[1].replace(/\s/g,'').toLowerCase().split('|')
-
-        let confirmCounter = 0;
-
-        for(let type of types){
-          let c = validateType(type, dataObj[key]);
-          if(typeof c !== 'undefined') {
-            if(c === false) {
-              if(types.length === 1) {
-                return validationError(`The value of ${chalk.bold(key)} should be of type ${chalk.bold(type)} but it has a different type`);
-              }
-            } else {
-              if(types.length === 1) {
-                return null;
-              }
-              confirmCounter++;
-            }
-          } else {
-            return validationError(`The type ${chalk.bold(type)} does not exist. Please use a valid type.`)
-          }
-        }
-        if(confirmCounter === 0) {
-          return validationError(`The value of ${chalk.bold(key)} doesn't match with any of the given types`);
-        }
-      } else {
-        // if the validation is a custom value -> the response data at this key has to match this value
-        if(validateObject[key] !== dataObj[key]) {
-          return validationError(`The value of ${chalk.bold(key)} should have been ${chalk.bold(validateObject[key])} but instead it was ${chalk.bold(dataObj[key])}`)
-        } else {
-          return null;
-        }
-      }
-  return null;
-}
-/**
- * Loop recursively through all object
- * @param validateSchema 
- * @param dataToProof 
- */
-const createValidationLoop = (proofObject: any, dataToProof: any, key: any) => { 
-  if(typeof dataToProof[key] === 'undefined') {
-    return validationError(`The required item ${chalk.bold(key)} wasn't found in the response data`)
-  }
-  if(typeof proofObject[key] === 'object') {
-    
-    for(let l in proofObject[key]) {
-      let err: any = createValidationLoop(proofObject[key], dataToProof[key], l);
-      if(err !== null) {
-        return err;
-      }
-    }
-  } else {
-    let err = validateObjectFunc(proofObject, dataToProof, key);
-    if(err !== null) {
-      return err;
-    }
-  }
-  return null;
-}
-
-/**
- * Validate a response with the given schema
- * @param validateSchema
- * @param headers
- */
-const validateHeaders = (validateSchema: any, headers: any) => {
-  /**
-   * Example:
-   * validate:
-   *  headers:
-   *    content-type: application/json; charset=utf-8
-   */
-  let headersProofObject: any = validateSchema.headers;
-
-  if(typeof headersProofObject === 'object') {
-    for(let key in headersProofObject) {
-      let err = createValidationLoop(headersProofObject, headers, key)
-      if(err !== null) {
-        return err;
-      }
-    }
-  }
-
-  return null;
-}
-
-
-/**
- * Validate a response with the given schema
- * @param validateSchema 
- * @param dataToProof
- */
-const validateResponse = (validateSchema: any, dataToProof: any) => {
-  /**
-   * Example:
-   * validate:
-   *  token: Type(string | null)
-   */
-
-  let proofObject: any = validateSchema.json || validateSchema.raw || null;
-  
-  if(typeof proofObject === 'object') {
-    for(let key in proofObject) {
-      let err = createValidationLoop(proofObject, dataToProof, key)
-      if(err !== null) {
-        return err;
-      }
-    }
-  }
-  if(typeof proofObject === 'string') {
-    if(dataToProof === proofObject) {
-      return null;
-    } else {
-      return validationError(`The response value should have been ${chalk.bold(proofObject)} but instead it was ${chalk.bold(dataToProof)}`);
-    }
-  }
-
-  return null;
-}
-
-/**
- * Validate a response with the given schema
- * @param validateSchema
- * @param response
- */
-const validateJp = (validateSchema: any, dataToProof: any) => {
-  /**
-   * Example:
-   * validate:
-   *  jq:
-   *    foo.bar: 1
-   */
-
-  let proofObject: any = validateSchema;
-
-  for (let key in proofObject) {
-    let value = proofObject[key];
-    let jsonPathValue = jp.value(dataToProof, key)
-    if(jsonPathValue === value){
-      } else {
-        return validationError(`The JSON response value should have been ${chalk.bold(value)} but instead it was ${chalk.bold(jsonPathValue)}`);
-      }
-    }
-  return null;
-}
-
-/**
- * Validate a response with the given schema
- * @param validateSchema
- * @param code
- */
-const validateCode = (validateSchema: number | string, code: number) => {
-  /**
-   * Example:
-   * validate:
-   *  code: 200
-   */
-
-  const codeChars = validateSchema.toString().split('');
-  const dataChars = code.toString().split('');
-  for (let i = 0; i < codeChars.length; i++) {
-    const ch = codeChars[i];
-    const dataCh = dataChars[i];
-    if (ch !== 'x' && dataCh !== ch) {
-      return validationError(`The response status code should be ${chalk.bold(validateSchema.toString())} but the request returned code ${chalk.bold(code.toString())}`);
-    }
-  }
-  return null;
-}
-
-/**
  * Perform the Request
  * @param requestObject All config data
  * @param requestName Name of the request
@@ -464,7 +284,8 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     method?: any,
     data?: any,
     params?: any,
-    headers?: any
+    headers?: any,
+    validateStatus?: any
   }
 
   let axiosObject: AxiosObject = {};
@@ -490,6 +311,15 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     }
   }
 
+  // queryString
+  for(let query in requestObject.request.queryString){
+    axiosObject.url += '?' + qs.stringify(query.toString())
+  }
+  // if(typeof requestObject.request.queryString !== 'undefined') {
+  //   // stringify queryString
+  //   console.log(requestObject.request.queryString)
+  //   axiosObject.url += '?' + qs.stringify(requestObject.request.queryString)
+  // }
   // data
   if(typeof requestObject.request.postData !== 'undefined') {
     // json data
@@ -500,74 +330,46 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     if(requestObject.request.postData.text) {
       axiosObject.data = requestObject.request.postData.text;
     }
-    // queryString
-    if(typeof requestObject.request.queryString !== 'undefined') {
-      // stringify queryString
-      axiosObject.url += '?' + qs.stringify(requestObject.request.queryString)
-    }
   }
 
   try {
-    const response = await axios(axiosObject)
+    let axiosInstance = axios.create({
+      validateStatus: function (status) {
+        return status < 500; // Reject only if the status code is greater than or equal to 500
+      }
+    })
+    let response = await axiosInstance(axiosObject)
+
     if(typeof response.data !== 'undefined') {
       requestReponses[requestName] = response.data;
-    } 
-    
+    }
+
     const req = response.request;
-    if(requestObject.response){
-      if(typeof requestObject.response._validateStatus !== 'undefined'){
-        const err = validateCode(requestObject.response._validateStatus.toString(), response.status);
-        if(err !== null) {
-          return { isError: true, message: err, code: 1 }
-        }
-      }
-      if(requestObject.response._validateJsonPath){
-        const err = validateJp(requestObject.response._validateJsonPath, response.data);
-        if(err !== null) {
-          return { isError: true, message: err, code: 1 }
-        }
-      }
-      if(requestObject.response._validateHeaders){
-        const err = validateHeaders(requestObject.response._validateHeaders, response.headers);
-        if(err !== null) {
-          return { isError: true, message: err, code: 1 }
-        }
-      }
-      if(requestObject.response._validateContent){
-        const err = validateResponse(requestObject.response._validateContent, response.data);
-        if(err !== null) {
-          return { isError: true, message: err, code: 1 }
-        }
+    // Convert req to har object structure
+
+    const har = {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+      content: response.data
+    }
+    let message = ""
+    for (let validate of requestObject.validate){
+      let jsonPathValue = jp.value(har, validate.jsonpath)
+      if(jsonPathValue !== validate.expect){
+        let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);
+        return { isError: true, har: har, message: err, code: 1 }
+      }else{
+        message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " equals " + validate.expect + "\n"
       }
     }
 
     // if the result should be logged
     if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
-      return { isError: false, message: response, code: 0, curl: req.toCurl() }
+      return { isError: false, har: har, message: message, code: 0, curl: req.toCurl() }
     }
-
-    return { isError: false, message: null, code: 0, curl: req.toCurl() }
-  
+    return { isError: false, har: har, message: message, code: 0, curl: req.toCurl() }
   } catch(e) {
-    if(typeof requestObject.response !== 'undefined') {
-      if(typeof requestObject.response._validateStatus !== 'undefined') {
-        const vErr = validateCode(requestObject.response._validateStatus, e.response.status);
-        if(vErr === null) {
-          return { 
-            isError: false, 
-            message: null,
-            code: 0
-          };
-        } else {
-          return {
-            isError: true, 
-            message: vErr,
-            code: 1,
-          };
-        }
-      }
-    }
-    return { isError: true, message: e, code: 1 }
+    return { isError: true, har: null, message: e, code: 1 }
   }
-  
 }

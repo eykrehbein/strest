@@ -5,13 +5,7 @@ requests:                             # all test requests will be listed here
     request:
       url: https://postman-echo.com/get  # required
       method: GET                       # required
-      # postData:
-        # mimeType: application/json
-      #   params:
-      #     foo: bar
-      # queryString:
-      # - foo1: bar1
-      #   foo2: bar2
-    # response:
-    #   _validateStatus: 2xx
-    # log: true
+    log: true
+    validate:
+    - jsonpath: status
+      expect: 200
