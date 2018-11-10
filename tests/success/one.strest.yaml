@@ -2,11 +2,10 @@ version: 1
 
 requests:
   todoOne:
-    url: https://jsonplaceholder.typicode.com/todos/1
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/1
+      method: GET
   todoTwo:
-    url: https://jsonplaceholder.typicode.com/todos/2
-    method: GET
-    validate:
-      json: 
-        id: 2
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET

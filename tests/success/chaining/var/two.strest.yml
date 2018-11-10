@@ -2,5 +2,5 @@ version: 1
 
 requests:
   chaining_var2:
-    url: "{{ testUrl }}"
+    url: <% testUrl %>
     method: GET

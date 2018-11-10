@@ -12,7 +12,7 @@ requests:
     method: GET
     data:
       params:
-        baz: {{ value1.args.foo }}
+        baz: <% value1.args.foo %>
     validate:
       json:
         args:

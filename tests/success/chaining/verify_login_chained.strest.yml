@@ -6,7 +6,7 @@ requests:
     method: POST
     data:
       json:
-        expect: "{{login.authenticated}}"
+        expect: <% login.authenticated %>
     validate:
       json:
         expect: "true"

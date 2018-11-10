@@ -5,7 +5,7 @@ requests:
     url: https://jsonplaceholder.typicode.com/todos
     method: GET
   arr1: 
-    url: https://jsonplaceholder.typicode.com/todos/{{arr[0].id}}
+    url: https://jsonplaceholder.typicode.com/todos/<%arr[0].id%>
     method: GET
     validate:
       json:

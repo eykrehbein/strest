@@ -2,7 +2,7 @@ version: 1
 
 requests:
   jsonValidate:
-    url: '{{ Env("STREST_URL") }}/todos/2'
+    url: <% Env("STREST_URL") %>/todos/2'
     method: GET
     validate:
       json: 
