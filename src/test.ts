@@ -290,7 +290,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   // optional keys 
   axiosObject.url = requestObject.request.url;
   axiosObject.method = requestObject.request.method;
-
+  axiosObject.headers = {}
   // headers 
   if(typeof requestObject.request.headers !== 'undefined') {
     axiosObject.headers = requestObject.request.headers;
@@ -302,10 +302,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
       const username = requestObject.auth.basic.username;
       const password = requestObject.auth.basic.password;
       const encoded = Buffer.from(username + ':' + password).toString('base64');
-      if(typeof axiosObject.headers === 'undefined') {
-        axiosObject.headers = {Authorization:null}
-      }
-      axiosObject.headers.Authorization = `Basic ${encoded}`;
+      axiosObject.headers["Authorization"] = `Basic ${encoded}`;
     }
   }
 
@@ -313,6 +310,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   for(let query in requestObject.request.queryString){
     axiosObject.url += '?' + qs.stringify(query.toString())
   }
+
   // if(typeof requestObject.request.queryString !== 'undefined') {
   //   // stringify queryString
   //   console.log(requestObject.request.queryString)
@@ -320,11 +318,7 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   // }
   // data
   if(typeof requestObject.request.postData !== 'undefined') {
-    // json data
-    if(requestObject.request.postData.params) {
-      axiosObject.data = requestObject.request.postData.params;
-    }
-    // text data
+    axiosObject.headers["Content-Type"] = requestObject.request.postData.mimeType
     if(requestObject.request.postData.text) {
       axiosObject.data = requestObject.request.postData.text;
     }
