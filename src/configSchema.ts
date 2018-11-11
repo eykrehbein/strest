@@ -37,10 +37,15 @@ const queryStringSchema = Joi.object().keys({
   // comment: Joi.string().optional()
 })
 
+const paramsSchema = Joi.object().keys({
+  name: Joi.string().required(),
+  value: Joi.string().required()
+})
+
 const postDataSchema = Joi.object().keys({
-  mimeType: Joi.string().required(),
-  params: Joi.object().optional(),
-  text : Joi.string().optional(),
+  mimeType: Joi.string().required().valid('application/json', 'text/plain'),
+  params: Joi.array().items(paramsSchema).optional(),
+  text : Joi.alternatives().try(Joi.object(), Joi.string()).optional(),
   comment: Joi.string().optional(),
 }).without('text', 'params')
   .without('params', 'text')

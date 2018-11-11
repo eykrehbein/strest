@@ -2,11 +2,13 @@ version: 1
 
 requests:
   basic_auth:
-    url: https://postman-echo.com/basic-auth
-    method: GET
+    request:
+      url: https://postman-echo.com/basic-auth
+      method: GET
     auth: 
       basic:
         username: postman
         password: password
     validate:
-      code: 2xx
+    - jsonpath: code
+      expect: 200

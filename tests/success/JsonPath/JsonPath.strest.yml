@@ -2,35 +2,42 @@ version: 1
 # Using http://jsonpath.com as object and simple testing
 requests:
   set_JsonPath:
-    url: https://jsonplaceholder.typicode.com/posts
-    method: POST
-    data:
-      json:
-        firstName: John
-        lastName: doe
-        age: 26
-        address:
-            streetAddress: 'naist street'
-            city: Nara
-            postalCode: 630-0192
-        phoneNumbers:
-            - {type: iPhone, number: 0123-4567-8888}
-            - {type: home, number: 0123-4567-8910}
+    request:
+      url: https://jsonplaceholder.typicode.com/posts
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          firstName: John
+          lastName: doe
+          age: 26
+          address:
+              streetAddress: 'naist street'
+              city: Nara
+              postalCode: 630-0192
+          phoneNumbers:
+              - {type: iPhone, number: 0123-4567-8888}
+              - {type: home, number: 0123-4567-8910}
     validate:
-      jsonpath:
-        $.phoneNumbers[:1].type: iPhone
-        age: 26
-        $.age: 26
-        address.city: Nara
-        $.phoneNumbers[?(@.type == "home")].number: "0123-4567-8910"
-      code: 2xx
+    - jsonpath: $.phoneNumbers[:1].type
+      expect: iPhone
+    - jsonpath: age
+      expect: 26
+    - jsonpath: $.age
+      expect: 26
+    - jsonpath: address.city
+      expect: Nara
+    - jsonpath: $.phoneNumbers[?(@.type == "home")].number
+      expect: "0123-4567-8910"
+    - jsonpath: code
+      expect: 200
   JsonPath:
-    url: https://postman-echo.com/get
-    method: GET
-    data:
-      params:
-        foo: <% JsonPath("set_JsonPath.phoneNumbers[?(@.type == \"home\")].number") %>
+    request:
+      url: https://postman-echo.com/get
+      method: GET
+    queryString:
+    - name: foo
+      value: <% JsonPath("set_JsonPath.phoneNumbers[?(@.type == \"home\")].number") %>
     validate:
-      json:
-        args:
-          foo: 0123-4567-8910
+    - jsonpath: args.foo
+      expect: 0123-4567-8910

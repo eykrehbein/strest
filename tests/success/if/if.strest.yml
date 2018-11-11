@@ -1,23 +1,25 @@
 version: 1
 
 requests:
-  todoOne:
+  if_Set:
     request:
       url: https://jsonplaceholder.typicode.com/posts
       method: POST
       postData:
         mimeType: application/json
         text:
-          myArray:
-          - foo: 1
-            bar: 1
-          - foo: 2
-            bar: 2
-  todoTwo:
+          foo: 1
+  skipped:
+    if:
+      operand: <% if_Set.foo %>
+      equals: 2
     request:
       url: https://jsonplaceholder.typicode.com/todos/2
       method: GET
-    validate:
-    # Should this remove content???
-    - jsonpath: content.id
-      expect: 2
+  executed:
+    if:
+      operand: <% if_Set.foo %>
+      equals: 1
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET

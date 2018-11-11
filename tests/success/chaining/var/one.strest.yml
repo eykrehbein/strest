@@ -4,5 +4,6 @@ variables:
 
 requests:
   chaining_var1:
-    url: <% testUrl %>
-    method: GET
+    request:
+      url: <% testUrl %>
+      method: GET

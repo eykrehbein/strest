@@ -2,5 +2,6 @@ version: 1
 
 requests:
   chaining_var2:
-    url: <% testUrl %>
-    method: GET
+    request:
+      url: <% testUrl %>
+      method: GET
