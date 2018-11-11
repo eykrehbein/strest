@@ -296,11 +296,11 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
     axiosObject.headers = requestObject.request.headers;
   }
 
+  //Basic Auth
   if(typeof requestObject.auth !== 'undefined') {
     if(typeof requestObject.auth.basic !== 'undefined') {
       const username = requestObject.auth.basic.username;
       const password = requestObject.auth.basic.password;
-
       const encoded = Buffer.from(username + ':' + password).toString('base64');
       if(typeof axiosObject.headers === 'undefined') {
         axiosObject.headers = {Authorization:null}

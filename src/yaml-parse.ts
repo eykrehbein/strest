@@ -36,13 +36,13 @@ export const parseTestingFiles = (pathArray: string[], dir: string) => {
 
 export const validateSchema = (testSettings: object[]) => {
   let proofedSettings: object[] = [];
-  let errors: string[] = [];
+  let errors: Joi.ValidationError[] = [];
   testSettings.map((fileSetting) => {
     const test = Joi.validate(fileSetting, joiSchema);
     if(test.error === null) {
       proofedSettings.push(fileSetting);
     } else {
-      errors.push(JSON.stringify(test.error));
+      errors.push(test.error);
     }
   });
   return { proofedSettings, errors};
