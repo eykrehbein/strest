@@ -112,7 +112,7 @@ interface requestObjectSchema {
   method: string,
   postData: postDataObjectSchema,
   headers: Array<Object>,
-  queryString: queryStringObjectSchema,
+  queryString: Array<queryStringObjectSchema>,
   cookies: cookiesObjectSchema,
 }
 
