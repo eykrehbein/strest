@@ -6,5 +6,5 @@ variables:
 requests:
   my_variable_request:
     request:
-      url: <% testUrl %>
+      url: <$ testUrl $>
       method: GET

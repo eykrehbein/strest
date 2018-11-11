@@ -13,17 +13,17 @@ import * as yaml from 'js-yaml';
 
 require('request-to-curl');
 
-nunjucks.configure( { tags: {
-  blockStart: '<%',
-  blockEnd: '%>',
-  variableStart: '<$',
-  variableEnd: '$>',
-  commentStart: '<#',
-  commentEnd: '#>'
-}})
 
-const nunjucksEnv = new nunjucks.Environment();
-
+const nunjucksEnv = nunjucks.configure(".", {
+  tags: {
+    blockStart: '<%',
+    blockEnd: '%>',
+    variableStart: '<$',
+    variableEnd: '$>',
+    commentStart: '<#',
+    commentEnd: '#>'
+  }
+});
 nunjucksEnv.addGlobal('Faker', function(faked: string) {
   return faker.fake(`{{${faked}}}`);
 })
@@ -46,7 +46,7 @@ let requestReponses: any = {
 }
 
 // The manually defined variables 
-// Usable throught Variable(variableName) or Var(variableName)
+// Usable through <% variableName %>
 let definedVariables: any = {
 
 }
@@ -195,9 +195,8 @@ export const performTests = async (testObjects: object[], cmd: any) => {
 export const computeRequestObject = (requestName: string, raw: string, r: any) => {
 
   let merged = {...r, ...definedVariables};
-
   nunjucksEnv.addGlobal('JsonPath', function(path: string) {
-    return jp.value(r, path)
+    return jp.value(merged, path)
   })
 
   // Parse obj using nunjucks
