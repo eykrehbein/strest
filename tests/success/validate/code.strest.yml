@@ -2,7 +2,9 @@ version: 1
 
 requests:
   codeValidate:
-    url: https://jsonplaceholder.typicode.com/todos
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET
     validate:
-      code: 200
+    - jsonpath: code 
+      expect: 200

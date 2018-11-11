@@ -5,7 +5,8 @@ requests:
     request:
       url: https://postman-echo.com/basic-auth
       headers:
-        Authorization: Basic cG9zdG1hbjpwYXNzd29yZA==
+      - name: Authorization
+        value: Basic cG9zdG1hbjpwYXNzd29yZA==
       method: GET
   verify_login:
     request:

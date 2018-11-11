@@ -2,10 +2,12 @@ version: 1                            # only version at the moment
 
 requests:                             # all test requests will be listed here
   logging:                        # name the request however you want
-    url: https://postman-echo.com/get  # required
-    method: GET                       # required
-    data:                             # valid data types: params + json or raw
-      params:
-        foo1: bar1
-        foo2: bar2
+    request:
+      url: https://postman-echo.com/get  # required
+      method: GET                       # required
+      queryString:                             # valid data types: params + json or raw
+      - name: foo1
+        value: bar1
+      - name: foo2
+        value: bar2
     log: true # uncomment this to log the response

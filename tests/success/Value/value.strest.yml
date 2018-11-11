@@ -2,18 +2,19 @@ version: 1
 
 requests:
   value1:
-    url: https://postman-echo.com/get
-    method: GET
-    data:
-      params:
-        foo: bar
+    request:
+      url: https://postman-echo.com/get
+      method: GET
+      queryString:
+      - name: foo
+        value: bar
   value2:
-    url: https://postman-echo.com/get
-    method: GET
-    data:
-      params:
-        baz: <% value1.args.foo %>
+    request:
+      url: https://postman-echo.com/get
+      method: GET
+      queryString:
+      - name: baz
+        value: <% value1.args.foo %>
     validate:
-      json:
-        args:
-          baz: bar
+    - jsonpath: args.baz
+      expect: bar 
