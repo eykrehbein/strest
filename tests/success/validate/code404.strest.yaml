@@ -6,5 +6,5 @@ requests:
       url: https://jsonplaceholder.typicode.com/test/
       method: GET
     validate:
-    - jsonpath: code
+    - jsonpath: status
       expect: 404

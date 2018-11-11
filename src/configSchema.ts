@@ -62,7 +62,7 @@ const requestSchema = Joi.object().keys({
 
 const validateSchema = Joi.object().keys({
   jsonpath: Joi.string().required(),
-  expect: Joi.alternatives().try(Joi.number(), Joi.object(), Joi.string()).optional(),
+  expect: Joi.alternatives().try(Joi.boolean(), Joi.number(), Joi.object(), Joi.string()).optional(),
   type: Joi.string().optional(),
 }).without('type', 'expect')
   .without('expect', 'type')
@@ -111,12 +111,17 @@ interface requestObjectSchema {
   url: string,
   method: string,
   postData: postDataObjectSchema,
-  headers: Array<Object>,
+  headers: Array<headerObjectSchema>,
   queryString: Array<queryStringObjectSchema>,
   cookies: cookiesObjectSchema,
 }
 
 interface queryStringObjectSchema {
+  name: string,
+  value: string,
+}
+
+interface headerObjectSchema {
   name: string,
   value: string,
 }

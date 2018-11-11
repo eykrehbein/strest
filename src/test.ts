@@ -173,7 +173,11 @@ export const performTests = async (testObjects: object[], cmd: any) => {
                   `${dataString}`
                 )
               } else {
-                spinner.succeed(`Skipped ${chalk.bold(colorizeMain(requestName))} (${chalk.bold(`${execTime.toString()}s`)})`)
+                if (result === "skipped"){
+                  spinner.succeed(`Skipped Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})`)
+                }else{
+                  spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})`)
+                }
               }
             }
             if(toCurl === true){
@@ -290,9 +294,11 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   axiosObject.url = requestObject.request.url;
   axiosObject.method = requestObject.request.method;
   axiosObject.headers = {}
-  // headers 
+  // headers
   if(typeof requestObject.request.headers !== 'undefined') {
-    axiosObject.headers = requestObject.request.headers;
+    requestObject.request.headers.map((header) => {
+      axiosObject.headers[header.name] = header.value
+    })
   }
 
   //Basic Auth

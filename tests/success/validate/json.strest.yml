@@ -6,5 +6,5 @@ requests:
       url: <% Env("STREST_URL") %>/todos/2'
       method: GET
     validate:
-    - jsonpath: id
+    - jsonpath: content.id
       expect: 2

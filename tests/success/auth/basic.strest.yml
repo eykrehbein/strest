@@ -10,5 +10,5 @@ requests:
         username: postman
         password: password
     validate:
-    - jsonpath: code
+    - jsonpath: status
       expect: 200

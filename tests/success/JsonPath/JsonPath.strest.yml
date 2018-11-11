@@ -19,25 +19,26 @@ requests:
               - {type: iPhone, number: 0123-4567-8888}
               - {type: home, number: 0123-4567-8910}
     validate:
-    - jsonpath: $.phoneNumbers[:1].type
+    - jsonpath: $.content.phoneNumbers[:1].type
       expect: iPhone
-    - jsonpath: age
+    - jsonpath: content.age
       expect: 26
-    - jsonpath: $.age
+    - jsonpath: $.content.age
       expect: 26
-    - jsonpath: address.city
+    - jsonpath: content.address.city
       expect: Nara
-    - jsonpath: $.phoneNumbers[?(@.type == "home")].number
+    - jsonpath: $.content.phoneNumbers[?(@.type == "home")].number
       expect: "0123-4567-8910"
-    - jsonpath: code
-      expect: 200
+    - jsonpath: status
+      expect: 201
   JsonPath:
     request:
       url: https://postman-echo.com/get
       method: GET
       queryString:
       - name: foo
-        value: <% JsonPath("set_JsonPath.phoneNumbers[?(@.type == \"home\")].number") %>
-    validate:
-    - jsonpath: args.foo
-      expect: 0123-4567-8910
+        value: <$ JsonPath("set_JsonPath.phoneNumbers[?(@.type == \"home\")].number") $>
+    # validate:
+    # - jsonpath: content.args.foo
+    #   expect: 0123-4567-8910
+    log: true
