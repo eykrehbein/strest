@@ -159,14 +159,12 @@ export const performTests = async (testObjects: object[], cmd: any) => {
               let har = error.har
               if(har) {
                 // log the response info and data
-                // let parsedData = JSON.stringify(error.har, null, 2);
                 let dataString = '';
                 if('content' in har) {
-                  dataString = `\n\n${colorizeMain('Content')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(har.content))}\n`;
+                  dataString = `\n\n${colorizeMain('Content')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(har.content, null, 2))}\n`;
                 } else {
                   dataString = `\n\n${colorizeMain('Content')}: No Content received\n`;
                 }
-                if ('status')
                 spinner.succeed(
                   `Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})` +
                   `\n\n${colorizeMain('Status')}: ${har.status}`+
@@ -354,27 +352,28 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
       content: response.data
     }
     let message = ""
-    for (let validate of requestObject.validate){
-      let jsonPathValue = jp.value(har, validate.jsonpath)
-      if (validate.expect){
-        if(jsonPathValue !== validate.expect){
-          let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);
-          return { isError: true, har: har, message: err, code: 1 }
-        }else{
-          message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " equals " + validate.expect + "\n"
+    if ('validate' in requestObject){
+      for (let validate of requestObject.validate){
+        let jsonPathValue = jp.value(har, validate.jsonpath)
+        if (validate.expect){
+          if(jsonPathValue !== validate.expect){
+            let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);
+            return { isError: true, har: har, message: err, code: 1 }
+          }else{
+            message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " equals " + validate.expect + "\n"
+          }
         }
-      }
-      if (validate.type){
-        let validated = validateType(validate.type, jsonPathValue)
-        if (validated){
-          let err = validationError(`The Type should have been ${chalk.bold(validate.type)} but instead it was ${chalk.bold(jsonPathValue)}`);
-          return { isError: true, har: har, message: err, code: 1 }
-        }else{
-          message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " type equals " + validate.type + "\n"
+        if (validate.type){
+          let validated = validateType(validate.type, jsonPathValue)
+          if (validated){
+            let err = validationError(`The Type should have been ${chalk.bold(validate.type)} but instead it was ${chalk.bold(jsonPathValue)}`);
+            return { isError: true, har: har, message: err, code: 1 }
+          }else{
+            message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " type equals " + validate.type + "\n"
+          }
         }
       }
     }
-
     // if the result should be logged
     if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
       return { isError: false, har: har, message: message, code: 0, curl: req.toCurl() }
