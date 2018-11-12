@@ -1,6 +1,6 @@
 version: 1
 requests:
-  raw:
+  rawPost:
     request:
       url: https://postman-echo.com/post
       method: POST
