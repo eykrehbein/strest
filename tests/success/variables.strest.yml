@@ -2,6 +2,7 @@ version: 1
 
 variables:
   testUrl: https://jsonplaceholder.typicode.com/todos/1
+  to_log: true
 
 requests:
   my_variable_request:
