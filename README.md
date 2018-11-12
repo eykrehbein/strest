@@ -147,17 +147,17 @@ requests:
     delay: 2000 # Wait 2 seconds for token to become valid
     ...
     headers:
-      Authorization: Bearer <% login.token %>
+      Authorization: Bearer <$ login.token $>
     ...
     validation:
       json:
-        id: <% login.users[0].id %> # use arrays like you would in javascript
+        id: <$ login.users[0].id $> # use arrays like you would in javascript
 
 ```
 
-As you could see, the usage is very simple. Just use `<% requestName.jsonKey %>` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `<% requestName %>` without any keys.
+As you could see, the usage is very simple. Just use `<$ requestName.jsonKey $>` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `<$ requestName $>` without any keys.
 
-You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/<% postKey.key %>/...` or as a standalone term like `Authorization: <% login.token %>`
+You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/<$ postKey.key $>/...` or as a standalone term like `Authorization: <$ login.token $>`
 
 This can also be used across files as demonstrated [here](tests/success/chaining)
 
@@ -181,7 +181,7 @@ requests:
     method: GET
     data:
       params:
-        foo: <% JsonPath(set_JsonPath.phoneNumbers[?(@.type == "home")].number) %>
+        foo: <$ JsonPath(set_JsonPath.phoneNumbers[?(@.type == "home")].number) $>
     validate:
       json:
         args:
@@ -205,7 +205,7 @@ requests:
     method: GET
     data:
       params:
-        name: <% Fake(name.firstName) %> <% Fake(name.lastName) %>
+        name: <$ Fake(name.firstName) $> <$ Fake(name.lastName) $>
     log: true
 ```
 
@@ -225,7 +225,7 @@ version: 1
 # ensure the ENV var is set: `export STREST_URL=https://jsonplaceholder.typicode.com`
 requests:
   environment:
-    url: <% Env(STREST_URL) %>/todos/1
+    url: <$ Env(STREST_URL) $>/todos/1
     method: GET
 ```
 
@@ -242,11 +242,11 @@ variables:
 
 requests:
   test:
-    url: <% example_url %> # Use them in any field
+    url: <$ example_url $> # Use them in any field
     ...
     validate:
       json:
-        id: <% example_id %>
+        id: <$ example_id $>
 ```
 
 ## Only Execute If
@@ -265,13 +265,13 @@ requests:
         foo: 1
   skipped:
     if:
-      operand: <% if_Set.foo %>
+      operand: <$ if_Set.foo $>
       equals: 2
     url: https://jsonplaceholder.typicode.com/todos/2
     method: GET
   executed:
     if:
-      operand: <% if_Set.foo %>
+      operand: <$ if_Set.foo $>
       equals: 1
     url: https://jsonplaceholder.typicode.com/todos/2
     method: GET
