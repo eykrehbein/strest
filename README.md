@@ -63,7 +63,7 @@ strest tests/success/postman.strest.yml
 You may also run multiple test files at the same time by pointing to the directory, where the files are stored
 
 ```bash
-strest # this will recursively search for all .strest.yml files in the cwd and it's subdirectories
+strest # this will recursively search for all .strest.yml files in the cwd and its subdirectories
 # or
 strest tests/success/chaining
 ```
