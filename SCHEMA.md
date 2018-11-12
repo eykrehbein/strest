@@ -35,6 +35,7 @@ Property specifying the version of the schema. Available versions:
 - `1`
 
 ## `variables`
+
 You can define custom variables to use them later in a request. They work across files, so you can define them in one file and use them in an other.
 
 ```yml
@@ -45,11 +46,10 @@ variables:
 
 requests:
   test:
-    url: Var(example_url)
-    ...
-    validate:
-      json:
-        id: Variable(example_id) # Both, Var() and Variable() are allowed
+    request:
+      url: <$ example_url $>
+      ...
+
 ```
 
 ## `allowInsecure`
@@ -64,8 +64,9 @@ Boolean to allow:
 # Example
 allowInsecure: true
 someRequest:
-  url: ...
-  method: ...
+  request:
+    url: ...
+    method: ...
 ```
 
 ## `requests` **_Required_**
@@ -104,11 +105,13 @@ version: 1
 
 requests:
   if_Set:
-    url: https://jsonplaceholder.typicode.com/posts
-    method: POST
-    data:
-      json:
-        foo: 1
+    request:
+      url: https://jsonplaceholder.typicode.com/posts
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          foo: 1
   skipped:
     if:
       operand: <$ if_Set.content.foo $>
@@ -133,8 +136,9 @@ If present, the execution of the request will be delayed by the specified number
 # Example
 someRequest:
   delay: 2000 # Wait 2 seconds before perfoming request
-  url: ...
-  method: ...
+  request:
+    url: ...
+    method: ...
 ```
 
 #### `request` **_Required_**
@@ -213,7 +217,7 @@ requests:
 
 ##### `queryString`
 
-Conforms to [this](http://www.softwareishard.com/blog/har-12-spec/#queryString) shema.
+Conforms to [this](http://www.softwareishard.com/blog/har-12-spec/#queryString) shema. Formatted as an Array.
 
 ```yaml
 version: 1
@@ -287,7 +291,7 @@ The immediate response is stored in [HAR Format](http://www.softwareishard.com/b
 
 With **Strest** you can validate responses with:
 
-- exact match (expect)
+- expect (exact match)
 - regex
 - type _[List of all valid Types](VALIDATION.md)_
 
