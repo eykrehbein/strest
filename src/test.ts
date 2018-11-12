@@ -4,7 +4,7 @@ import * as ora from 'ora';
 import axios from 'axios';
 import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
-import { requestsObjectSchema as requestObjectSchema } from './configSchema';
+import { requestsObjectSchema as requestsObjectSchema } from './configSchema';
 import { config } from './configLoader';
 import * as jp from 'jsonpath';
 import * as nunjucks from 'nunjucks';
@@ -92,18 +92,16 @@ export const performTests = async (testObjects: object[], cmd: any) => {
       for(let requestName in requests) {
     
         if(!abortBecauseTestFailed) {
-          const val = requests[requestName];
+          const val:requestsObjectSchema = requests[requestName];
 
           let runTimes = 1;
-          if(typeof val.validate !== 'undefined'){
-            if(typeof val.validate.max_retries !== 'undefined'){
-              runTimes = val.validate.max_retries;
-            }
+          if(typeof val.maxRetries !== 'undefined'){
+            runTimes = val.maxRetries;
           }
           for(let i = 0; i != runTimes; i++) {
             // Delay for the specified number of milliseconds if given
             if(typeof val.delay !== 'undefined') {
-              const waitSpinner = ora(`Waiting for ${chalk.bold(colorizeMain(val.delay))} milliseconds`).start();
+              const waitSpinner = ora(`Waiting for ${chalk.bold(colorizeMain(val.delay.toString()))} milliseconds`).start();
 
               await function() {
                 return new Promise(resolve => setTimeout(resolve, val.delay));
@@ -274,7 +272,7 @@ export const validateType = (type: string, dataToProof: any) => {
  * @param requestName Name of the request
  * @param printAll If true, all response information will be logged in the console
  */
-const performRequest = async (requestObject: requestObjectSchema, requestName: string, printAll: boolean) => {
+const performRequest = async (requestObject: requestsObjectSchema, requestName: string, printAll: boolean) => {
 
   // parse the requestObject
   // let requestMethod: string, requestData: any, requestUrl: string, requestHeaders: any, requestParams: string;

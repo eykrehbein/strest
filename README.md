@@ -45,12 +45,14 @@ version: 1                            # only version at the moment
 
 requests:                             # all test requests will be listed here
   testRequest:                        # name the request however you want
-    url: https://postman-echo.com/get  # required
-    method: GET                       # required
-    data:                             # valid data types: params + json or raw
-      params:
-        foo1: bar1
-        foo2: bar2
+    request:
+      url: https://postman-echo.com/get  # required
+      method: GET                       # required
+      queryString:
+      - name: foo1
+        value: bar1
+      - name: foo2
+        value: bar2
     # log: true # uncomment this to log the response
 ```
 
@@ -144,14 +146,15 @@ requests:
     ...
 
   authNeeded:
-    delay: 2000 # Wait 2 seconds for token to become valid
+    request:
     ...
+    delay: 2000 # Wait 2 seconds for token to become valid
     headers:
-      Authorization: Bearer <$ login.token $>
+    - Authorization: Bearer <$ login.token $>
     ...
     validation:
-      json:
-        id: <$ login.users[0].id $> # use arrays like you would in javascript
+    - jsonpath: content.id
+      expect: <$ login.users[0].id $> # use arrays like you would in javascript
 
 ```
 
@@ -363,12 +366,13 @@ requests:
 ```yaml
 requests:
   waiter:
-    url: https://postman-echo.com/time/now
-    method: GET
+    request:
+      url: https://postman-echo.com/time/now
+      method: GET
     delay: 900
     validate:
       code: 200
-      max_retries: 30
+      maxRetries: 30
       raw: "Tue, 09 Oct 2018 03:07:20 GMT"
 ```
 
