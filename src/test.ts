@@ -390,7 +390,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     }
     return { isError: false, har: null, message: message, code: 0, curl: response.request.toCurl() }
   } catch(e) {
-    console.log("Failed request object: \n" + JSON.stringify(axiosObject, null, 2))
+    console.log("\nFailed request object: \n" + JSON.stringify(axiosObject, null, 2))
     return { isError: true, har: null, message: e, code: 1 }
   }
 }
