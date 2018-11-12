@@ -6,5 +6,5 @@ requests:
       url: https://jsonplaceholder.typicode.com/test/
       method: GET
     validate:
-      jsonpath: status
+    - jsonpath: status
       expect: 300
