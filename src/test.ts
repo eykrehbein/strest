@@ -221,49 +221,51 @@ const validationError = (message: string) => {
  * @param type 
  * @param dataToProof 
  */
-export const validateType = (type: string, dataToProof: any) => {  
-  
-  switch(type) {
-    // strings
-    case "string":
-      return Joi.validate(dataToProof, Joi.string()).error === null
-    case "string.hex":
-      return Joi.validate(dataToProof, Joi.string().hex()).error === null
-    case "string.email":
-      return Joi.validate(dataToProof, Joi.string().email()).error === null
-    case "string.ip":
-      return Joi.validate(dataToProof, Joi.string().ip()).error === null
-    case "string.url":
-    case "string.uri":
-      return Joi.validate(dataToProof, Joi.string().uri()).error === null
-    case "string.lowercase":
-      return Joi.validate(dataToProof, Joi.string().lowercase()).error === null
-    case "string.uppercase":
-      return Joi.validate(dataToProof, Joi.string().uppercase()).error === null
-    case "string.base64":
-      return Joi.validate(dataToProof, Joi.string().base64()).error === null
-    // boolean
-    case "bool":
-    case "boolean":
-      return Joi.validate(dataToProof, Joi.boolean()).error === null
-    // object
-    case "object":
-      return Joi.validate(dataToProof, Joi.object()).error === null
-    // array
-    case "array":
-      return Joi.validate(dataToProof, Joi.array()).error === null
-    // number
-    case "number":
-      return Joi.validate(dataToProof, Joi.number()).error === null
-    case "number.positive":
-      return Joi.validate(dataToProof, Joi.number().positive()).error === null
-    case "number.negative":
-      return Joi.validate(dataToProof, Joi.number().negative()).error === null
-    case "null":
-      return Joi.validate(dataToProof, Joi.allow(null)).error === null
-    default: 
-      return undefined;
-  };
+export const validateType = (type: Array<string>, dataToProof: any):boolean => {
+  function isType(elem:string){
+    switch(elem) {
+      // strings
+      case "string":
+        return Joi.validate(dataToProof, Joi.string()).error === null
+      case "string.hex":
+        return Joi.validate(dataToProof, Joi.string().hex()).error === null
+      case "string.email":
+        return Joi.validate(dataToProof, Joi.string().email()).error === null
+      case "string.ip":
+        return Joi.validate(dataToProof, Joi.string().ip()).error === null
+      case "string.url":
+      case "string.uri":
+        return Joi.validate(dataToProof, Joi.string().uri()).error === null
+      case "string.lowercase":
+        return Joi.validate(dataToProof, Joi.string().lowercase()).error === null
+      case "string.uppercase":
+        return Joi.validate(dataToProof, Joi.string().uppercase()).error === null
+      case "string.base64":
+        return Joi.validate(dataToProof, Joi.string().base64()).error === null
+      // boolean
+      case "bool":
+      case "boolean":
+        return Joi.validate(dataToProof, Joi.boolean()).error === null
+      // object
+      case "object":
+        return Joi.validate(dataToProof, Joi.object()).error === null
+      // array
+      case "array":
+        return Joi.validate(dataToProof, Joi.array()).error === null
+      // number
+      case "number":
+        return Joi.validate(dataToProof, Joi.number()).error === null
+      case "number.positive":
+        return Joi.validate(dataToProof, Joi.number().positive()).error === null
+      case "number.negative":
+        return Joi.validate(dataToProof, Joi.number().negative()).error === null
+      case "null":
+        return Joi.validate(dataToProof, Joi.allow(null)).error === null
+      default: 
+        return false;
+    }
+  }
+  return type.every(isType)
 } 
 
 /**
@@ -359,8 +361,8 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
         }
         if (validate.type){
           let validated = validateType(validate.type, jsonPathValue)
-          if (validated){
-            let err = validationError(`The Type should have been ${chalk.bold(validate.type)} but instead it was ${chalk.bold(jsonPathValue)}`);
+          if (!validated){
+            let err = validationError(`The Type should have been ${chalk.bold(validate.type.toString())} but instead it was ${chalk.bold(typeof jsonPathValue)}`);
             return { isError: true, har: har, message: err, code: 1 }
           }else{
             message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " type equals " + validate.type + "\n"

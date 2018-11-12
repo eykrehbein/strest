@@ -1,10 +1,10 @@
 # Validation
 
-## max_retries
+## maxRetries
 
-max_retries is best when combined with delay.  The request continues to execute until the expected validated response is received.
+maxRetries is best when combined with delay.  The request continues to execute until the expected validated response is received.
 
-[example](tests/success/successRequestValidateMaxRetries.strest.yml)
+[example](tests/success/success_validate_retries/maxRetries.strest.yml)
 
 ## Valid Types for Validation
 
@@ -31,12 +31,16 @@ All types can be used in uppercase or lowercase letters. They will be converted 
 **Match exactly one _Type_**
 
 ```yaml
-someItem: Type(String)
+validate:
+- jsonpath: content.id
+  type: [ string ]
 ```
 
 **Match at least one of the given _Types_**
 
 ```yaml
 # use the | character as a seperator
-someItem: Type(String | String.Hex | Null | Boolean)
+validate:
+- jsonpath: content.id
+  type: [ string, string.Hex, null, boolean]
 ```

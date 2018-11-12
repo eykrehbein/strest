@@ -9,4 +9,4 @@ requests:
     - jsonpath: headers["content-type"]
       expect: application/json; charset=utf-8
     - jsonpath: headers["access-control-allow-credentials"]
-      type: Boolean | String
+      type: [ boolean, string ]
