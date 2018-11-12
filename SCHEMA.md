@@ -6,23 +6,24 @@
 - [`variables`](#variables)
 - [`allowInsecure`](#allowinsecure)
 - [`requests` **_Required_**](#requests-_required_)
-    - [`request` **_At least one request is required_**](#request-_at-least-one-request-is-required_)
-        - [`url` **_Required_**](#url-_required_)
-        - [`method` **_Required_**](#method-_required_)
+    - [`requestName` **_At least one request is required_**](#requestname-_at-least-one-request-is-required_)
         - [`if`](#if)
         - [`delay`](#delay)
-        - [`data`](#data)
-            - [`json`](#json)
-            - [`raw`](#raw)
-            - [`params`](#params)
-        - [`headers`](#headers)
+        - [`request` **_Required_**](#request-_required_)
+            - [`url` **_Required_**](#url-_required_)
+            - [`method` **_Required_**](#method-_required_)
+            - [`postData`](#postdata)
+                - [`mimeType`](#mimetype)
+                - [`text`](#text)
+            - [`queryString`](#querystring)
+            - [`headers`](#headers)
         - [`auth`](#auth)
-          - [`basic`](#basic)
+            - [`basic`](#basic)
         - [`validate`](#validate)
-            - [`raw`](#raw-1)
-            - [`json`](#json-1)
-            - [`code`](#code)
-            - [`jsonpath`](#jsonpath)
+            - [jsonpath *required*](#jsonpath-required)
+            - [Expect](#expect)
+            - [Type](#type)
+            - [Regex](#regex)
         - [`log`](#log)
 
 <!-- /TOC -->
@@ -82,7 +83,7 @@ requests:
     ..
 ```
 
-### `request` **_At least one request is required_**
+### `requestName` **_At least one request is required_**
 
 A single request. You can name the request however you want. Try not to overwrite names because
 this will also overwrite the response data and you'll no longer be able to retrieve the data from the overwritten request.
@@ -110,45 +111,18 @@ requests:
         foo: 1
   skipped:
     if:
-      operand: Value(if_Set.foo)
+      operand: <$ if_Set.content.foo $>
       equals: 2
-    url: https://jsonplaceholder.typicode.com/todos/2
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET
   executed:
     if:
-      operand: Value(if_Set.foo)
+      operand: <$ if_Set.content.foo $>
       equals: 1
-    url: https://jsonplaceholder.typicode.com/todos/2
-    method: GET
-```
-
-#### `url` **_Required_**
-
-The target URL to which the request will be sent to. _Needs to start with `http` or `https`_
-
-```yaml
-# Basic Example
-someRequestName:
-  url: http://localhost:3000/api
-
-# Example with a connected value
-someConnectedRequest:
-  url: http://localhost:3000/api/user/Value(getUser.id)/friends
-```
-
-#### `method` **_Required_**
-
-The HTTP request method that will be used Strest to perform the request. All strings are accepted but consider to use one of the requests listed in the [Mozilla Developer Docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
-
-```yaml
-# Example
-somePostRequest:
-  url: ...
-  method: POST
-
-someGetRequest:
-  url: ...
-  method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET
 ```
 
 #### `delay`
@@ -163,166 +137,228 @@ someRequest:
   method: ...
 ```
 
-#### `data`
+#### `request` **_Required_**
 
-Specify data that you want to be sent with the request. This data can be formatted either `raw` or as `json`. You may only use one of those keys in a request.
+The request object conforms with [HAR](http://www.softwareishard.com/blog/har-12-spec/#request)
 
-However, `params` can always be added. They'll be added to the request's URL.
+##### `url` **_Required_**
 
-##### `json`
-
-```yaml
-# JSON Example
-someRequest:
-  url: ...
-  method: ...
-  data:
-    json:
-      username: testUser
-      password: test123
-      nested:
-        nestedKey: false
-```
-
-##### `raw`
-
-```yaml
-# Raw Data Example
-someRequest:
-  url: ...
-  method: ...
-  data:
-    raw: 'Some raw data to be sent'
-```
-
-##### `params`
-
-```yaml
-# Params as a string Example
-someRequest:
-  url: ...
-  method: ...
-  data:
-    json: ...
-    params: 'name=testUser&password=test123'
-
-# Params as an object Example
-someRequest:
-  url: ...
-  method: ...
-  data:
-    raw: ...
-    params: 
-      name: testUser
-      password: test123
-```
-
-#### `headers`
-
-Specify HTTP headers that you want to be sent with the request. Formatted as an Object.
+The target URL to which the request will be sent to. _Needs to start with `http` or `https`_
 
 ```yaml
 # Basic Example
-someRequest:
-  url:
-  method:
-  headers:
-    Authorization: Bearer Asmdoaodmasodm2omksd
-    ...
+someRequestName:
+  url: http://localhost:3000/api
 
 # Example with a connected value
-someRequest:
-  url:
-  method:
-  headers:
-    Authorization: Bearer Value(login.token)
-    ...
+someConnectedRequest:
+  url: http://localhost:3000/api/user/Value(getUser.id)/friends
+```
+
+##### `method` **_Required_**
+
+The HTTP request method that will be used Strest to perform the request. All strings are accepted but consider to use one of the requests listed in the [Mozilla Developer Docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+
+```yaml
+# Example
+somePostRequest:
+  request:
+    url: ...
+    method: POST
 
 ```
+
+##### `postData`
+
+Follows [this](http://www.softwareishard.com/blog/har-12-spec/#postData) schema.
+
+###### `mimeType`
+
+Set the mimeType to:
+
+- application/json
+- plain/text
+
+###### `text`
+
+```yaml
+# JSON Example
+version: 1
+
+requests:
+  postRequest:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json # Set the mimeType
+        text:
+          foo:
+            bar: "baz"
+```
+
+```yaml
+# Raw Data Example
+version: 1
+
+requests:
+  postRequest:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: text/plain  # Set the mimeType
+        text: "This is raw text"
+```
+
+##### `queryString`
+
+Conforms to [this](http://www.softwareishard.com/blog/har-12-spec/#queryString) shema.
+
+```yaml
+version: 1
+
+requests:
+  responseHeaders:
+    request:
+      url: https://postman-echo.com/response-headers
+      method: GET
+      queryString:
+      - name: foo1
+        value: bar1
+      - name: foo2
+        value: bar2
+```
+
+##### `headers`
+
+Specify HTTP headers that you want to be sent with the request. Formatted as an Array.
+
+```yaml
+# Basic Example
+version: 1
+
+requests:
+  requestHeaders:
+    request:
+      url: https://postman-echo.com/headers
+      method: GET
+      headers:
+        - name: exampleHeader
+          value: "Lorem ipsum dolor sit amet"
+    validate:
+      - jsonpath: content.headers.exampleheader
+        expect: "Lorem ipsum dolor sit amet"
+  requestHeaders2:
+    request:
+      url: https://postman-echo.com/headers
+      method: GET
+      headers:
+        [{ "name": "h1", "value": "v1" }, { "name": "h2", "value": "v2" }]
+    validate:
+      - jsonpath: content.headers.h1
+        expect: "v1"
+      - jsonpath: content.headers.h2
+        expect: "v2"
+```
+
 #### `auth`
 
 Predefined authentication methods which will set the `Authorization` header automatically
 
-#### `basic`
+##### `basic`
 
 HTTP Basic Authentication. Requires username and password.
 
 ```yaml
 # Example
 someRequest:
-  url:
-  method:
+  request:
+  ...
   auth:
     basic:
       username: myusername
       password: test123
-  ...
 ```
 
 #### `validate`
 
-Validate the incoming response either by a specific value or by a [`Type`](VALIDATION.md).
-[More information](README.md#ResponseValidation) about how to validate responses.
+The immediate response is stored in [HAR Format](http://www.softwareishard.com/blog/har-12-spec/#response)
 
-##### `raw`
+With **Strest** you can validate responses with:
 
-Validate a response against a raw
+- exact match (expect)
+- regex
+- type _[List of all valid Types](VALIDATION.md)_
 
-##### `json`
+Read [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) for more info and see [this file](tests/success/validate/jsonpath.strest.yml) for more complex example
 
-Validate response against a json
+##### jsonpath *required*
 
-##### `code`
+Read [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) for more info and see [this file](tests/success/validate/jsonpath.strest.yml) for more complex example
 
-Expect the returned status code to be a specific number or in a range of numbers.
+##### Expect
 
 ```yaml
-# Example (simple)
-someRequest:
-  url: ...
-  method: ...
-  validate:
-    code: 200 # expect the request to return the response code 200
-# Example (range)
-someRequest:
-  url: ...
-  method: ...
-  validate:
-    code: 2xx # expect the request to return a response code which is in the range of 200-299
+requests:
+  example:
+    ...
+    validate:
+    - jsonpath: content
+      expect: "the response has to match this string exactly"
 ```
 
-##### `jsonpath`
+##### Type
 
-Specify a [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) lookup.  The first match from the jsonpath is evaluated.  This currently deos not support objects.
+```yaml
+version: 1
+
+requests:
+  typeValidate:
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET
+    validate:
+    - jsonpath: headers["content-type"]
+      type: [ string ]
+    - jsonpath: status
+      type: [ boolean, string, number ]
+    - jsonpath: content.0.userId
+      type: [ number ]
+```
+
+##### Regex
+
+Regex can be used to validate status code or any other returned param
 
 ```yml
 version: 1
 
 requests:
-  jsonpath:
-    url: https://jsonplaceholder.typicode.com/posts
-    method: POST
-    data:
-      json:
-        myArray:
-        - foo: 1
-          bar: 1
-        - foo: 2
-          bar: 2
-    validate:
-      jsonpath:
-        myArray.1.foo: 2
+  codeValidate:
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET
+    validate: # Multiple ways to use regex to validate status code
+    - jsonpath: status
+      regex: 2\d+
+    - jsonpath: status
+      regex: 2[0-9]{2}
+    - jsonpath: status
+      regex: 2..
+    - jsonpath: status
+      regex: 2.*
 ```
 
 Read [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) for more info and see [this file](tests/success/validate/jsonpath.strest.yml) for more complex example
 
 #### `log`
 
-If set to `true`, the following information will be logged into the console for this request.
+If set to `true`, the following information will be logged into the console for this request. [HAR](http://www.softwareishard.com/blog/har-12-spec/#response)
 
-- Response Code
+- Response Status
 - Response Text
-- HTTP Headers
-- Response Data
+- Response Headers
+- Response Content
 
 If you want to log information of all requests into the console, use the `-p` flag when using the `strest` command
