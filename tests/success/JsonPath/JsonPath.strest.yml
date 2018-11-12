@@ -38,7 +38,7 @@ requests:
       queryString:
       - name: foo
         value: <$ JsonPath("set_JsonPath.phoneNumbers[?(@.type == \"home\")].number") $>
-    # validate:
-    # - jsonpath: content.args.foo
-    #   expect: 0123-4567-8910
+    validate:
+    - jsonpath: content.args.foo
+      expect: 0123-4567-8910
     log: true

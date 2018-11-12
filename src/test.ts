@@ -2,7 +2,6 @@ import chalk from 'chalk';
 import * as Joi from 'joi';
 import * as ora from 'ora';
 import axios from 'axios';
-import * as qs from 'qs';
 import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
 import { requestsObjectSchema as requestObjectSchema } from './configSchema';
@@ -202,7 +201,6 @@ export const computeRequestObject = (requestName: string, raw: string, r: any) =
   nunjucksEnv.addGlobal('JsonPath', function(path: string) {
     return jp.value(merged, path)
   })
-
   // Parse obj using nunjucks
   try {
     let converted = nunjucksEnv.renderString(raw, merged)
@@ -312,15 +310,14 @@ const performRequest = async (requestObject: requestObjectSchema, requestName: s
   }
 
   // queryString
-  for(let query in requestObject.request.queryString){
-    axiosObject.url += '?' + qs.stringify(query.toString())
+  if(typeof requestObject.request.queryString !== 'undefined') {
+    let queryString = "?"
+    for (let item of requestObject.request.queryString){
+      queryString += item.name + "=" + item.value + "&"
+    }
+    axiosObject.url += queryString.slice(0, -1)
   }
 
-  // if(typeof requestObject.request.queryString !== 'undefined') {
-  //   // stringify queryString
-  //   console.log(requestObject.request.queryString)
-  //   axiosObject.url += '?' + qs.stringify(requestObject.request.queryString)
-  // }
   // data
   if(typeof requestObject.request.postData !== 'undefined') {
     axiosObject.headers["Content-Type"] = requestObject.request.postData.mimeType
