@@ -14,7 +14,7 @@ requests:
       method: GET
       queryString:
       - name: baz
-        value: <% value1.args.foo %>
+        value: <$ value1.args.foo $>
     validate:
-    - jsonpath: args.baz
+    - jsonpath: content.args.baz
       expect: bar 

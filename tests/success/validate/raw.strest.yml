@@ -2,8 +2,13 @@ version: 1
 requests:
   raw:
     request:
-      url: https://postman-echo.com/stream/5
+      url: https://postman-echo.com/digest-auth
       method: GET
+      # postData:
+      #   text: This is expected to be sent back as part of response body.
+      #   mimeType: text/plain
     validate:
-    - jsonpath: code
-      expect: 200
+    - jsonpath: status
+      expect: 401
+    - jsonpath: content
+      expect: "Unauthorized"

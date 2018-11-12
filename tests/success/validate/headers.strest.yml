@@ -6,7 +6,7 @@ requests:
       url: https://jsonplaceholder.typicode.com/todos
       method: GET
     validate:
-    - jsonpath: headers.content-type
+    - jsonpath: headers["content-type"]
       expect: application/json; charset=utf-8
-    - jsonpath: access-control-allow-credentials
+    - jsonpath: headers["access-control-allow-credentials"]
       type: Boolean | String

@@ -7,10 +7,10 @@ requests:
       method: GET
   arr1:
     request:
-      url: https://jsonplaceholder.typicode.com/todos/<%arr[0].id%>
+      url: https://jsonplaceholder.typicode.com/todos/<$ arr[0].id $>
       method: GET
     validate:
-    - jsonpath: title
+    - jsonpath: content.title
       expect: "delectus aut autem"
-    - jsonpath: id
+    - jsonpath: content.id
       expect: 1
