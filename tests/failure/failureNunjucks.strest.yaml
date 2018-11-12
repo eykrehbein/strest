@@ -1,0 +1,14 @@
+version: 1
+
+variables:
+  testUrl: https://jsonplaceholder.typicode.com/todos/1
+  to_log: true
+
+requests:
+  invalidValidation:
+    request:
+      url: <$ failUrl $>/todos/1
+      method: GET
+    validate:
+    - jsonpath: content.id
+      expect: 100

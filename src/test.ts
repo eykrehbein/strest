@@ -137,7 +137,10 @@ export const performTests = async (testObjects: object[], cmd: any) => {
               if(runTimes === 1){
                 spinner.clear();
                 spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
-                console.log(JSON.stringify(error.har, null, 2))
+                if (error.curl) {
+                  console.log("Request: " + JSON.stringify(error.curl, null, 2))
+                }
+                console.log("Response: \n" + JSON.stringify(error.har, null, 2))
                 if(!cmd.noExit) {
                   return 1;
                 }
@@ -350,12 +353,12 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
         let jsonPathValue = jp.value(har, validate.jsonpath)
         if (!jsonPathValue){
           let err = validationError(`The jsonpath ${chalk.bold(validate.jsonpath)} resolved to ${chalk.bold(typeof jsonPathValue)}`);
-          return { isError: true, har: har, message: err, code: 1 }
+          return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
         }
         if (validate.expect){
           if(jsonPathValue !== validate.expect){
             let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);
-            return { isError: true, har: har, message: err, code: 1 }
+            return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
           }else{
             message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " equals " + validate.expect + "\n"
           }
@@ -364,7 +367,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
           let validated = validateType(validate.type, jsonPathValue)
           if (!validated){
             let err = validationError(`The Type should have been ${chalk.bold(validate.type.toString())} but instead it was ${chalk.bold(typeof jsonPathValue)}`);
-            return { isError: true, har: har, message: err, code: 1 }
+            return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
           }else{
             message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " type equals " + validate.type + "\n"
           }
@@ -374,11 +377,11 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
           let validated = regex.test(jsonPathValue)
           if (!validated){
             let err = validationError(`The regex ${chalk.bold(validate.regex.toString())} did not return a match against ${chalk.bold(jsonPathValue)}`);
-            return { isError: true, har: har, message: err, code: 1 }
+            return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
           }else{
             message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " regex return a match on " + validate.regex + "\n"
           }
-        }        
+        }
       }
     }
     // if the result should be logged
@@ -387,6 +390,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     }
     return { isError: false, har: null, message: message, code: 0, curl: response.request.toCurl() }
   } catch(e) {
+    console.log("Failed request object: \n" + JSON.stringify(axiosObject, null, 2))
     return { isError: true, har: null, message: e, code: 1 }
   }
 }
