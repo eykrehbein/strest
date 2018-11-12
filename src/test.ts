@@ -368,6 +368,16 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
             message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " type equals " + validate.type + "\n"
           }
         }
+        if (validate.regex){
+          let regex = RegExp(validate.regex);
+          let validated = regex.test(jsonPathValue)
+          if (!validated){
+            let err = validationError(`The regex ${chalk.bold(validate.regex.toString())} did not return a match against ${chalk.bold(jsonPathValue)}`);
+            return { isError: true, har: har, message: err, code: 1 }
+          }else{
+            message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " regex return a match on " + validate.regex + "\n"
+          }
+        }        
       }
     }
     // if the result should be logged

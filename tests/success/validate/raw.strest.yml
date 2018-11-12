@@ -4,9 +4,6 @@ requests:
     request:
       url: https://postman-echo.com/digest-auth
       method: GET
-      # postData:
-      #   text: This is expected to be sent back as part of response body.
-      #   mimeType: text/plain
     validate:
     - jsonpath: status
       expect: 401

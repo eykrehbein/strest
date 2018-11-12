@@ -66,7 +66,11 @@ const validateSchema = Joi.object().keys({
   type: Joi.array().items(Joi.string()).optional(),
   regex: Joi.string().optional()
 }).without('type', 'expect')
+  .without('type', 'regex')
+  .without('expect', 'regex')
   .without('expect', 'type')
+  .without('regex', 'type')
+  .without('regex', 'expect')
 
 export const responseSchema = Joi.object().keys({
   // This is the strict response schema.  It can be used to validate and log responses

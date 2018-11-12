@@ -1,0 +1,10 @@
+version: 1
+
+requests:
+  failureCodeRegex201:
+    request:
+      url: https://postman-echo.com/status/201
+      method: GET
+    validate:
+    - jsonpath: status
+      regex: 3\d+
