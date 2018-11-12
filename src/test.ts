@@ -137,9 +137,10 @@ export const performTests = async (testObjects: object[], cmd: any) => {
               if(runTimes === 1){
                 spinner.clear();
                 spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
+                console.log(JSON.stringify(error.har, null, 2))
                 if(!cmd.noExit) {
                   return 1;
-                } 
+                }
               } else {
                 if(runTimes - 1 === i){
                   spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate within ${chalk.bold(colorizeCustomRed(runTimes.toString()))} (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
@@ -223,7 +224,7 @@ const validationError = (message: string) => {
  */
 export const validateType = (type: Array<string>, dataToProof: any):boolean => {
   function isType(elem:string){
-    switch(elem) {
+    switch(elem.toLowerCase()) {
       // strings
       case "string":
         return Joi.validate(dataToProof, Joi.string()).error === null
@@ -265,7 +266,7 @@ export const validateType = (type: Array<string>, dataToProof: any):boolean => {
         return false;
     }
   }
-  return type.every(isType)
+  return type.some(isType)
 } 
 
 /**
@@ -347,6 +348,10 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     if ('validate' in requestObject){
       for (let validate of requestObject.validate){
         let jsonPathValue = jp.value(har, validate.jsonpath)
+        if (!jsonPathValue){
+          let err = validationError(`The jsonpath ${chalk.bold(validate.jsonpath)} resolved to ${chalk.bold(typeof jsonPathValue)}`);
+          return { isError: true, har: har, message: err, code: 1 }
+        }
         if (validate.expect){
           if(jsonPathValue !== validate.expect){
             let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);

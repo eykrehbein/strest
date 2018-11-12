@@ -9,3 +9,4 @@ requests:
     request:
       url: <$ testUrl $>
       method: GET
+    log: <$ to_log $>

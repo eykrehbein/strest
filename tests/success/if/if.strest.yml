@@ -11,14 +11,14 @@ requests:
           foo: 1
   skipped:
     if:
-      operand: <$ if_Set.foo $>
+      operand: <$ if_Set.content.foo $>
       equals: 2
     request:
       url: https://jsonplaceholder.typicode.com/todos/2
       method: GET
   executed:
     if:
-      operand: <$ if_Set.foo $>
+      operand: <$ if_Set.content.foo $>
       equals: 1
     request:
       url: https://jsonplaceholder.typicode.com/todos/2
