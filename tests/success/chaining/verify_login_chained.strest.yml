@@ -8,7 +8,7 @@ requests:
       postData:
         mimeType: application/json
         text:
-          foo: <$ login.authenticated $>
+          foo: <$ login.content.authenticated $>
     validate:
     - jsonpath: content.foo
       expect: true

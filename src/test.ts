@@ -334,19 +334,15 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     })
     let response = await axiosInstance(axiosObject)
 
-    if(typeof response.data !== 'undefined') {
-      requestReponses[requestName] = response.data;
-    }
-
-    const req = response.request;
-    // Convert req to har object structure
-
+    // Convert response to har object structure
     const har = {
       status: response.status,
       statusText: response.statusText,
       headers: response.headers,
       content: response.data
     }
+
+    requestReponses[requestName] = har;
     let message = ""
     if ('validate' in requestObject){
       for (let validate of requestObject.validate){
@@ -382,9 +378,9 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     }
     // if the result should be logged
     if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
-      return { isError: false, har: har, message: message, code: 0, curl: req.toCurl() }
+      return { isError: false, har: har, message: message, code: 0, curl: response.request.toCurl() }
     }
-    return { isError: false, har: null, message: message, code: 0, curl: req.toCurl() }
+    return { isError: false, har: null, message: message, code: 0, curl: response.request.toCurl() }
   } catch(e) {
     return { isError: true, har: null, message: e, code: 1 }
   }
