@@ -1,0 +1,17 @@
+version: 1
+
+requests:
+  responseHeaders:
+    request:
+      url: https://postman-echo.com/response-headers
+      method: GET
+      queryString:
+      - name: foo1
+        value: bar1
+      - name: foo2
+        value: bar2
+    validate:
+    - jsonpath:  headers["foo1"]
+      expect: bar1
+    - jsonpath:  headers["foo2"]
+      expect: bar2

@@ -1,0 +1,10 @@
+version: 1
+
+requests:
+  responseStatusCode:
+    request:
+      url: https://postman-echo.com/status/201
+      method: GET
+    validate:
+    - jsonpath: status
+      expect: 201

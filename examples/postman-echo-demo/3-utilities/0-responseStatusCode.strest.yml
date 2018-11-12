@@ -1,8 +1,0 @@
-version: 1
-
-requests:
-  responseStatusCode:
-    url: https://postman-echo.com/status/201
-    method: GET
-    validate:
-      code: 201

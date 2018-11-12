@@ -1,0 +1,13 @@
+version: 1
+
+requests:
+  patchRequest:
+    request:
+      url: <$ baseUrl $>/patch
+      method: PATCH
+      postData:
+        mimeType: text/plain
+        text: <$ exampleData $>
+    validate:
+    - jsonpath: status
+      expect: 200
