@@ -15,18 +15,18 @@ export const parseTestingFiles = (pathArray: string[], dir: string) => {
   let responseData: object[] = [];
   pathArray.map((filePath: any) => {
     try {
-      if(typeof filePath === 'string'){
+      if(typeof filePath === 'string') {
         const data = fs.readFileSync(filePath.toString(), 'utf8');
-        const parsed: any = yaml.safeLoad(data)
-        const removeFilename = filePath.substring(0, filePath.lastIndexOf("/") + 1);
-        if(dir === null){
-          dir = "";
+        const parsed: any = yaml.safeLoad(data);
+        const removeFilename = path.dirname(filePath) + path.sep;
+        if(dir === null) {
+          dir = '';
         }
-        parsed.relativePath = removeFilename.replace(path.join(process.cwd(), dir), "./")
+        parsed.relativePath = removeFilename.replace(path.join(process.cwd(), dir), '.' + path.sep);
         responseData.push(parsed);
       }
     } catch(e) {
-      writeErrorMessage(`An error occured while parsing ${path.relative(process.cwd(), filePath)}`)
+      writeErrorMessage(`An error occured while parsing ${path.relative(process.cwd(), filePath)}`);
       writeErrorMessage(e);
     }
   })
