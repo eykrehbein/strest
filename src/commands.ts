@@ -14,6 +14,7 @@ const initializeCommands = () => {
     .option('-b, --bulk', 'Execute Tests and directories defined in the specified yml')
     .option('-s, --save', 'Saves the results of the executions and variables to strest_history.json')
     .option('-l, --load', 'Loads strest_history.json to use as input.')
+    .option('-k, --key [keyname]', 'Execute a specific key in the file.')
     .action(async (dir, cmd: any) => {
       // use time to inform the user about how long the execution of the test took
       const executionStartedTime = new Date().getTime();

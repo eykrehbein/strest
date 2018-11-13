@@ -13,7 +13,6 @@ import * as jsonfile  from 'jsonfile'
 
 require('request-to-curl');
 
-
 const nunjucksEnv = nunjucks.configure(".", {
   tags: {
     blockStart: '<%',
@@ -98,8 +97,15 @@ export const performTests = async (testObjects: object[], cmd: any) => {
 
       const requests = testObject['requests'];
       for (let requestName in requests) {
+        let bypass = false
+        if (cmd.key){
+          bypass = true
+          if (cmd.key == requestName) {
+            bypass = false
+          }
+        }
 
-        if (!abortBecauseTestFailed) {
+        if (!abortBecauseTestFailed && !bypass) {
           const val: requestsObjectSchema = requests[requestName];
 
           let runTimes = 1;
