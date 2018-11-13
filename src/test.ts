@@ -9,6 +9,7 @@ import { config } from './configLoader';
 import * as jp from 'jsonpath';
 import * as nunjucks from 'nunjucks';
 import * as yaml from 'js-yaml';
+import * as jsonfile  from 'jsonfile'
 
 require('request-to-curl');
 
@@ -23,11 +24,11 @@ const nunjucksEnv = nunjucks.configure(".", {
     commentEnd: '#>'
   }
 });
-nunjucksEnv.addGlobal('Faker', function(faked: string) {
+nunjucksEnv.addGlobal('Faker', function (faked: string) {
   return faker.fake(`{{${faked}}}`);
 })
 
-nunjucksEnv.addGlobal('Env', function(envi: string) {
+nunjucksEnv.addGlobal('Env', function (envi: string) {
   let environ = process.env[envi]
   return environ;
 })
@@ -55,25 +56,25 @@ let definedVariables: any = {
  * @param testObjects 
  * @param printAll If true, all response information will be logged in the console
  */
-export const performTests = async (testObjects: object[], cmd: any) => {
+export const performTests = async (testObjects: object[], cmd: any) => {
   let testObject: any
   let abortBecauseTestFailed = false;
-  
-  const printAll = cmd.print;
 
-  // true if the --output curl option was set
+  const printAll = cmd.print;
+  // true if the options are set was set
   const toCurl = cmd.output == 'curl';
+
   let curPath = "./";
-  if(testObjects.length > 1){
+  if (testObjects.length > 1) {
     console.log(chalk.blueBright("Executing tests in " + curPath));
   }
-  for(testObject of testObjects){
-  
-    if(testObject['allowInsecure']) {
+  for (testObject of testObjects) {
+
+    if (testObject['allowInsecure']) {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     }
 
-    if(testObject['variables']) {
+    if (testObject['variables']) {
       // merge the existing variables with the new to allow multiple testfiles
       // to use variables from previous files
       definedVariables = {
@@ -81,29 +82,29 @@ export const performTests = async (testObjects: object[], cmd: any) => {
         ...testObject['variables']
       }
     }
-  
-    if (curPath != testObject.relativePath && testObjects.length > 1){
+
+    if (curPath != testObject.relativePath && testObjects.length > 1) {
       console.log(chalk.blueBright("Executing tests in: " + testObject.relativePath));
     }
     curPath = testObject.relativePath
-    if(!abortBecauseTestFailed){
-    
+    if (!abortBecauseTestFailed) {
+
       const requests = testObject['requests'];
-      for(let requestName in requests) {
-    
-        if(!abortBecauseTestFailed) {
-          const val:requestsObjectSchema = requests[requestName];
+      for (let requestName in requests) {
+
+        if (!abortBecauseTestFailed) {
+          const val: requestsObjectSchema = requests[requestName];
 
           let runTimes = 1;
-          if(typeof val.maxRetries !== 'undefined'){
+          if (typeof val.maxRetries !== 'undefined') {
             runTimes = val.maxRetries;
           }
-          for(let i = 0; i != runTimes; i++) {
+          for (let i = 0; i != runTimes; i++) {
             // Delay for the specified number of milliseconds if given
-            if(typeof val.delay !== 'undefined') {
+            if (typeof val.delay !== 'undefined') {
               const waitSpinner = ora(`Waiting for ${chalk.bold(colorizeMain(val.delay.toString()))} milliseconds`).start();
 
-              await function() {
+              await function () {
                 return new Promise(resolve => setTimeout(resolve, val.delay));
               }();
 
@@ -115,11 +116,11 @@ export const performTests = async (testObjects: object[], cmd: any) => {
             let result = "succeeded"
             let error = null
             let computed = computeRequestObject(requestName, testObject.raw, requestReponses);
-            if(error !== null) {
+            if (error !== null) {
               // pass
             } else {
-              if(typeof computed.if !== 'undefined'){
-                if(computed.if.operand == computed.if.equals){
+              if (typeof computed.if !== 'undefined') {
+                if (computed.if.operand == computed.if.equals) {
                   error = await performRequest(computed, requestName, printAll);
                 } else {
                   result = "skipped"
@@ -133,55 +134,55 @@ export const performTests = async (testObjects: object[], cmd: any) => {
             const endTime = new Date().getTime();
             const execTime = (endTime - startTime) / 1000;
 
-            if(error.isError === true) {
-              if(runTimes === 1){
+            if (error.isError === true) {
+              if (runTimes === 1) {
                 spinner.clear();
                 spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
                 if (error.curl) {
                   console.log("Request: " + JSON.stringify(error.curl, null, 2))
                 }
                 console.log("Response: \n" + JSON.stringify(error.har, null, 2))
-                if(!cmd.noExit) {
+                if (!cmd.noExit) {
                   return 1;
                 }
               } else {
-                if(runTimes - 1 === i){
+                if (runTimes - 1 === i) {
                   spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate within ${chalk.bold(colorizeCustomRed(runTimes.toString()))} (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
                   abortBecauseTestFailed = true;
-                  if(!cmd.noExit) {
+                  if (!cmd.noExit) {
                     return 1;
                   }
                 } else {
-                  spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate. Retrying (${chalk.bold((runTimes -i).toString())})... (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
+                  spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate. Retrying (${chalk.bold((runTimes - i).toString())})... (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
                   continue
                 }
               }
             } else {
               let har = error.har
-              if(har) {
+              if (har) {
                 // log the response info and data
                 let dataString = '';
-                if('content' in har) {
+                if ('content' in har) {
                   dataString = `\n\n${colorizeMain('Content')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(har.content, null, 2))}\n`;
                 } else {
                   dataString = `\n\n${colorizeMain('Content')}: No Content received\n`;
                 }
                 spinner.succeed(
                   `Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})` +
-                  `\n\n${colorizeMain('Status')}: ${har.status}`+
+                  `\n\n${colorizeMain('Status')}: ${har.status}` +
                   `\n${colorizeMain('Status Text')}: ${har.statusText}` +
-                  `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(har.headers, null ,2))}` +
+                  `\n\n${colorizeMain('Headers')}: \n\n${chalk.hex(config.secondaryColor)(JSON.stringify(har.headers, null, 2))}` +
                   `${dataString}`
                 )
-              } else {
-                if (result === "skipped"){
+              } else {
+                if (result === "skipped") {
                   spinner.succeed(`Skipped Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})`)
-                }else{
+                } else {
                   spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})`)
                 }
               }
             }
-            if(toCurl === true){
+            if (toCurl === true) {
               console.log(`\n${colorizeMain('Curl Equivalent: ')}${chalk.grey(error.curl)}\n`);
             }
             break
@@ -190,8 +191,19 @@ export const performTests = async (testObjects: object[], cmd: any) => {
       }
     }
   }
+  if (cmd.save) {
+    const fileName = cmd.save
+    let fileObj = {}
+    try {
+      fileObj = jsonfile.readFileSync(fileName)
+    } catch {
+      // Oh well, but whatever...
+    }
+    const fileOutput = {...fileObj, ...requestReponses, ...definedVariables}
+    jsonfile.writeFileSync(fileName, fileOutput, { spaces: 2, EOL: '\r\n'})    
+  }
   return 0;
-} 
+}
 
 /**
  * Use nunjucks to replace and update the object
@@ -199,8 +211,8 @@ export const performTests = async (testObjects: object[], cmd: any) => {
  */
 export const computeRequestObject = (requestName: string, raw: string, r: any) => {
 
-  let merged = {...r, ...definedVariables};
-  nunjucksEnv.addGlobal('JsonPath', function(path: string) {
+  let merged = { ...r, ...definedVariables };
+  nunjucksEnv.addGlobal('JsonPath', function (path: string) {
     return jp.value(merged, path)
   })
   // Parse obj using nunjucks
@@ -208,7 +220,7 @@ export const computeRequestObject = (requestName: string, raw: string, r: any) =
     let converted = nunjucksEnv.renderString(raw, merged)
     const parsed: any = yaml.safeLoad(converted)
     return parsed.requests[requestName]
-  } catch(e) {
+  } catch (e) {
     throw e;
   }
 }
@@ -225,9 +237,9 @@ const validationError = (message: string) => {
  * @param type 
  * @param dataToProof 
  */
-export const validateType = (type: Array<string>, dataToProof: any):boolean => {
-  function isType(elem:string){
-    switch(elem.toLowerCase()) {
+export const validateType = (type: Array<string>, dataToProof: any): boolean => {
+  function isType(elem: string) {
+    switch (elem.toLowerCase()) {
       // strings
       case "string":
         return Joi.validate(dataToProof, Joi.string()).error === null
@@ -265,12 +277,12 @@ export const validateType = (type: Array<string>, dataToProof: any):boolean => {
         return Joi.validate(dataToProof, Joi.number().negative()).error === null
       case "null":
         return Joi.validate(dataToProof, Joi.allow(null)).error === null
-      default: 
+      default:
         return false;
     }
   }
   return type.some(isType)
-} 
+}
 
 /**
  * Perform the Request
@@ -297,15 +309,15 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
   axiosObject.method = requestObject.request.method;
   axiosObject.headers = {}
   // headers
-  if(typeof requestObject.request.headers !== 'undefined') {
+  if (typeof requestObject.request.headers !== 'undefined') {
     requestObject.request.headers.map((header) => {
       axiosObject.headers[header.name] = header.value
     })
   }
 
   //Basic Auth
-  if(typeof requestObject.auth !== 'undefined') {
-    if(typeof requestObject.auth.basic !== 'undefined') {
+  if (typeof requestObject.auth !== 'undefined') {
+    if (typeof requestObject.auth.basic !== 'undefined') {
       const username = requestObject.auth.basic.username;
       const password = requestObject.auth.basic.password;
       const encoded = Buffer.from(username + ':' + password).toString('base64');
@@ -314,23 +326,23 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
   }
 
   // queryString
-  if(typeof requestObject.request.queryString !== 'undefined') {
+  if (typeof requestObject.request.queryString !== 'undefined') {
     let queryString = "?"
-    for (let item of requestObject.request.queryString){
+    for (let item of requestObject.request.queryString) {
       queryString += item.name + "=" + item.value + "&"
     }
     axiosObject.url += queryString.slice(0, -1)
   }
 
   // data
-  if(typeof requestObject.request.postData !== 'undefined') {
+  if (typeof requestObject.request.postData !== 'undefined') {
     axiosObject.headers["Content-Type"] = requestObject.request.postData.mimeType
-    if(requestObject.request.postData.text) {
+    if (requestObject.request.postData.text) {
       axiosObject.data = requestObject.request.postData.text;
     }
   }
 
-  try {
+  try {
     let axiosInstance = axios.create({
       validateStatus: function (status) {
         return status < 500; // Reject only if the status code is greater than or equal to 500
@@ -348,48 +360,48 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
 
     requestReponses[requestName] = har;
     let message = ""
-    if ('validate' in requestObject){
-      for (let validate of requestObject.validate){
+    if ('validate' in requestObject) {
+      for (let validate of requestObject.validate) {
         let jsonPathValue = jp.value(har, validate.jsonpath)
-        if (!jsonPathValue){
+        if (!jsonPathValue) {
           let err = validationError(`The jsonpath ${chalk.bold(validate.jsonpath)} resolved to ${chalk.bold(typeof jsonPathValue)}`);
           return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
         }
-        if (validate.expect){
-          if(jsonPathValue !== validate.expect){
+        if (validate.expect) {
+          if (jsonPathValue !== validate.expect) {
             let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);
             return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
-          }else{
-            message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " equals " + validate.expect + "\n"
+          } else {
+            message = message + "jsonpath " + validate.jsonpath + "(" + jsonPathValue + ")" + " equals " + validate.expect + "\n"
           }
         }
-        if (validate.type){
+        if (validate.type) {
           let validated = validateType(validate.type, jsonPathValue)
-          if (!validated){
+          if (!validated) {
             let err = validationError(`The Type should have been ${chalk.bold(validate.type.toString())} but instead it was ${chalk.bold(typeof jsonPathValue)}`);
             return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
-          }else{
-            message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " type equals " + validate.type + "\n"
+          } else {
+            message = message + "jsonpath " + validate.jsonpath + "(" + jsonPathValue + ")" + " type equals " + validate.type + "\n"
           }
         }
-        if (validate.regex){
+        if (validate.regex) {
           let regex = RegExp(validate.regex);
           let validated = regex.test(jsonPathValue)
-          if (!validated){
+          if (!validated) {
             let err = validationError(`The regex ${chalk.bold(validate.regex.toString())} did not return a match against ${chalk.bold(jsonPathValue)}`);
             return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
-          }else{
-            message = message + "jsonpath " + validate.jsonpath + "(" +jsonPathValue + ")" + " regex return a match on " + validate.regex + "\n"
+          } else {
+            message = message + "jsonpath " + validate.jsonpath + "(" + jsonPathValue + ")" + " regex return a match on " + validate.regex + "\n"
           }
         }
       }
     }
     // if the result should be logged
-    if(requestObject.log === true || requestObject.log == 'true' || printAll === true) {
+    if (requestObject.log === true || requestObject.log == 'true' || printAll === true) {
       return { isError: false, har: har, message: message, code: 0, curl: response.request.toCurl() }
     }
     return { isError: false, har: null, message: message, code: 0, curl: response.request.toCurl() }
-  } catch(e) {
+  } catch (e) {
     console.log("\nFailed request object: \n" + JSON.stringify(axiosObject, null, 2))
     return { isError: true, har: null, message: e, code: 1 }
   }

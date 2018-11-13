@@ -12,6 +12,8 @@ const initializeCommands = () => {
     .option('-o, --output <type>', 'Output the test as a specific equivalent')
     .option('-n, --no-exit', `Don't exit with code 1 when a request failed`)
     .option('-b, --bulk', 'Execute Tests and directories defined in the specified yml')
+    .option('-s, --save [filename.json]', 'Saves the results of the executions and variables')
+    // .option('-l, --load [filename.json]', 'Loads a file to use as input. Future used for iterative manual executions')
     .action(async (dir, cmd: any) => {
       // use time to inform the user about how long the execution of the test took
       const executionStartedTime = new Date().getTime();
