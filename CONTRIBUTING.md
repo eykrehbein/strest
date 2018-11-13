@@ -15,4 +15,7 @@ export STREST_GMT_DATE=$(TZ=GMT-0 date --date='10 seconds' --rfc-2822 | sed "s/+
 node dist/main.js tests/success_validate_retries/
 node dist/main.js tests/failure/ --no-exit
 node dist/main.js tests/success/bulk.yml -b
+# Manual chained executions
+node dist/main.js tests/success/chaining/login.strest.yml --save
+node dist/main.js tests/success/chaining/verify_login_chained.strest.yml --load --save
 ```

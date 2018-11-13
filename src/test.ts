@@ -57,6 +57,20 @@ export const performTests = async (testObjects: object[], cmd: any) => {
   // true if the options are set was set
   const toCurl = cmd.output == 'curl';
 
+  // Load existing objects
+  if (cmd.load) {
+    const fileName = "strest_history.json"
+    let fileMap: Map<string, object> = new Map<string, object>()
+    try {
+      fileMap = new Map(Object.entries(jsonfile.readFileSync(fileName)))
+    } catch {
+      // Oh well, but whatever...
+    }
+    fileMap.forEach(function(value, key){
+      requestReponses.set(key, value)
+    })
+  }
+
   let curPath = "./";
   if (testObjects.length > 1) {
     console.log(chalk.blueBright("Executing tests in " + curPath));
@@ -186,7 +200,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
     }
   }
   if (cmd.save) {
-    const fileName = cmd.save
+    const fileName = "strest_history.json"
     let fileMap: Map<string, object> = new Map<string, object>()
     try {
       fileMap = new Map(Object.entries(jsonfile.readFileSync(fileName)))
