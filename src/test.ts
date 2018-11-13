@@ -36,14 +36,7 @@ nunjucksEnv.addGlobal('Env', function (envi: string) {
 /**
  * All Data that any request returns, will be stored here. After that it can be used in the following methods
  */
-let requestReponses: any = {
-  // // Example data
-  // register: {
-  //     id: 123,
-  //     token: 'aTokenValue'
-  // },
-  // rawDataExample: 'asdaasds'
-}
+let requestReponses: Map<string, object> = new Map<string, object>()
 
 // The manually defined variables 
 // Usable through <% variableName %>
@@ -115,7 +108,8 @@ export const performTests = async (testObjects: object[], cmd: any) => {
             const startTime = new Date().getTime();
             let result = "succeeded"
             let error = null
-            let computed = computeRequestObject(requestName, testObject.raw, requestReponses);
+            const requestReponsesObj = Array.from(requestReponses.entries()).reduce((main, [key, value]) => ({...main, [key]: value}), {})
+            let computed = computeRequestObject(requestName, testObject.raw, requestReponsesObj);
             if (error !== null) {
               // pass
             } else {
@@ -193,14 +187,21 @@ export const performTests = async (testObjects: object[], cmd: any) => {
   }
   if (cmd.save) {
     const fileName = cmd.save
-    let fileObj = {}
+    let fileMap: Map<string, object> = new Map<string, object>()
     try {
-      fileObj = jsonfile.readFileSync(fileName)
+      fileMap = new Map(Object.entries(jsonfile.readFileSync(fileName)))
     } catch {
       // Oh well, but whatever...
     }
-    const fileOutput = {...fileObj, ...requestReponses, ...definedVariables}
-    jsonfile.writeFileSync(fileName, fileOutput, { spaces: 2, EOL: '\r\n'})    
+    let definedVariablesMap = new Map(Object.entries(definedVariables))
+    definedVariablesMap.forEach(function(value, key){
+      fileMap.set(key, value)
+    })
+    requestReponses.forEach(function(value, key){
+      fileMap.set(key, value)
+    })
+    let resultOrder = Array.from(fileMap.entries()).reduce((main, [key, value]) => ({...main, [key]: value}), {})
+    jsonfile.writeFileSync(fileName, resultOrder, { spaces: 2, EOL: '\r\n'})
   }
   return 0;
 }
@@ -358,7 +359,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
       content: response.data
     }
 
-    requestReponses[requestName] = har;
+    requestReponses.set(requestName, har)
     let message = ""
     if ('validate' in requestObject) {
       for (let validate of requestObject.validate) {
