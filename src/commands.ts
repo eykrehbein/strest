@@ -24,7 +24,7 @@ const initializeCommands = () => {
       }
       // workaround for --no-exit option because options with hyphens can't be read
       cmd.noExit = cmd.rawArgs.includes('-n') || cmd.rawArgs.includes('--no-exit');
-      
+
       const exitCode: any = await handler.start(dir,cmd);
 
       const executionEndedTime = new Date().getTime();

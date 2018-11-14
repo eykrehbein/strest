@@ -17,7 +17,11 @@ export const findTestFiles = async (dir: string) => {
   let isFile = false;
   // if a custom path was defined
   if(dir !== null){
-    cwd = path.join(process.cwd(), dir);
+    if (dir.charAt(0) == '/'){
+      cwd = dir
+    } else {
+      cwd = path.join(process.cwd(), dir);
+    }
     if(!fs.existsSync(cwd)){
       return null;
     }

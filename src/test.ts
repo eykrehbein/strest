@@ -10,6 +10,7 @@ import * as jp from 'jsonpath';
 import * as nunjucks from 'nunjucks';
 import * as yaml from 'js-yaml';
 import * as jsonfile  from 'jsonfile'
+import * as path from 'path';
 
 require('request-to-curl');
 
@@ -206,7 +207,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
     }
   }
   if (cmd.save) {
-    const fileName = "strest_history.json"
+    const fileName = path.join(process.cwd(), "strest_history.json");
     let fileMap: Map<string, object> = new Map<string, object>()
     try {
       fileMap = new Map(Object.entries(jsonfile.readFileSync(fileName)))
