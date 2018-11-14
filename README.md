@@ -19,12 +19,12 @@
 
 ```bash
 # Via Yarn
-yarn global add strest-cli
+yarn global add @strest/cli
 ```
 
 ```bash
 # Via npm
-npm i -g strest-cli
+npm i -g @strest/cli
 ```
 
 ```bash
