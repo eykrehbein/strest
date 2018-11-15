@@ -1,5 +1,5 @@
 {
-  "name": "strest-cli",
+  "name": "@strest/cli",
   "version": "2.0.0",
   "description": "A new dimension of REST API testing",
   "main": "dist/main.js",
@@ -60,5 +60,8 @@
     "jest": "^23.6.0",
     "ts-jest": "^23.1.4",
     "typescript": "^3.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
