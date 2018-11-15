@@ -17,10 +17,10 @@ script:
     - node dist/main.js tests/success/bulk.yml -b
     - node dist/main.js tests/success/chaining/login.strest.yml --save
     - node dist/main.js tests/success/chaining/verify_login_chained.strest.yml --load --save
-deploy:
-  provider: npm
-  email: "eykrehbein@gmail.com"
-  api_key: $NPM_KEY
-  on:
-    tags: true
-    branch: master
+# deploy:
+#   provider: npm
+#   email: "eykrehbein@gmail.com"
+#   api_key: $NPM_KEY
+#   on:
+#     tags: true
+#     branch: master
