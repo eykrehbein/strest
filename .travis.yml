@@ -15,10 +15,10 @@ script:
     - node dist/main.js tests/success_validate_retries/
     - node dist/main.js tests/failure/ --no-exit
     - node dist/main.js tests/success/bulk.yml -b
-deploy:
-  provider: npm
-  email: "eykrehbein@gmail.com"
-  api_key: $NPM_KEY
-  on:
-    tags: true
-    branch: master
+# deploy:
+#   provider: npm
+#   email: "eykrehbein@gmail.com"
+#   api_key: $NPM_KEY
+#   on:
+#     tags: true
+#     branch: master
