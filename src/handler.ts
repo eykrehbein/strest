@@ -53,7 +53,7 @@ export const start = async (dir:string , cmd: any) => {
   const validTests = validateSchema.proofedSettings;
   if(validateSchema.errors.length > 0) {
     for (let erroredSchema of validateSchema.errors){
-      console.log(JSON.stringify(erroredSchema.details, null, 2));
+      writeErrorMessage(`Schema validation failed: ${JSON.stringify(erroredSchema.details, null, 2)}`)
     }
     return 1;
   }

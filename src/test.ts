@@ -29,14 +29,14 @@ nunjucksEnv.addGlobal('Faker', function (faked: string) {
 })
 
 nunjucksEnv.addGlobal('Env', function (envi: string) {
-  let environ = process.env[envi]
+  const environ = process.env[envi]
   return environ;
 })
 
 /**
  * All Data that any request returns, will be stored here. After that it can be used in the following methods
  */
-let requestReponses: Map<string, object> = new Map<string, object>()
+const requestReponses: Map<string, object> = new Map<string, object>()
 
 // The manually defined variables 
 // Usable through <% variableName %>

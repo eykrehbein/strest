@@ -31,4 +31,4 @@ When / before you merge a Pull Request, there are more steps to go.
 3. [Draft a new Release on Github](https://github.com/eykrehbein/strest/releases/new)
     - Tag Version = npm version
 
-The new Release will automatically publish the new changes under the new package version into the npm registry. 
+The new Release will automatically publish the new changes under the new package version into the npm registry.
