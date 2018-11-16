@@ -1,6 +1,6 @@
 {
   "name": "@strest/cli",
-  "version": "1.18.2",
+  "version": "1.18.3",
   "description": "A new dimension of REST API testing",
   "main": "dist/main.js",
   "repository": "https://github.com/eykhagen/strest",
@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "strest tests/success"
+    "test": "strest tests/success",
+    "publish": "tsc && npm publish"
   },
   "dependencies": {
     "axios": "^0.18.0",
