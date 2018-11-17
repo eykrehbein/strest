@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "strest tests/success"
+    "test": "strest tests/success",
+    "publish": "tsc && npm publish"
   },
   "dependencies": {
     "axios": "^0.18.0",
