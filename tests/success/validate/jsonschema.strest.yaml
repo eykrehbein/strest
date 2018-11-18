@@ -1,0 +1,33 @@
+version: 1
+variables:
+  schemaValidate:
+    type: array
+
+requests:
+  jsonschema:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          myArray:
+          - item1
+          - item2
+    validate:
+    - jsonpath: content.data.myArray
+      jsonschema: <$ varialbes.schemaValidate $>
+  jsonschema2:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          myArray:
+          - item1
+          - item2
+    validate:
+    - jsonpath: content.data.myArray
+      jsonschema:
+        type: array

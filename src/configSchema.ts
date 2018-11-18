@@ -64,6 +64,7 @@ const validateSchema = Joi.object().keys({
   jsonpath: Joi.string().required(),
   expect: Joi.alternatives().try(Joi.boolean(), Joi.number(), Joi.object(), Joi.string()).optional(),
   type: Joi.array().items(Joi.string()).optional(),
+  jsonschema: Joi.any().optional(),
   regex: Joi.string().optional()
 }).without('type', 'expect')
   .without('type', 'regex')
@@ -168,7 +169,8 @@ interface validateObjectSchema {
   jsonpath: string,
   expect: any,
   type: Array<string>,
-  regex: string
+  regex: string,
+  jsonschema: any
 }
 
 export interface requestsObjectSchema {

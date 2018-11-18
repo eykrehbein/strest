@@ -320,6 +320,7 @@ With **Strest** you can validate responses with:
 - exact match (expect)
 - regex
 - type _[List of all valid Types](VALIDATION.md)_
+- jsonschema
 
 Read [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) for more info and see [this file](tests/success/validate/jsonpath.strest.yml) for more complex example
 
@@ -374,6 +375,46 @@ requests:
       regex: 2..
     - jsonpath: status
       regex: 2.*
+```
+
+### jsonschema
+
+Validate the response using a specified json(yaml) schema.  The schema can be defined in the variables portion or within the request.
+
+```yaml
+version: 1
+variables:
+  schemaValidate:
+    type: array
+
+requests:
+  jsonschema:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          myArray:
+          - item1
+          - item2
+    validate:
+    - jsonpath: content.data.myArray
+      jsonschema: <$ varialbes.schemaValidate $>
+  jsonschema2:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          myArray:
+          - item1
+          - item2
+    validate:
+    - jsonpath: content.data.myArray
+      jsonschema:
+        type: array
 ```
 
 ### Retry until validation succeeds

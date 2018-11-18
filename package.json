@@ -17,6 +17,7 @@
     "publish": "tsc && npm publish"
   },
   "dependencies": {
+    "ajv": "^6.5.5",
     "axios": "^0.18.0",
     "chalk": "^2.4.1",
     "commander": "^2.17.1",

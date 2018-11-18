@@ -11,6 +11,7 @@ import * as nunjucks from 'nunjucks';
 import * as yaml from 'js-yaml';
 import * as jsonfile  from 'jsonfile'
 import * as path from 'path';
+import * as Ajv from 'ajv';
 
 require('request-to-curl');
 
@@ -404,6 +405,16 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
             return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
           } else {
             message = message + "jsonpath " + validate.jsonpath + "(" + jsonPathValue + ")" + " type equals " + validate.type + "\n"
+          }
+        }
+        if (validate.jsonschema) {
+          var ajv = new Ajv();
+          let validated = ajv.validate(validate.jsonschema, jsonPathValue);
+          if (!validated) {
+            let err = validationError(`The jsonschema ${chalk.bold(validate.jsonschema.toString())} did not validate against ${chalk.bold(jsonPathValue)}`);
+            return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
+          } else {
+            message = message + "jsonpath " + validate.jsonpath + "(" + jsonPathValue + ")" + " jsonschema validated on " + validate.jsonschema + "\n"
           }
         }
         if (validate.regex) {
