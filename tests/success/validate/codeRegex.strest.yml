@@ -1,0 +1,16 @@
+version: 1
+requests:
+  codeRegex:
+    request:
+      url: https://postman-echo.com/digest-auth
+      method: GET
+    validate:
+    - jsonpath: status
+      regex: 4\d+
+  codeRegex201:
+    request:
+      url: https://postman-echo.com/status/201
+      method: GET
+    validate:
+    - jsonpath: status
+      regex: 2\d+

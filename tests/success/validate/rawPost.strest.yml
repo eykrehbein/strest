@@ -1,0 +1,14 @@
+version: 1
+requests:
+  rawPost:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        text: This is expected to be sent back as part of response body.
+        mimeType: text/plain
+    validate:
+    - jsonpath: status
+      expect: 200
+    - jsonpath: content.data
+      expect: This is expected to be sent back as part of response body.

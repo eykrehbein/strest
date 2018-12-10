@@ -1,0 +1,10 @@
+version: 1
+
+requests:
+  invalidValidation:
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/1
+      method: GET
+    validate:
+    - jsonpath: content.id
+      expect: 100

@@ -2,18 +2,22 @@ version: 1
 
 requests:
   todoOne:
-    url: https://jsonplaceholder.typicode.com/posts
-    method: POST
-    data:
-      json:
-        myArray:
-        - foo: 1
-          bar: 1
-        - foo: 2
-          bar: 2
+    request:
+      url: https://jsonplaceholder.typicode.com/posts
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          myArray:
+          - foo: 1
+            bar: 1
+          - foo: 2
+            bar: 2
   todoTwo:
-    url: https://jsonplaceholder.typicode.com/todos/2
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET
     validate:
-      json: 
-        id: 2
+    # Should this remove content???
+    - jsonpath: content.id
+      expect: 2

@@ -1,0 +1,10 @@
+version: 1
+
+requests:
+  codeFailure:
+    request:
+      url: https://jsonplaceholder.typicode.com/test/
+      method: GET
+    validate:
+    - jsonpath: status
+      expect: 300

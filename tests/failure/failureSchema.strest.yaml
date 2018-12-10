@@ -1,0 +1,12 @@
+version: 1
+
+requests:
+  codeTypeFailure:
+    badSchema:
+      this: fails
+    request:
+      url: https://jsonplaceholder.typicode.com/test/
+      method: GET
+    validate:
+    - jsonpath: status
+      type: [ boolean ]

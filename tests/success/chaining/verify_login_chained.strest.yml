@@ -2,11 +2,13 @@ version: 1
 # This file assumes login.strest.yml was executed.
 requests:
   verify_login_chained:
-    url: https://jsonplaceholder.typicode.com/posts
-    method: POST
-    data:
-      json:
-        expect: Value(login.authenticated)
+    request:
+      url: https://jsonplaceholder.typicode.com/posts
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          foo: <$ login.content.authenticated $>
     validate:
-      json:
-        expect: "true"
+    - jsonpath: content.foo
+      expect: true

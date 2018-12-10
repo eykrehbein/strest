@@ -22,6 +22,7 @@ export const parseTestingFiles = (pathArray: string[], dir: string) => {
         if(dir === null) {
           dir = '';
         }
+        parsed.raw = data
         parsed.relativePath = removeFilename.replace(path.join(process.cwd(), dir), '.' + path.sep);
         responseData.push(parsed);
       }
@@ -35,13 +36,13 @@ export const parseTestingFiles = (pathArray: string[], dir: string) => {
 
 export const validateSchema = (testSettings: object[]) => {
   let proofedSettings: object[] = [];
-  let errors: string[] = [];
+  let errors: Joi.ValidationError[] = [];
   testSettings.map((fileSetting) => {
     const test = Joi.validate(fileSetting, joiSchema);
     if(test.error === null) {
       proofedSettings.push(fileSetting);
     } else {
-      errors.push(test.error.message);
+      errors.push(test.error);
     }
   });
   return { proofedSettings, errors};

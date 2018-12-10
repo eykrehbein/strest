@@ -1,0 +1,25 @@
+version: 1
+
+requests:
+  if_Set:
+    request:
+      url: https://jsonplaceholder.typicode.com/posts
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          foo: 1
+  skipped:
+    if:
+      operand: <$ if_Set.content.foo $>
+      equals: 2
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET
+  executed:
+    if:
+      operand: <$ if_Set.content.foo $>
+      equals: 1
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET

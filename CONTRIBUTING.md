@@ -15,6 +15,9 @@ export STREST_GMT_DATE=$(TZ=GMT-0 date --date='10 seconds' --rfc-2822 | sed "s/+
 node dist/main.js tests/success_validate_retries/
 node dist/main.js tests/failure/ --no-exit
 node dist/main.js tests/success/bulk.yml -b
+# Manual chained executions
+node dist/main.js tests/success/chaining/login.strest.yml -s
+node dist/main.js tests/success/chaining/verify_login_chained.strest.yml -l -s
 ```
 
 ## Publishing - Information for Collaborators
@@ -28,4 +31,4 @@ When / before you merge a Pull Request, there are more steps to go.
 3. [Draft a new Release on Github](https://github.com/eykrehbein/strest/releases/new)
     - Tag Version = npm version
 
-The new Release will automatically publish the new changes under the new package version into the npm registry. 
+The new Release will automatically publish the new changes under the new package version into the npm registry.

@@ -1,0 +1,13 @@
+version: 1
+
+requests:
+  deleteRequest:
+    request:
+      url: <$ baseUrl $>/delete
+      method: DELETE
+      postData:
+        mimeType: text/plain
+        text: <$ exampleData $>
+    validate:
+    - jsonpath: status
+      expect: 200

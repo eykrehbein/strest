@@ -1,4 +1,4 @@
 ---
 - tests/success/postman.strest.yml
 - tests/success/two.strest.yaml
-- tests/success/foo/
+- tests/success/fail/

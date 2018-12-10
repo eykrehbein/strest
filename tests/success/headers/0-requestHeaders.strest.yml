@@ -1,0 +1,24 @@
+version: 1
+
+requests:
+  requestHeaders:
+    request:
+      url: https://postman-echo.com/headers
+      method: GET
+      headers:
+        - name: exampleHeader
+          value: "Lorem ipsum dolor sit amet"
+    validate:
+      - jsonpath: content.headers.exampleheader
+        expect: "Lorem ipsum dolor sit amet"
+  requestHeaders2:
+    request:
+      url: https://postman-echo.com/headers
+      method: GET
+      headers:
+        [{ "name": "h1", "value": "v1" }, { "name": "h2", "value": "v2" }]
+    validate:
+      - jsonpath: content.headers.h1
+        expect: "v1"
+      - jsonpath: content.headers.h2
+        expect: "v2"

@@ -45,12 +45,14 @@ version: 1                            # only version at the moment
 
 requests:                             # all test requests will be listed here
   testRequest:                        # name the request however you want
-    url: https://postman-echo.com/get  # required
-    method: GET                       # required
-    data:                             # valid data types: params + json or raw
-      params:
-        foo1: bar1
-        foo2: bar2
+    request:
+      url: https://postman-echo.com/get  # required
+      method: GET                       # required
+      queryString:
+      - name: foo1
+        value: bar1
+      - name: foo2
+        value: bar2
     # log: true # uncomment this to log the response
 ```
 
@@ -63,14 +65,14 @@ strest tests/success/postman.strest.yml
 You may also run multiple test files at the same time by pointing to the directory, where the files are stored
 
 ```bash
-strest # this will recursively search for all .strest.yml files in the cwd and its subdirectories
-# or
 strest tests/success/chaining
+# or
+strest # this will recursively search for all .strest.yml files in the cwd and it's subdirectories
 ```
 
 Success! If you've done everything correctly, you'll get a response like this
 
-```
+```shell
 [ Strest ] Found 4 test file(s)
 [ Strest ] Schema validation: 4 of 4 file(s) passed
 
@@ -87,7 +89,7 @@ Executing tests in: ./var/
 
 ## Writing .strest.yml test files
 
-You can find a full __Documentation__ of how to write tests [here](SCHEMA.md)
+The examples in [tests/success](tests/success/) are used for testing this library. Read through the examples to see what is possible.
 
 ## Documentation
 
@@ -118,7 +120,7 @@ requests:
 
 Running this will result in something like
 
-```
+```shell
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
 
@@ -129,85 +131,110 @@ Running this will result in something like
 [ Strest ] ✨  Done in 0.62s
 ```
 
-### Connecting multiple requests
+### Chaining multiple requests
 
-**What is meant by _connecting multiple requests_?**
+**What is meant by _chaining multiple requests_?**
 
-Connecting multiple requests means that you write a request and in each of the following requests you are able to use and insert any of the data that was responded by this request.
+Chaining multiple requests means that you write a request and in each of the following requests you are able to use and insert any of the data that was responded by this request.
 
-**Usage**
+Each reponse is stored as a dictionary for future requests to use.  The format is [HAR](http://www.softwareishard.com/blog/har-12-spec/#response).  This format is used by browsers to store request and response history.
+
+```json
+{
+  "login": {
+    "status": 200,
+    "statusText": "OK",
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "date": "Mon, 12 Nov 2018 19:04:52 GMT",
+      "vary": "Accept-Encoding",
+      "content-length": "22",
+      "connection": "Close"
+    },
+    "content": {
+      "authenticated": true
+    }
+  }
+}
+```
+
+#### Chaining Example
 
 ```yaml
 requests:
-  
-  login: # will return { token: "someToken" }
+  login: # will return { authenticated: true }
     ...
-
   authNeeded:
-    delay: 2000 # Wait 2 seconds for token to become valid
+    request:
     ...
-    headers:
-      Authorization: Bearer Value(login.token)
-    ...
-    validation:
-      json:
-        id: Value(login.users[0].id) # use arrays like you would in javascript
-
+      headers:
+      - Authorization: Bearer <$ login.content.authenticated $>  # It's possible to use the status code, headers, and status text from previous calls.
 ```
 
-As you could see, the usage is very simple. Just use `Value(requestName.jsonKey)` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `Value(requestName)` without any keys.
+As you could see, the usage is very simple. Just use `<$ requestName.content.jsonKey $>` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `<$ requestName.content $>` without any keys.
 
-You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/Value(postKey.key)/...` or as a standalone term like `Authorization: Value(login.token)`
+You can use this syntax __*anywhere*__ regardless of whether it is inside of some string like `https://localhost/posts/<$ postKey.content.key $>/...` or as a standalone term like `Authorization: <$ login.content.token $>`
 
 This can also be used across files as demonstrated [here](tests/success/chaining)
 
 ### JsonPath
 
-Using JsonPath is similar to using Value() but the queries can be more complex.  [This](https://github.com/dchester/jsonpath) library is used.
-
-> Note: The syntax is *not* `JsonPath()` it is `JsonPath{{}}`  This is because json path uses () in string matches
+Use JsonPath to extract specific data from previous.  [This](https://github.com/dchester/jsonpath) library is used.
 
 ```yaml
 version: 1
 requests:
   set_JsonPath:
-    url: https://jsonplaceholder.typicode.com/posts
-    method: POST
-    data:
-      json:
-        phoneNumbers:
-            - {type: iPhone, number: 0123-4567-8888}
-            - {type: home, number: 0123-4567-8910}
+    request:
+      url: https://jsonplaceholder.typicode.com/posts
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          firstName: John
+          lastName: doe
+          age: 26
+          address:
+              streetAddress: 'naist street'
+              city: Nara
+              postalCode: 630-0192
+          phoneNumbers:
+              - {type: iPhone, number: 0123-4567-8888}
+              - {type: home, number: 0123-4567-8910}
   JsonPath:
-    url: https://postman-echo.com/get
-    method: GET
-    data:
-      params:
-        foo: JsonPath{{set_JsonPath.phoneNumbers[?(@.type == "home")].number}}
+    request:
+      url: https://postman-echo.com/get
+      method: GET
+      queryString:
+      - name: foo
+        value: <$ JsonPath("set_JsonPath.content.phoneNumbers[?(@.type == \"home\")].number") $>
     validate:
-      json:
-        args:
-          foo: 0123-4567-8910
+    - jsonpath: content.args.foo
+      expect: 0123-4567-8910
+
 ```
 
 Practice [here](http://jsonpath.com/)
 
 ## Using random values with Faker
 
-If you need to generate some random values, you are able to do so by using [Faker API](http://marak.github.io/faker.js/) templates. 
+If you need to generate some random values, you are able to do so by using [Faker API](http://marak.github.io/faker.js/) templates.
 
-**Usage**
+### Example - Faker
 
 ```yaml
 version: 1
 
 requests:
-  userRequest:
-    url: https://postman-echo.com/get
-    method: GET
-    data:
-      params:
-        name: Fake(name.firstName) Fake(name.lastName)
+  fake:
+    request:
+      url: https://postman-echo.com/get
+      method: GET
+      queryString:
+        - name: first
+          value: <$ Faker("name.firstName") $>
+        - name: first_last
+          value: <$ Faker("name.firstName") $> <$ Faker("name.lastName") $>
     log: true
 ```
 
@@ -215,7 +242,7 @@ Visit [Faker.js Documentation](http://marak.github.io/faker.js/) for more method
 
 ## Replacing values with predefined environment variables
 
-**Usage**
+### Example - Environment Variables
 
 ```bash
 export STREST_URL=https://jsonplaceholder.typicode.com
@@ -227,28 +254,29 @@ version: 1
 # ensure the ENV var is set: `export STREST_URL=https://jsonplaceholder.typicode.com`
 requests:
   environment:
-    url: Env(STREST_URL)/todos/1
-    method: GET
+    request:
+      url: <$ Env("STREST_URL") $>/todos/1
+      method: GET
 ```
 
 ## Replacing values with predefined custom variables
 
-**Usage**
+### Example - User Defined Variables
 
 ```yml
 version: 1
-# Define variables here
-variables:
-  example_url: https://jsonplaceholder.typicode.com/todos/1
-  example_id: 1
+
+variables:  # Define variables here
+  testUrl: https://jsonplaceholder.typicode.com/todos/1
+  to_log: true
 
 requests:
-  test:
-    url: Var(example_url) # Use them in any field
-    ...
-    validate:
-      json: 
-        id: Variable(example_id) # Both, Var() and Variable() are allowed
+  my_variable_request:
+    request:
+      url: <$ testUrl $>
+      method: GET
+    log: <$ to_log $>
+
 ```
 
 ## Only Execute If
@@ -260,102 +288,133 @@ version: 1
 
 requests:
   if_Set:
-    url: https://jsonplaceholder.typicode.com/posts
-    method: POST
-    data:
-      json:
-        foo: 1
+    request:
+      url: https://jsonplaceholder.typicode.com/posts
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          foo: 1
   skipped:
     if:
-      operand: Value(if_Set.foo)
+      operand: <$ if_Set.content.foo $>
       equals: 2
-    url: https://jsonplaceholder.typicode.com/todos/2
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET
   executed:
     if:
-      operand: Value(if_Set.foo)
+      operand: <$ if_Set.content.foo $>
       equals: 1
-    url: https://jsonplaceholder.typicode.com/todos/2
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos/2
+      method: GET
 ```
 
 ## Response Validation
 
-With **Strest** you can validate responses either by a specific value or by a `Type`. _[List of all valid Types](VALIDATION.md)_
+The immediate response is stored in [HAR Format](http://www.softwareishard.com/blog/har-12-spec/#response)
 
-### Raw Validation
+With **Strest** you can validate responses with:
+
+- exact match (expect)
+- regex
+- type _[List of all valid Types](VALIDATION.md)_
+- jsonschema
+
+Read [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) for more info and see [this file](tests/success/validate/jsonpath.strest.yml) for more complex example
+
+### Expect
 
 ```yaml
 requests:
   example:
     ...
     validate:
-      raw: "the response has to match this string exactly"
+    - jsonpath: content
+      expect: "the response has to match this string exactly"
 ```
 
-### JSON Validation
+### Type
 
 ```yaml
+version: 1
+
 requests:
-  example:
-    ...
+  typeValidate:
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET
     validate:
-      json:
-        user:
-          name: Type(String) # name has to be of type String
-          id: Type(Null | Number | String) # id has to be of type Number, String or Null
-          iconUrl: Type(String.Url)
-        someOtherData: "match this string"
+    - jsonpath: headers["content-type"]
+      type: [ string ]
+    - jsonpath: status
+      type: [ boolean, string, number ]
+    - jsonpath: content.0.userId
+      type: [ number ]
 ```
 
-### JSON Path Validation
+### Regex
+
+Regex can be used to validate status code or any other returned param
 
 ```yml
 version: 1
 
 requests:
-  jsonpath:
-    url: https://jsonplaceholder.typicode.com/posts
-    method: POST
-    data:
-      json:
-        myArray:
-        - foo: 1
-          bar: 1
-        - foo: 2
-          bar: 2
-    validate:
-      jsonpath:
-        myArray.1.foo: 2
+  codeValidate:
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET
+    validate: # Multiple ways to use regex to validate status code
+    - jsonpath: status
+      regex: 2\d+
+    - jsonpath: status
+      regex: 2[0-9]{2}
+    - jsonpath: status
+      regex: 2..
+    - jsonpath: status
+      regex: 2.*
 ```
 
-Read [jsonpath](https://github.com/dchester/jsonpath#jpvalueobj-pathexpression-newvalue) for more info and see [this file](tests/success/validate/jsonpath.strest.yml) for more complex example
+### jsonschema
 
-### Header Validation
-
-```yaml
-requests:
-  example:
-    ...
-    validate:
-      headers:
-        content-type: application/json; charset=utf-8
-        access-control-allow-credentials: Type(Boolean | String)
-```
-
-### Response-Code Validation
+Validate the response using a specified json(yaml) schema.  The schema can be defined in the variables portion or within the request.
 
 ```yaml
+version: 1
+variables:
+  schemaValidate:
+    type: array
+
 requests:
-  example:
-    ...
+  jsonschema:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          myArray:
+          - item1
+          - item2
     validate:
-      code: 200 # only allow code 200 (default)
-  ...
-  advanced:
-    ...
+    - jsonpath: content.data.myArray
+      jsonschema: <$ varialbes.schemaValidate $>
+  jsonschema2:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          myArray:
+          - item1
+          - item2
     validate:
-      code: 2xx # allow all numbers in range of 200-299
+    - jsonpath: content.data.myArray
+      jsonschema:
+        type: array
 ```
 
 ### Retry until validation succeeds
@@ -363,13 +422,16 @@ requests:
 ```yaml
 requests:
   waiter:
-    url: https://postman-echo.com/time/now
-    method: GET
+    request:
+      url: https://postman-echo.com/time/now
+      method: GET
     delay: 900
+    maxRetries: 30
     validate:
-      code: 200
-      max_retries: 30
-      raw: "Tue, 09 Oct 2018 03:07:20 GMT"
+    - jsonpath: status
+      expect: 200
+    - jsonpath: content
+      expect: "Tue, 09 Oct 2018 03:07:20 GMT"
 ```
 
 ```bash
@@ -377,14 +439,47 @@ export STREST_GMT_DATE=$(TZ=GMT-0 date --date='15 seconds' --rfc-2822 | sed "s/+
 strest tests/success/validate/maxRetries.strest.yml
 ```
 
+## Reusing Objects
+
+stREST uses [nunjucks](https://mozilla.github.io/nunjucks/templating.html) to parse everything inside <$ $>
+
+This allows passing complex objects between requests using the [`dump` filter](https://mozilla.github.io/nunjucks/templating.html#dump)
+
+```yaml
+version: 1
+requests:
+  objectSet:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          foo: bar
+          baz: 1
+    log: true
+  objectReset:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          new: <$ objectSet.content.data | dump | safe $>
+    validate:
+      - jsonpath: content.data
+        expect: {"new":{"foo":"bar","baz":1}}
+    log: true
+```
+
 ## Errors
 
 **Strest** is a testing library so of course, you'll run into a few errors when testing an endpoint. Error handling is made very simple so can instantly see what caused an error and fix it.
 If a request fails, the process will be exited with _exit code 1_ and no other requests will be executed afterwards.
 
-_Example of a Validation Error_
+### Example
 
-```
+```shell
 [ Strest ] Found 1 test file(s)
 [ Strest ] Schema validation: 1 of 1 file(s) passed
 
@@ -403,24 +498,26 @@ Boolean to allow:
 - self-signed certificates
 - expired certificates
 
+### Example - Allow Insecure certs
+
 ```yaml
-# Example
 allowInsecure: true
-someRequest:
-  url: ...
-  method: ...
+requests:
+  someRequest:
+    ...
 ```
 
 ## Print out the equivalent curl commands
 
 To print out the equivalent curl commands for each request, add the following flag to the command
+
 ```bash
 strest ... --output curl
 ```
 
 ## Exiting on a failed request
 
-By default, **Strest** will exit the process with an exit code 1 if any request failed. 
+By default, **Strest** will exit the process with an exit code 1 if any request failed.
 But you can also manipulate this by adding the `-n` or `--no-exit` flag into the command. This will instruct the program to go on
 with the following request if the request failed.
 
@@ -443,14 +540,11 @@ Contents of bulk.yml:
 
 You can create a file in your Computer's home directory called `.strestConfig.yml` which will be the custom config for **Strest**.
 
-*Setup*
-
 ```yaml
 config:
   primaryColor: "#2ed573" # Hexadecimal Color Code (don't forget the quotation marks)
   secondaryColor: "#ff4757" # Hexadecimal Color Code
   errorColor: "#576574" # Hexadecimal Color Code
-
 ```
 
 ## License

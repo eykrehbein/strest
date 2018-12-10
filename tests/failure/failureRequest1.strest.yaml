@@ -1,8 +1,0 @@
-version: 1
-
-requests:
-  codeFailure:
-    url: https://jsonplaceholder.typicode.com/test/
-    method: GET
-    validate:
-      code: 2xx

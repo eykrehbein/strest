@@ -2,9 +2,11 @@ version: 1
 
 requests:
   headersValidate:
-    url: https://jsonplaceholder.typicode.com/todos
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET
     validate:
-      headers:
-        content-type: application/json; charset=utf-8
-        access-control-allow-credentials: Type(Boolean | String)
+    - jsonpath: headers["content-type"]
+      expect: application/json; charset=utf-8
+    - jsonpath: headers["access-control-allow-credentials"]
+      type: [ boolean, string ]

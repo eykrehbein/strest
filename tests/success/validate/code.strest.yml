@@ -2,7 +2,18 @@ version: 1
 
 requests:
   codeValidate:
-    url: https://jsonplaceholder.typicode.com/todos
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET
     validate:
-      code: 200
+    - jsonpath: status 
+      expect: 200
+    # Multiple ways to use regex to validate status code
+    - jsonpath: status 
+      regex: 2\d+
+    - jsonpath: status 
+      regex: 2[0-9]{2}
+    - jsonpath: status 
+      regex: 2..
+    - jsonpath: status 
+      regex: 2.*

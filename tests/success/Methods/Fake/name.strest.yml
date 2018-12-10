@@ -1,0 +1,13 @@
+version: 1
+
+requests:
+  fake:
+    request:
+      url: https://postman-echo.com/get
+      method: GET
+      queryString:
+        - name: first
+          value: <$ Faker("name.firstName") $>
+        - name: first_last
+          value: <$ Faker("name.firstName") $> <$ Faker("name.lastName") $>
+    log: true

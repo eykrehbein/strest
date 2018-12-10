@@ -1,0 +1,14 @@
+version: 1
+
+requests:
+  typeValidate:
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET
+    validate:
+    - jsonpath: headers["content-type"]
+      type: [ string ]
+    - jsonpath: status
+      type: [ boolean, string, number ]
+    - jsonpath: content.0.userId
+      type: [ number ]

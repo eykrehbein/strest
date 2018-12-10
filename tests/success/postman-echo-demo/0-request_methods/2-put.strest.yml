@@ -1,0 +1,13 @@
+version: 1
+
+requests:
+  putRequest:
+    request:
+      url: <$ baseUrl $>/put
+      method: PUT
+      postData:
+        mimeType: text/plain
+        text: <$ exampleData $>
+    validate:
+    - jsonpath: status
+      expect: 200

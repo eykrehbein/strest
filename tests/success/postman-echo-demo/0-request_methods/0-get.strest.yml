@@ -1,0 +1,19 @@
+version: 1
+
+variables:
+  baseUrl: https://postman-echo.com
+  exampleData: "This is expected to be sent back as part of response body."
+
+requests:
+  getRequest:
+    request:
+      url: <$ baseUrl $>/get
+      method: GET
+      queryString:
+      - name: foo1
+        value: bar1
+      - name: foo2
+        value: bar2
+    validate:
+    - jsonpath: status
+      expect: 200

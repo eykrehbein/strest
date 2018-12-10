@@ -12,6 +12,9 @@ const initializeCommands = () => {
     .option('-o, --output <type>', 'Output the test as a specific equivalent')
     .option('-n, --no-exit', `Don't exit with code 1 when a request failed`)
     .option('-b, --bulk', 'Execute Tests and directories defined in the specified yml')
+    .option('-s, --save', 'Saves the results of the executions and variables to strest_history.json')
+    .option('-l, --load', 'Loads strest_history.json to use as input.')
+    .option('-k, --key [keyname]', 'Execute a specific key in the file.')
     .action(async (dir, cmd: any) => {
       // use time to inform the user about how long the execution of the test took
       const executionStartedTime = new Date().getTime();
@@ -21,7 +24,7 @@ const initializeCommands = () => {
       }
       // workaround for --no-exit option because options with hyphens can't be read
       cmd.noExit = cmd.rawArgs.includes('-n') || cmd.rawArgs.includes('--no-exit');
-      
+
       const exitCode: any = await handler.start(dir,cmd);
 
       const executionEndedTime = new Date().getTime();

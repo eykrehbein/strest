@@ -1,0 +1,7 @@
+version: 1
+# ensure the ENV var is set: `export STREST_URL=https://jsonplaceholder.typicode.com`
+requests:
+  environment:
+    request:
+      url: <$ Env("STREST_URL") $>/todos/1
+      method: GET

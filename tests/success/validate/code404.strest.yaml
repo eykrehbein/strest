@@ -2,7 +2,9 @@ version: 1
 
 requests:
   code404:
-    url: https://jsonplaceholder.typicode.com/test/
-    method: GET
+    request:
+      url: https://jsonplaceholder.typicode.com/test/
+      method: GET
     validate:
-      code: 404
+    - jsonpath: status
+      expect: 404

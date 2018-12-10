@@ -6,6 +6,7 @@ variables:
 
 requests:
   my_variable_request:
-    url: Var(testUrl)
-    method: GET
-    log: Var(to_log)
+    request:
+      url: <$ testUrl $>
+      method: GET
+    log: <$ to_log $>

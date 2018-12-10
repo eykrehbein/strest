@@ -51,9 +51,13 @@ export const start = async (dir:string , cmd: any) => {
   writeMessage(`Schema validation: ${colorizedAmountOfValidSchemas} of ${colorizedTestFileAmount} file(s) passed`)
 
   const validTests = validateSchema.proofedSettings;
-  if(validTests.length === 0) {
-    console.log();
-    return 1;
+  if(validateSchema.errors.length > 0) {
+    for (let erroredSchema of validateSchema.errors){
+      writeErrorMessage(`Schema validation failed: ${JSON.stringify(erroredSchema.details, null, 2)}`)
+    }
+    if (!cmd.noExit) {
+      return 1;
+    }
   }
   console.log();
   const responseCode = await test.performTests(validTests, cmd) as Number;
