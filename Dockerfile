@@ -9,5 +9,6 @@ RUN npm run build
 FROM node:8.12-alpine
 COPY --from=builder /app /app
 WORKDIR /app
+RUN npm link
 
-ENTRYPOINT ["node", "dist/main.js"]
+ENTRYPOINT ["strest"]
