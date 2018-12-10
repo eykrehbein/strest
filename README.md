@@ -439,6 +439,39 @@ export STREST_GMT_DATE=$(TZ=GMT-0 date --date='15 seconds' --rfc-2822 | sed "s/+
 strest tests/success/validate/maxRetries.strest.yml
 ```
 
+## Reusing Objects
+
+stREST uses [nunjucks](https://mozilla.github.io/nunjucks/templating.html) to parse everything inside <$ $>
+
+This allows passing complex objects between requests using the [`dump` filter](https://mozilla.github.io/nunjucks/templating.html#dump)
+
+```yaml
+version: 1
+requests:
+  objectSet:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          foo: bar
+          baz: 1
+    log: true
+  objectReset:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          new: <$ objectSet.content.data | dump | safe $>
+    validate:
+      - jsonpath: content.data
+        expect: {"new":{"foo":"bar","baz":1}}
+    log: true
+```
+
 ## Errors
 
 **Strest** is a testing library so of course, you'll run into a few errors when testing an endpoint. Error handling is made very simple so can instantly see what caused an error and fix it.

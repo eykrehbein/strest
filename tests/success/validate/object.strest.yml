@@ -1,0 +1,24 @@
+version: 1
+requests:
+  objectSet:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          foo: bar
+          baz: 1
+    log: true
+  objectReset:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          new: <$ objectSet.content.data | dump | safe $>
+    validate:
+      - jsonpath: content.data
+        expect: {"new":{"foo":"bar","baz":1}}
+    log: true

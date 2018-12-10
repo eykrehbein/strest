@@ -12,6 +12,7 @@ import * as yaml from 'js-yaml';
 import * as jsonfile  from 'jsonfile'
 import * as path from 'path';
 import * as Ajv from 'ajv';
+var deepEql = require("deep-eql");
 
 require('request-to-curl');
 
@@ -391,11 +392,19 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
           return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
         }
         if (validate.expect) {
-          if (jsonPathValue !== validate.expect) {
-            let err = validationError(`The JSON response value should have been ${chalk.bold(validate.expect)} but instead it was ${chalk.bold(jsonPathValue)}`);
+          let expectResult = validate.expect
+          let valueResult = jsonPathValue
+          if (typeof validate.expect == "object") {
+            expectResult = JSON.stringify(validate.expect)
+          }
+          if (typeof jsonPathValue == "object") {
+            valueResult = JSON.stringify(jsonPathValue)
+          }
+          if (! deepEql(validate.expect, jsonPathValue)) {
+            let err = validationError(`The JSON response value should have been ${chalk.bold(expectResult)} but instead it was ${chalk.bold(valueResult)}`);
             return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
           } else {
-            message = message + "jsonpath " + validate.jsonpath + "(" + jsonPathValue + ")" + " equals " + validate.expect + "\n"
+            message = message + "jsonpath " + validate.jsonpath + "(" + expectResult + ")" + " equals " + valueResult + "\n"
           }
         }
         if (validate.type) {
