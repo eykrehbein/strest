@@ -91,12 +91,21 @@ Executing tests in: ./var/
 
 The examples in [tests/success](tests/success/) are used for testing this library. Read through the examples to see what is possible.
 
+## VS Code extension
+
+Send requests directly from the yml file.
+
+[source](https://github.com/jgroom33/vscode-strest-client)
+
+[extension](https://marketplace.visualstudio.com/items?itemName=jgroom.strest)
+
+![alt text](https://raw.githubusercontent.com/jgroom33/vscode-strest-client/master/images/strest_preview.gif "extension demo")
+
 ## Documentation
 
 - [How to write Tests](SCHEMA.md)
 - [Validation Types](VALIDATION.md)
 - [Examples](tests/success/)
-- [Trello Board](https://trello.com/b/lqi6Aj9F)
 
 ## Using & Connecting multiple requests
 

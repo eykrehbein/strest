@@ -18,6 +18,5 @@ requests:
       url: https://jsonplaceholder.typicode.com/todos/2
       method: GET
     validate:
-    # Should this remove content???
     - jsonpath: content.id
       expect: 2
