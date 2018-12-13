@@ -11,4 +11,4 @@ COPY --from=builder /app /app
 WORKDIR /app
 RUN npm link
 
-ENTRYPOINT ["strest"]
+CMD ["strest", "tests/success/"]

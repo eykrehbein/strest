@@ -1,4 +1,4 @@
-version: 1
+version: 2
 # Using http://jsonpath.com as object and simple testing
 requests:
   jsonpath:

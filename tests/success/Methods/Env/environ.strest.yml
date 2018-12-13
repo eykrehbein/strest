@@ -1,4 +1,4 @@
-version: 1
+version: 2
 # ensure the ENV var is set: `export STREST_URL=https://jsonplaceholder.typicode.com`
 requests:
   environment:
