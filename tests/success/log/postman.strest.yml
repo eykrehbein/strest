@@ -1,4 +1,4 @@
-version: 1                            # only version at the moment
+version: 2                            # only version at the moment
 
 requests:                             # all test requests will be listed here
   logging:                        # name the request however you want

@@ -100,12 +100,11 @@ const requestsSchema = Joi.object().keys({
 const requestNameSchema = Joi.object().pattern(/\w+/, requestsSchema);
 
 export const Schema = Joi.object({
-  version: Joi.number().min(1).max(1),
+  version: Joi.number().min(2).max(2),
   requests: requestNameSchema,
   allowInsecure: Joi.boolean().optional(),
   variables: Joi.object().optional(),
   // Created dynamically
-  raw: Joi.string().required(),
   relativePath: Joi.string().required(),
 });
 

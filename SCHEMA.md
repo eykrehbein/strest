@@ -32,7 +32,7 @@
 
 Property specifying the version of the schema. Available versions:
 
-- `1`
+- `2`
 
 ## `variables`
 
@@ -101,7 +101,7 @@ requests:
 This provides conditional execution of a request.
 
 ```yaml
-version: 1
+version: 2
 
 requests:
   if_Set:
@@ -187,7 +187,7 @@ Set the mimeType to:
 
 ```yaml
 # JSON Example
-version: 1
+version: 2
 
 requests:
   postRequest:
@@ -203,7 +203,7 @@ requests:
 
 ```yaml
 # Raw Data Example
-version: 1
+version: 2
 
 requests:
   postRequest:
@@ -220,7 +220,7 @@ requests:
 Conforms to [this](http://www.softwareishard.com/blog/har-12-spec/#queryString) shema. Formatted as an Array.
 
 ```yaml
-version: 1
+version: 2
 
 requests:
   responseHeaders:
@@ -240,7 +240,7 @@ Specify HTTP headers that you want to be sent with the request. Formatted as an 
 
 ```yaml
 # Basic Example
-version: 1
+version: 2
 
 requests:
   requestHeaders:
@@ -315,7 +315,7 @@ requests:
 ##### Type
 
 ```yaml
-version: 1
+version: 2
 
 requests:
   typeValidate:
@@ -336,7 +336,7 @@ requests:
 Regex can be used to validate status code or any other returned param
 
 ```yml
-version: 1
+version: 2
 
 requests:
   codeValidate:

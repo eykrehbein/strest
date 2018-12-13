@@ -41,7 +41,7 @@ We'll be using the [postman-echo](https://docs.postman-echo.com) test API in thi
 To get started, we're using [this file](tests/success/postman.strest.yml) _(The extension needs to be `.strest.yml` or `.strest.yaml`)_
 
 ```yaml
-version: 1                            # only version at the moment
+version: 2                            # only version at the moment
 
 requests:                             # all test requests will be listed here
   testRequest:                        # name the request however you want
@@ -116,7 +116,7 @@ With __Strest__ you're able to predefine a very well structured test file once, 
 To create multiple requests, simply add multiple entries into the `requests` yaml object.
 
 ```yaml
-version: 1
+version: 2
 
 requests:
   requestOne:
@@ -191,7 +191,7 @@ This can also be used across files as demonstrated [here](tests/success/chaining
 Use JsonPath to extract specific data from previous.  [This](https://github.com/dchester/jsonpath) library is used.
 
 ```yaml
-version: 1
+version: 2
 requests:
   set_JsonPath:
     request:
@@ -232,7 +232,7 @@ If you need to generate some random values, you are able to do so by using [Fake
 ### Example - Faker
 
 ```yaml
-version: 1
+version: 2
 
 requests:
   fake:
@@ -259,7 +259,7 @@ strest tests/success/Env/environ.strest.yml
 ```
 
 ```yaml
-version: 1
+version: 2
 # ensure the ENV var is set: `export STREST_URL=https://jsonplaceholder.typicode.com`
 requests:
   environment:
@@ -273,7 +273,7 @@ requests:
 ### Example - User Defined Variables
 
 ```yml
-version: 1
+version: 2
 
 variables:  # Define variables here
   testUrl: https://jsonplaceholder.typicode.com/todos/1
@@ -293,7 +293,7 @@ requests:
 With **Strest** you can skip a response by setting a match criteria
 
 ```yaml
-version: 1
+version: 2
 
 requests:
   if_Set:
@@ -347,7 +347,7 @@ requests:
 ### Type
 
 ```yaml
-version: 1
+version: 2
 
 requests:
   typeValidate:
@@ -368,7 +368,7 @@ requests:
 Regex can be used to validate status code or any other returned param
 
 ```yml
-version: 1
+version: 2
 
 requests:
   codeValidate:
@@ -391,7 +391,7 @@ requests:
 Validate the response using a specified json(yaml) schema.  The schema can be defined in the variables portion or within the request.
 
 ```yaml
-version: 1
+version: 2
 variables:
   schemaValidate:
     type: array
@@ -455,7 +455,7 @@ stREST uses [nunjucks](https://mozilla.github.io/nunjucks/templating.html) to pa
 This allows passing complex objects between requests using the [`dump` filter](https://mozilla.github.io/nunjucks/templating.html#dump)
 
 ```yaml
-version: 1
+version: 2
 requests:
   objectSet:
     request:

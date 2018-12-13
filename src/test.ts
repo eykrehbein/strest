@@ -132,7 +132,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
             let result = "succeeded"
             let error = null
             const requestReponsesObj = Array.from(requestReponses.entries()).reduce((main, [key, value]) => ({...main, [key]: value}), {})
-            let computed = computeRequestObject(requestName, testObject.raw, requestReponsesObj);
+            let computed = computeRequestObject(val, requestReponsesObj);
             if (error !== null) {
               // pass
             } else {
@@ -233,7 +233,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
  * Use nunjucks to replace and update the object
  * @param obj working obj
  */
-export const computeRequestObject = (requestName: string, raw: string, r: any) => {
+export const computeRequestObject = (request: requestsObjectSchema, r: any) => {
 
   let merged = { ...r, ...definedVariables };
   nunjucksEnv.addGlobal('JsonPath', function (path: string) {
@@ -241,9 +241,10 @@ export const computeRequestObject = (requestName: string, raw: string, r: any) =
   })
   // Parse obj using nunjucks
   try {
-    let converted = nunjucksEnv.renderString(raw, merged)
+    const yamlRequest = yaml.dump(request, {lineWidth:5000})
+    let converted = nunjucksEnv.renderString(yamlRequest, merged)
     const parsed: any = yaml.safeLoad(converted)
-    return parsed.requests[requestName]
+    return parsed
   } catch (e) {
     throw e;
   }

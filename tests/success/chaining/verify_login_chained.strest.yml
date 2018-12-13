@@ -1,4 +1,4 @@
-version: 1
+version: 2
 # This file assumes login.strest.yml was executed.
 requests:
   verify_login_chained:

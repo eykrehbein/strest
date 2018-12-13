@@ -1,0 +1,20 @@
+version: 2
+
+requests:
+    value1:
+      request:
+        url: https://postman-echo.com/get
+        method: GET
+        queryString:
+        - name: foo
+          value: bar
+    value2:
+      request:
+        url: https://postman-echo.com/get
+        method: GET
+        queryString:
+        - name: baz
+          value: <$ value1.content.args.foo | string $>
+      validate:
+      - jsonpath: content.args.baz
+        expect: bar

@@ -1,4 +1,4 @@
-version: 1
+version: 2
 
 requests:
   value1:
@@ -17,4 +17,4 @@ requests:
         value: <$ value1.content.args.foo $>
     validate:
     - jsonpath: content.args.baz
-      expect: bar 
+      expect: bar
