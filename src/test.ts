@@ -13,6 +13,8 @@ import * as jsonfile  from 'jsonfile'
 import * as path from 'path';
 import * as Ajv from 'ajv';
 var deepEql = require("deep-eql");
+var lineNumber = require('line-number');
+var getLineFromPos = require('get-line-from-pos');
 
 require('request-to-curl');
 
@@ -132,7 +134,10 @@ export const performTests = async (testObjects: object[], cmd: any) => {
             let result = "succeeded"
             let error = null
             const requestReponsesObj = Array.from(requestReponses.entries()).reduce((main, [key, value]) => ({...main, [key]: value}), {})
-            let computed = computeRequestObject(val, requestReponsesObj);
+            let keys = Object.keys(requests);
+            let nextIndex = keys.indexOf(requestName) +1;
+            let nextRequest = keys[nextIndex];
+            let computed = computeRequestObject(requestReponsesObj, testObject.raw, requestName, nextRequest);
             if (error !== null) {
               // pass
             } else {
@@ -233,7 +238,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
  * Use nunjucks to replace and update the object
  * @param obj working obj
  */
-export const computeRequestObject = (request: requestsObjectSchema, r: any) => {
+export const computeRequestObject = (r: any, raw: string, requestName: string, nextRequest: string) => {
 
   let merged = { ...r, ...definedVariables };
   nunjucksEnv.addGlobal('JsonPath', function (path: string) {
@@ -241,9 +246,23 @@ export const computeRequestObject = (request: requestsObjectSchema, r: any) => {
   })
   // Parse obj using nunjucks
   try {
-    const yamlRequest = yaml.dump(request, {lineWidth:5000})
-    let converted = nunjucksEnv.renderString(yamlRequest, merged)
-    const parsed: any = yaml.safeLoad(converted)
+    const regexpStart = new RegExp("^\\s{1,6}" + requestName + ":","gm")
+    const regexpEnd = new RegExp("^\\s{1,6}" + nextRequest + ":","gm")
+
+    let last = getLineFromPos(raw, -1)
+    let start = lineNumber(raw, regexpStart)
+    let end = lineNumber(raw, regexpEnd)
+
+    start = start[0].number
+    if (end == "") {
+      end = last + 1
+    } else {
+      end = end[0].number
+    }
+    let lines = raw.split("\n")
+    var newRaw = lines.slice(start, end - 1).join("\n")
+    let converted = nunjucksEnv.renderString(newRaw, merged)
+    const parsed: any = yaml.load(converted)
     return parsed
   } catch (e) {
     throw e;

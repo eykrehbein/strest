@@ -1,19 +1,83 @@
 version: 2
 variables:
   schemaValidate:
-    type: string
+    properties:
+      fruits:
+        type: array
+        items:
+          type: string
+      vegetables:
+        type: array
+        items:
+          "$ref": "#/definitions/veggie"
+    definitions:
+      veggie:
+        type: object
+        required:
+        - veggieName
+        - veggieLike
+        properties:
+          veggieName:
+            type: string
+          veggieLike:
+            type: string
 
 requests:
-  failjsonschema:
+  jsonschema1:
     request:
       url: https://postman-echo.com/post
       method: POST
       postData:
         mimeType: application/json
         text:
-          myArray:
-          - item1
-          - item2
+          fruits:
+            - apple
+            - orange
+            - pear
+          vegetables:
+          - veggieName: potato
+            veggieLike: true
+          - veggieName: broccoli
+            veggieLike: false            
     validate:
-    - jsonpath: content.data.myArray
-      jsonschema: <$ varialbes.schemaValidate $>
+    - jsonpath: content.data
+      jsonschema: <$ schemaValidate | dump | safe $>
+  jsonschema2:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          fruits:
+            - apple
+            - orange
+            - pear
+          vegetables:
+          - veggieName: potato
+            veggieLike: true
+          - veggieName: broccoli
+            veggieLike: false  
+    validate:
+    - jsonpath: content.data
+      jsonschema:
+        properties:
+          fruits:
+            type: array
+            items:
+              type: string
+          vegetables:
+            type: array
+            items:
+              "$ref": "#/definitions/veggie"
+        definitions:
+          veggie:
+            type: object
+            required:
+            - veggieName
+            - veggieLike
+            properties:
+              veggieName:
+                type: string
+              veggieLike:
+                type: boolean

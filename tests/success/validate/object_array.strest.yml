@@ -1,0 +1,27 @@
+version: 2
+requests:
+  object_arraySet:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          myArray:
+          - foo: bar
+            baz: 1
+          - foo1: bar
+            bax: 2
+    log: true
+  object_arrayReset:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          new: <$ object_arraySet.content.data.myArray[0] | dump | safe $>
+    validate:
+      - jsonpath: content.data.new
+        expect: {"foo": "bar","baz": 1}
+    log: true
