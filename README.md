@@ -394,22 +394,47 @@ Validate the response using a specified json(yaml) schema.  The schema can be de
 version: 2
 variables:
   schemaValidate:
-    type: array
+    properties:
+      fruits:
+        type: array
+        items:
+          type: string
+      vegetables:
+        type: array
+        items:
+          "$ref": "#/definitions/veggie"
+    definitions:
+      veggie:
+        type: object
+        required:
+        - veggieName
+        - veggieLike
+        properties:
+          veggieName:
+            type: string
+          veggieLike:
+            type: boolean
 
 requests:
-  jsonschema:
+  jsonschema1:
     request:
       url: https://postman-echo.com/post
       method: POST
       postData:
         mimeType: application/json
         text:
-          myArray:
-          - item1
-          - item2
+          fruits:
+            - apple
+            - orange
+            - pear
+          vegetables:
+          - veggieName: potato
+            veggieLike: true
+          - veggieName: broccoli
+            veggieLike: false            
     validate:
-    - jsonpath: content.data.myArray
-      jsonschema: <$ varialbes.schemaValidate $>
+    - jsonpath: content.data
+      jsonschema: <$ schemaValidate | dump | safe $>
   jsonschema2:
     request:
       url: https://postman-echo.com/post
@@ -417,13 +442,38 @@ requests:
       postData:
         mimeType: application/json
         text:
-          myArray:
-          - item1
-          - item2
+          fruits:
+            - apple
+            - orange
+            - pear
+          vegetables:
+          - veggieName: potato
+            veggieLike: true
+          - veggieName: broccoli
+            veggieLike: false  
     validate:
-    - jsonpath: content.data.myArray
+    - jsonpath: content.data
       jsonschema:
-        type: array
+        properties:
+          fruits:
+            type: array
+            items:
+              type: string
+          vegetables:
+            type: array
+            items:
+              "$ref": "#/definitions/veggie"
+        definitions:
+          veggie:
+            type: object
+            required:
+            - veggieName
+            - veggieLike
+            properties:
+              veggieName:
+                type: string
+              veggieLike:
+                type: boolean
 ```
 
 ### Retry until validation succeeds

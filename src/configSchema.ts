@@ -105,6 +105,7 @@ export const Schema = Joi.object({
   allowInsecure: Joi.boolean().optional(),
   variables: Joi.object().optional(),
   // Created dynamically
+  raw: Joi.string().required(),
   relativePath: Joi.string().required(),
 });
 

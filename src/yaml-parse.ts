@@ -22,6 +22,7 @@ export const parseTestingFiles = (pathArray: string[], dir: string) => {
         if(dir === null) {
           dir = '';
         }
+        parsed.raw = data
         parsed.relativePath = removeFilename.replace(path.join(process.cwd(), dir), '.' + path.sep);
         responseData.push(parsed);
       }
