@@ -10,4 +10,4 @@ requests:
           value: <$ Faker("name.firstName") $>
         - name: first_last
           value: <$ Faker("name.firstName") $> <$ Faker("name.lastName") $>
-    log: true
+    # log: true

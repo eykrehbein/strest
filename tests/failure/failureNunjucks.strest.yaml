@@ -5,10 +5,7 @@ variables:
   to_log: true
 
 requests:
-  invalidValidation:
+  nunjucksFailure:
     request:
-      url: <$ failUrl $>/todos/1
+      url: <$ failUrl.0.foo $>/todos/1
       method: GET
-    validate:
-    - jsonpath: content.id
-      expect: 100

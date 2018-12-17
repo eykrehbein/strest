@@ -1,0 +1,7 @@
+version: 2
+
+requests:
+  arr:
+    request:
+      url: https://jsonplaceholder.typicode.com/todos
+      method: GET

@@ -1,0 +1,13 @@
+version: 2
+requests:
+  maxRetries:
+    request:
+      url: https://postman-echo.com/time/now
+      method: GET
+    delay: 900
+    maxRetries: 3
+    validate:
+    - jsonpath: status
+      expect: 200
+    - jsonpath: content
+      expect: <$ failed.path $>

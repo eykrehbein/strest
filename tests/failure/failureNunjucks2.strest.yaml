@@ -5,8 +5,7 @@ variables:
   to_log: true
 
 requests:
-  my_variable_request:
+  nunjucksFailure2:
     request:
-      url: <$ testUrl $>
+      url: <$ failUrl.foo $>/todos/1
       method: GET
-    # log: <$ to_log $>

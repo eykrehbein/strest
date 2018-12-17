@@ -26,7 +26,8 @@ const nunjucksEnv = nunjucks.configure(".", {
     variableEnd: '$>',
     commentStart: '<#',
     commentEnd: '#>'
-  }
+  },
+  throwOnUndefined: true
 });
 nunjucksEnv.addGlobal('Faker', function (faked: string) {
   return faker.fake(`{{${faked}}}`);
@@ -138,18 +139,19 @@ export const performTests = async (testObjects: object[], cmd: any) => {
             let nextIndex = keys.indexOf(requestName) +1;
             let nextRequest = keys[nextIndex];
             let computed = computeRequestObject(requestReponsesObj, testObject.raw, requestName, nextRequest);
-            if (error !== null) {
-              // pass
-            } else {
-              if (typeof computed.if !== 'undefined') {
-                if (computed.if.operand == computed.if.equals) {
-                  error = await performRequest(computed, requestName, printAll);
+            if (computed.error) {
+              error = { isError: true, message: computed.message, har: null, code: 0 }
+            }
+            if (error == null) {
+              if (typeof computed.parsed.if !== 'undefined') {
+                if (computed.parsed.if.operand == computed.parsed.if.equals) {
+                  error = await performRequest(computed.parsed, requestName, printAll);
                 } else {
                   result = "skipped"
                   error = { isError: false, message: null, har: null, code: 0 }
                 }
               } else {
-                error = await performRequest(computed, requestName, printAll);
+                error = await performRequest(computed.parsed, requestName, printAll);
               }
             }
 
@@ -263,9 +265,10 @@ export const computeRequestObject = (r: any, raw: string, requestName: string, n
     var newRaw = lines.slice(start, end - 1).join("\n")
     let converted = nunjucksEnv.renderString(newRaw, merged)
     const parsed: any = yaml.load(converted)
-    return parsed
+    return {parsed: parsed, error: null}
   } catch (e) {
-    throw e;
+    let err = validationError(`Failed to process ${requestName} request line using nunjucks:\n ${e}`);
+    return { parsed: null, error: true, message: err}
   }
 }
 
@@ -440,7 +443,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
           var ajv = new Ajv();
           let validated = ajv.validate(validate.jsonschema, jsonPathValue);
           if (!validated) {
-            let err = validationError(`The jsonschema ${chalk.bold(validate.jsonschema.toString())} did not validate against ${chalk.bold(jsonPathValue)}`);
+            let err = validationError(`The jsonschema ${chalk.bold(JSON.stringify(validate.jsonschema))} did not validate against ${chalk.bold(JSON.stringify(jsonPathValue))}`);
             return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
           } else {
             message = message + "jsonpath " + validate.jsonpath + "(" + jsonPathValue + ")" + " jsonschema validated on " + validate.jsonschema + "\n"

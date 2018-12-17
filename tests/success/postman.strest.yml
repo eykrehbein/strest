@@ -5,7 +5,7 @@ requests:                             # all test requests will be listed here
     request:
       url: https://postman-echo.com/get  # required
       method: GET                       # required
-    log: true
+    # log: true
     validate:
     - jsonpath: status
       expect: 200
