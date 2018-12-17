@@ -9,7 +9,7 @@ requests:
         text:
           foo: bar
           baz: 1
-    log: true
+    # log: true
   objectReset:
     request:
       url: https://postman-echo.com/post
@@ -21,4 +21,4 @@ requests:
     validate:
       - jsonpath: content.data
         expect: {"new":{"foo":"bar","baz":1}}
-    log: true
+    # log: true

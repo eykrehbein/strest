@@ -12,7 +12,7 @@ requests:
             baz: 1
           - foo1: bar
             bax: 2
-    log: true
+    # log: true
   object_arrayReset:
     request:
       url: https://postman-echo.com/post
@@ -24,4 +24,4 @@ requests:
     validate:
       - jsonpath: content.data.new
         expect: {"foo": "bar","baz": 1}
-    log: true
+    # log: true
