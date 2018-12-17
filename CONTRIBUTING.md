@@ -18,6 +18,10 @@ node dist/main.js tests/success/bulk.yml -b
 # Manual chained executions
 node dist/main.js tests/success/chaining/login.strest.yml -s
 node dist/main.js tests/success/chaining/verify_login_chained.strest.yml -l -s
+node dist/main.js tests/success/chaining/login.strest.yml -s tests/strest_history.json
+node dist/main.js tests/success/chaining/verify_login_chained.strest.yml -l tests/strest_history.json -s tests/strest_history.json
+node dist/main.js tests/success/chaining/login.strest.yml -s /tmp/strest_history.json
+node dist/main.js tests/success/chaining/verify_login_chained.strest.yml -l /tmp/strest_history.json -s /tmp/strest_history.json
 ```
 
 ## Publishing - Information for Collaborators

@@ -64,10 +64,9 @@ export const performTests = async (testObjects: object[], cmd: any) => {
 
   // Load existing objects
   if (cmd.load) {
-    const fileName = "strest_history.json"
     let fileMap: Map<string, object> = new Map<string, object>()
     try {
-      fileMap = new Map(Object.entries(jsonfile.readFileSync(fileName)))
+      fileMap = new Map(Object.entries(jsonfile.readFileSync(cmd.load)))
     } catch {
       // Oh well, but whatever...
     }
@@ -216,7 +215,12 @@ export const performTests = async (testObjects: object[], cmd: any) => {
     }
   }
   if (cmd.save) {
-    const fileName = path.join(process.cwd(), "strest_history.json");
+    let fileName
+    if (cmd.save.substring(0, 1) == "/") {
+      fileName = cmd.save
+    } else {
+      fileName = path.join(process.cwd(), cmd.save)
+    }
     let fileMap: Map<string, object> = new Map<string, object>()
     try {
       fileMap = new Map(Object.entries(jsonfile.readFileSync(fileName)))

@@ -9,11 +9,11 @@ const initializeCommands = () => {
     .version(require('../package.json').version)
     .usage('[targetFileOrDirectory]')
     .option('-p, --print', 'Print out all response data')
-    .option('-o, --output <type>', 'Output the test as a specific equivalent')
+    .option('-o, --output <type>', 'Output the test as a specific equivalent [curl]')
     .option('-n, --no-exit', `Don't exit with code 1 when a request failed`)
     .option('-b, --bulk', 'Execute Tests and directories defined in the specified yml')
-    .option('-s, --save', 'Saves the results of the executions and variables to strest_history.json')
-    .option('-l, --load', 'Loads strest_history.json to use as input.')
+    .option('-s, --save [file]', 'Saves the results of the executions and variables to file. default: ./strest_history.json', 'strest_history.json')
+    .option('-l, --load [file]', 'Loads file to use as input for chained requests. default: ./strest_history.json', 'strest_history.json')
     .option('-k, --key [keyname]', 'Execute a specific key in the file.')
     .action(async (dir, cmd: any) => {
       // use time to inform the user about how long the execution of the test took
