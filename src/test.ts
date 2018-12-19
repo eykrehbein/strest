@@ -248,7 +248,7 @@ export const computeRequestObject = (r: any, raw: string, requestName: string, n
 
   let merged = { ...r, ...definedVariables };
   nunjucksEnv.addGlobal('JsonPath', function (path: string) {
-    return jp.value(merged, path)
+    return {parsed: jp.value(merged, path), error: null}
   })
   // Parse obj using nunjucks
   try {

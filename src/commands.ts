@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import * as handler from './handler';
 
 // Initialize the commander.js CLI commands
-const initializeCommands = () => {
+export const initializeCommands = () => {
   // main command
   program
     .version(require('../package.json').version)
@@ -25,7 +25,7 @@ const initializeCommands = () => {
       // workaround for --no-exit option because options with hyphens can't be read
       cmd.noExit = cmd.rawArgs.includes('-n') || cmd.rawArgs.includes('--no-exit');
 
-      const exitCode: any = await handler.start(dir,cmd);
+      const exitCode: Number = await handler.start(dir,cmd);
 
       const executionEndedTime = new Date().getTime();
       const executionTime = (executionEndedTime - executionStartedTime) / 1000;
@@ -46,3 +46,23 @@ const initializeCommands = () => {
   program.parse(process.argv);
 }
 export default initializeCommands;
+
+export const strestApi = async(file: string, key: string, loadFile: string, saveFile: string) => {
+  let cmd = {
+    "save": saveFile,
+    "load": loadFile,
+    "key": key
+  }
+  const exitCode: Number = await strest(file, cmd);
+  return exitCode;
+}
+
+const strest = async(dir: any,cmd: any) => {
+  const exitCode: any = await handler.start(dir,cmd);
+  return exitCode
+}
+
+module.exports = {
+  strestApi,
+  initializeCommands
+}

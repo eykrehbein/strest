@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import commands from './commands';
+import { initializeCommands } from './commands';
 import { loadConfig } from './configLoader';
 
 // Allow Docker container process to exit
@@ -8,4 +8,4 @@ process.on('SIGINT', () => {
 })
 
 loadConfig();
-commands();
+initializeCommands();

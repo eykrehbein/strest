@@ -22,6 +22,7 @@ node dist/main.js tests/success/chaining/login.strest.yml -s tests/strest_histor
 node dist/main.js tests/success/chaining/verify_login_chained.strest.yml -l tests/strest_history.json -s tests/strest_history.json
 node dist/main.js tests/success/chaining/login.strest.yml -s /tmp/strest_history.json
 node dist/main.js tests/success/chaining/verify_login_chained.strest.yml -l /tmp/strest_history.json -s /tmp/strest_history.json
+node dist/main.js tests/success/two.strest.yaml -l tests/strest_history.json -s tests/strest_history.json -k todoTwo
 ```
 
 ## Publishing - Information for Collaborators
