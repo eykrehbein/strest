@@ -1,0 +1,43 @@
+version: 2
+# Using http://jsonpath.com as object and simple testing
+requests:
+  set_JsonPath2:
+    request:
+      url: https://jsonplaceholder.typicode.com/posts
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          firstName: John
+          lastName: doe
+          age: 26
+          address:
+              streetAddress: 'naist street'
+              city: Nara
+              postalCode: 630-0192
+          phoneNumbers:
+              - {type: iPhone, number: 0123-4567-8888}
+              - {type: home, number: 0123-4567-8910}
+    validate:
+    - jsonpath: $.content.phoneNumbers[:1].type
+      expect: iPhone
+    - jsonpath: content.age
+      expect: 26
+    - jsonpath: $.content.age
+      expect: 26
+    - jsonpath: content.address.city
+      expect: Nara
+    - jsonpath: $.content.phoneNumbers[?(@.type == "home")].number
+      expect: "0123-4567-8910"
+    - jsonpath: status
+      expect: 201
+  JsonPath2:
+    request:
+      url: https://postman-echo.com/get
+      method: GET
+      queryString:
+      - name: foo
+        value: <$ JsonPath("set_JsonPath.content.phoneNumbers[?(@.type == \"home\")].number") $>
+    validate:
+    - jsonpath: content.args.foo
+      expect: 0123-4567-8910
