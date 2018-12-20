@@ -210,13 +210,13 @@ requests:
           phoneNumbers:
               - {type: iPhone, number: 0123-4567-8888}
               - {type: home, number: 0123-4567-8910}
-  JsonPath:
+  get_JsonPath:
     request:
       url: https://postman-echo.com/get
       method: GET
       queryString:
       - name: foo
-        value: <$ Jsonpath("set_JsonPath.content.phoneNumbers[?(@.type == \"home\")].number") $>
+        value: <$ JsonPath("set_JsonPath.content.phoneNumbers[?(@.type == \"home\")].number") $>
     validate:
     - jsonpath: content.args.foo
       expect: 0123-4567-8910

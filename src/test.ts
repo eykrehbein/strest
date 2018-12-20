@@ -247,7 +247,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
 export const computeRequestObject = (r: any, raw: string, requestName: string, nextRequest: string) => {
 
   let merged = { ...r, ...definedVariables };
-  nunjucksEnv.addGlobal("Jsonpath", function (path: string) {
+  nunjucksEnv.addGlobal("JsonPath", function (path: string) {
     let parsed = jp.value(merged, path)
     return parsed
   })
