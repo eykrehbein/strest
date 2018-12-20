@@ -186,9 +186,9 @@ You can use this syntax __*anywhere*__ regardless of whether it is inside of som
 
 This can also be used across files as demonstrated [here](tests/success/chaining)
 
-### JsonPath
+### Jsonpath
 
-Use JsonPath to extract specific data from previous.  [This](https://github.com/dchester/jsonpath) library is used.
+Use Jsonpath to extract specific data from previous.  [This](https://github.com/dchester/jsonpath) library is used.
 
 ```yaml
 version: 2
@@ -216,7 +216,7 @@ requests:
       method: GET
       queryString:
       - name: foo
-        value: <$ JsonPath("set_JsonPath.content.phoneNumbers[?(@.type == \"home\")].number") $>
+        value: <$ Jsonpath("set_JsonPath.content.phoneNumbers[?(@.type == \"home\")].number") $>
     validate:
     - jsonpath: content.args.foo
       expect: 0123-4567-8910
