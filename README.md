@@ -15,7 +15,18 @@
 
 **:tada: Easy to understand**: You'll understand the concept in seconds and be able to start instantly (seriously!)
 
-## Getting Started
+## Try it with Gipod
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/eykrehbein/strest)
+
+Run some Tests
+
+```bash
+npm i -g @strest/cli
+strest tests/success/postman.strest.yml
+```
+
+## Getting Started in your own environment
 
 ```bash
 # Via Yarn
@@ -431,7 +442,7 @@ requests:
           - veggieName: potato
             veggieLike: true
           - veggieName: broccoli
-            veggieLike: false            
+            veggieLike: false
     validate:
     - jsonpath: content.data
       jsonschema: <$ schemaValidate | dump | safe $>
@@ -450,7 +461,7 @@ requests:
           - veggieName: potato
             veggieLike: true
           - veggieName: broccoli
-            veggieLike: false  
+            veggieLike: false
     validate:
     - jsonpath: content.data
       jsonschema:
