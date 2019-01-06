@@ -15,7 +15,7 @@
 
 **:tada: Easy to understand**: You'll understand the concept in seconds and be able to start instantly (seriously!)
 
-## Try it with Gipod
+## Try it with Gitpod
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/eykrehbein/strest)
 
