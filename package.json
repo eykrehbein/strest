@@ -3,7 +3,7 @@
   "version": "2.2.2",
   "description": "A new dimension of REST API testing",
   "main": "dist/main.js",
-  "repository": "https://github.com/eykhagen/strest",
+  "repository": "https://github.com/eykrehbein/strest",
   "author": "Eyk Rehbein",
   "license": "MIT",
   "private": false,
