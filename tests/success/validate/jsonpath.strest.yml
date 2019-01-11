@@ -11,6 +11,9 @@ requests:
           firstName: John
           lastName: doe
           age: 26
+          active: false
+          count: 0
+          link: null
           address:
               streetAddress: 'naist street'
               city: Nara
@@ -21,6 +24,12 @@ requests:
     validate:
     - jsonpath: $.content.phoneNumbers[:1].type
       expect: iPhone
+    - jsonpath: content.active
+      expect: false
+    - jsonpath: content.count
+      expect: 0
+    - jsonpath: content.link
+      expect: null
     - jsonpath: content.age
       expect: 26
     - jsonpath: $.content.age

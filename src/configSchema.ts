@@ -62,7 +62,7 @@ const requestSchema = Joi.object().keys({
 
 const validateSchema = Joi.object().keys({
   jsonpath: Joi.string().required(),
-  expect: Joi.alternatives().try(Joi.boolean(), Joi.number(), Joi.object(), Joi.string()).optional(),
+  expect: Joi.alternatives().try(Joi.boolean(), Joi.number(), Joi.object(), Joi.string(), null).optional(),
   type: Joi.array().items(Joi.string()).optional(),
   jsonschema: Joi.any().optional(),
   regex: Joi.string().optional()
