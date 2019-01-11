@@ -43,7 +43,7 @@ nunjucksEnv.addGlobal('Env', function (envi: string) {
  */
 const requestReponses: Map<string, object> = new Map<string, object>()
 
-// The manually defined variables 
+// The manually defined variables
 // Usable through <% variableName %>
 let definedVariables: any = {
 
@@ -51,7 +51,7 @@ let definedVariables: any = {
 
 /**
  * Main handler that will perform the tests with each valid test object
- * @param testObjects 
+ * @param testObjects
  * @param printAll If true, all response information will be logged in the console
  */
 export const performTests = async (testObjects: object[], cmd: any) => {
@@ -285,8 +285,8 @@ const validationError = (message: string) => {
 
 /**
  * Checks whether a type matches the dataToProof
- * @param type 
- * @param dataToProof 
+ * @param type
+ * @param dataToProof
  */
 export const validateType = (type: Array<string>, dataToProof: any): boolean => {
   function isType(elem: string) {
@@ -355,7 +355,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
   }
 
   let axiosObject: AxiosObject = {};
-  // optional keys 
+  // optional keys
   axiosObject.url = requestObject.request.url;
   axiosObject.method = requestObject.request.method;
   axiosObject.headers = {}
@@ -414,7 +414,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     if ('validate' in requestObject) {
       for (let validate of requestObject.validate) {
         let jsonPathValue = jp.value(har, validate.jsonpath)
-        if (!jsonPathValue) {
+        if (typeof jsonPathValue === 'undefined') {
           let err = validationError(`The jsonpath ${chalk.bold(validate.jsonpath)} resolved to ${chalk.bold(typeof jsonPathValue)}`);
           return { isError: true, har: har, message: err, code: 1, curl: response.request.toCurl() }
         }
