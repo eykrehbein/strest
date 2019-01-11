@@ -188,7 +188,8 @@ requests:
     request:
     ...
       headers:
-      - Authorization: Bearer <$ login.content.authenticated $>  # It's possible to use the status code, headers, and status text from previous calls.
+      - name: Authorization
+        value: Bearer <$ login.content.authenticated $>  # It's possible to use the status code, headers, and status text from previous calls.
 ```
 
 As you could see, the usage is very simple. Just use `<$ requestName.content.jsonKey $>` to use any of the JSON data that was retrieved from a previous request. If you want to use raw data, just use `<$ requestName.content $>` without any keys.
