@@ -332,6 +332,26 @@ requests:
       method: GET
 ```
 
+## Use strest file name as paramter in the tests
+You can use the strest file name as a parmater in the tests .
+
+*note* that the strest suffix is removed 
+
+**Usage**
+The file name for this example is postman-echo.strest.yml
+
+```yml
+version: 2                            
+requests:                             
+  test-file-name:                       
+    request:
+      url: https://<$ Filename() $>.com/get  
+      method: GET                       
+    validate:
+    - jsonpath: status
+      expect: 200
+```
+
 ## Response Validation
 
 The immediate response is stored in [HAR Format](http://www.softwareishard.com/blog/har-12-spec/#response)

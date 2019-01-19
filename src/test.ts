@@ -137,7 +137,7 @@ export const performTests = async (testObjects: object[], cmd: any) => {
             let keys = Object.keys(requests);
             let nextIndex = keys.indexOf(requestName) +1;
             let nextRequest = keys[nextIndex];
-            let computed = computeRequestObject(requestReponsesObj, testObject.raw, requestName, nextRequest);
+            let computed = computeRequestObject(requestReponsesObj, testObject.raw, requestName, nextRequest, testObject.fileName);
             if (computed.error) {
               error = { isError: true, message: computed.message, har: null, code: 0 }
             }
@@ -244,11 +244,13 @@ export const performTests = async (testObjects: object[], cmd: any) => {
  * Use nunjucks to replace and update the object
  * @param obj working obj
  */
-export const computeRequestObject = (r: any, raw: string, requestName: string, nextRequest: string) => {
-
-  let merged = { ...r, ...definedVariables };
+export const computeRequestObject = (r: any, raw: string, requestName: string, nextRequest: string, fileName: string) => {
+  let merged = { ...r, ...definedVariables};
   nunjucksEnv.addGlobal('JsonPath', function (path: string) {
     return jp.value(merged, path)
+  })
+  nunjucksEnv.addGlobal('Filename', function () {
+    return fileName ? fileName.replace('.strest','') : '';
   })
   // Parse obj using nunjucks
   try {

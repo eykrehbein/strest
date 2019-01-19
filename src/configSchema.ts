@@ -107,6 +107,7 @@ export const Schema = Joi.object({
   // Created dynamically
   raw: Joi.string().required(),
   relativePath: Joi.string().required(),
+  fileName: Joi.string().required(),
 });
 
 export const BulkSchema = Joi.array().items(Joi.string());
