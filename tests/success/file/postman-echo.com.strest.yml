@@ -1,0 +1,10 @@
+version: 2                            # only version at the moment
+requests:                             # all test requests will be listed here
+  test-file-name:                       # name the request however you want
+    request:
+      url: https://<$ Filename() $>/get  # required
+      method: GET                       # required
+    # log: true
+    validate:
+    - jsonpath: status
+      expect: 200
