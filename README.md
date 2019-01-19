@@ -3,11 +3,9 @@
   <p align="center" style="font-size: 0.5em">:rocket: Flexible REST Tests</p>
 </h1>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
-  <img src="https://img.shields.io/github/package-json/v/eykhagen/strest.svg" alt="License: MIT">
-   <img src="https://badge.fury.io/js/%40strest%2Fcli.svg" alt="License: MIT">
-</p>
+![](https://img.shields.io/github/license/eykrehbein/strest.svg)
+![](https://img.shields.io/github/package-json/v/eykrehbein/strest.svg)
+![](https://img.shields.io/npm/v/@strest/cli.svg)
 
 **:link: Connect multiple requests**: _Example_ Embed an authorization token you got as a response from a login request in your following requests automatically
 
