@@ -18,11 +18,13 @@ export const parseTestingFiles = (pathArray: string[], dir: string) => {
       if(typeof filePath === 'string') {
         const data = fs.readFileSync(filePath.toString(), 'utf8');
         const parsed: any = yaml.safeLoad(data);
+        const { name:fileName } = path.parse(filePath);
         const removeFilename = path.dirname(filePath) + path.sep;
         if(dir === null) {
           dir = '';
         }
         parsed.raw = data.replace(/(\rn|\n|\r)/g, '\n')
+        parsed.fileName = fileName;
         parsed.relativePath = removeFilename.replace(path.join(process.cwd(), dir), '.' + path.sep);
         responseData.push(parsed);
       }
