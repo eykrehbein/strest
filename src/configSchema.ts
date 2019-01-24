@@ -43,7 +43,7 @@ const paramsSchema = Joi.object().keys({
 })
 
 const postDataSchema = Joi.object().keys({
-  mimeType: Joi.string().required().valid('application/json', 'text/plain'),
+  mimeType: Joi.string().required(),
   params: Joi.array().items(paramsSchema).optional(),
   text : Joi.alternatives().try(Joi.object(), Joi.string()).optional(),
   comment: Joi.string().optional(),

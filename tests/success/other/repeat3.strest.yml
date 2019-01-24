@@ -1,0 +1,8 @@
+version: 2
+requests:
+  repeat3:
+    request:
+      url: https://postman-echo.com/time/now
+      method: GET
+    delay: 900
+    maxRetries: 3

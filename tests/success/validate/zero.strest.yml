@@ -1,0 +1,14 @@
+version: 2
+requests:
+  zero:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        text: "0"
+        mimeType: text/plain
+    validate:
+    - jsonpath: status
+      expect: 200
+    - jsonpath: content.data
+      expect: 0

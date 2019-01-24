@@ -1,8 +1,8 @@
 version: 2                            # only version at the moment
 requests:                             # all test requests will be listed here
-  test-file-name-1:                       # name the request however you want
+  test-file-name:                       # name the request however you want
     request:
-      url: https://<$ Filename() $>.com/get  # required
+      url: https://<$ Filename() $>/get  # required
       method: GET                       # required
     # log: true
     validate:

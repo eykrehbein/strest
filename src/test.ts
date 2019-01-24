@@ -156,7 +156,6 @@ export const performTests = async (testObjects: object[], cmd: any) => {
 
             const endTime = new Date().getTime();
             const execTime = (endTime - startTime) / 1000;
-
             if (error.isError === true) {
               if (runTimes === 1) {
                 spinner.clear();
@@ -177,6 +176,10 @@ export const performTests = async (testObjects: object[], cmd: any) => {
                   }
                 } else {
                   spinner.fail(colorizeCustomRed(`Testing ${chalk.bold(colorizeCustomRed(requestName))} failed to validate. Retrying (${chalk.bold((runTimes - i).toString())})... (${chalk.bold(`${execTime.toString()}s`)}) \n${error.message}\n`))
+                  // if the result should be logged
+                  if (val.log === true || val.log == 'true' || printAll === true) {
+                    console.log("Response: \n" + JSON.stringify(error.har, null, 2))
+                  }
                   continue
                 }
               }
@@ -204,6 +207,9 @@ export const performTests = async (testObjects: object[], cmd: any) => {
                   spinner.succeed(`Testing ${chalk.bold(colorizeMain(requestName))} ${result} (${chalk.bold(`${execTime.toString()}s`)})`)
                 }
               }
+            }
+            if (val.validate == null && val.maxRetries > 0) {
+              continue
             }
             if (toCurl === true) {
               console.log(`\n${colorizeMain('Curl Equivalent: ')}${chalk.grey(error.curl)}\n`);
