@@ -1,0 +1,12 @@
+version: 2
+requests:
+  mimeType:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        text: foo
+        mimeType: application/xml
+    validate:
+    - jsonpath: content.headers['content-type']
+      expect: application/xml
