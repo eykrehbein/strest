@@ -27,7 +27,8 @@ const nunjucksEnv = nunjucks.configure(".", {
     commentStart: '<#',
     commentEnd: '#>'
   },
-  throwOnUndefined: true
+  throwOnUndefined: true,
+  autoescape: false
 });
 nunjucksEnv.addGlobal('Faker', function (faked: string) {
   return faker.fake(`{{${faked}}}`);
