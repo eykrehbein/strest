@@ -12,12 +12,15 @@ import * as yaml from 'js-yaml';
 import * as jsonfile  from 'jsonfile'
 import * as path from 'path';
 import * as Ajv from 'ajv';
+import * as nunjucksDate from 'nunjucks-date';
+
 var deepEql = require("deep-eql");
 var lineNumber = require('line-number');
 var getLineFromPos = require('get-line-from-pos');
 
 require('request-to-curl');
 
+nunjucksDate.setDefaultFormat('MMMM Do YYYY, h:mm:ss a');
 const nunjucksEnv = nunjucks.configure(".", {
   tags: {
     blockStart: '<%',
@@ -29,6 +32,8 @@ const nunjucksEnv = nunjucks.configure(".", {
   },
   throwOnUndefined: true
 });
+
+nunjucksDate.install(nunjucksEnv);
 nunjucksEnv.addGlobal('Faker', function (faked: string) {
   return faker.fake(`{{${faked}}}`);
 })
