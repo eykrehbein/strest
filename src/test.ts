@@ -30,7 +30,8 @@ const nunjucksEnv = nunjucks.configure(".", {
     commentStart: '<#',
     commentEnd: '#>'
   },
-  throwOnUndefined: true
+  throwOnUndefined: true,
+  autoescape: false
 });
 
 nunjucksDate.install(nunjucksEnv);

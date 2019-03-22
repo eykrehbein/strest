@@ -1,0 +1,21 @@
+version: 2
+
+requests:
+  setParam:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          param: https://jsonplaceholder.typicode.com/posts?userId=1&id=3
+    validate:
+    - jsonpath: status
+      expect: 200
+  useParam:
+    request:
+      url: <$ setParam.content.data.param $>
+      method: GET
+    validate:
+    - jsonpath: content.0.id
+      expect: 3
