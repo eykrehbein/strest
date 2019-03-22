@@ -32,7 +32,7 @@
     "mkdirp": "^0.5.1",
     "nunjucks": "^3.1.3",
     "nunjucks-date": "^1.2.0",
-    "ora": "3.1.0",
+    "ora": "^3.2.0",
     "recursive-readdir": "^2.2.2",
     "request-to-curl": "^0.1.1",
     "sort-paths": "^1.1.1"
@@ -62,7 +62,6 @@
     "@types/node": "^10.9.4",
     "@types/nunjucks": "^3.1.0",
     "@types/nunjucks-date": "0.0.6",
-    "@types/ora": "3.1.0",
     "@types/recursive-readdir": "^2.2.0",
     "jest": "^23.6.0",
     "ts-jest": "^23.1.4",

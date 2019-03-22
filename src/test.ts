@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import * as Joi from 'joi';
-import * as ora from 'ora';
+import ora from 'ora';
 import axios from 'axios';
 import * as faker from 'faker';
 import { colorizeMain, colorizeCustomRed } from './handler';
