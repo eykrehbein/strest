@@ -1,0 +1,20 @@
+version: 2
+
+requests:
+    moment-in-request:
+      request:
+        url: https://postman-echo.com/get
+        method: GET
+        queryString:
+        - name: foo
+          value: <$ now | date('YYYY') $>
+      validate:
+      - jsonpath: content.args.foo
+        expect: "<$ '2019-10-10' | date('YYYY') $>"
+    moment-in-validate:
+      request:
+        url: https://postman-echo.com/time/format?timestamp=2019-10-10&format=YYYY
+        method: GET
+      validate:
+      - jsonpath: content.format
+        expect: "<$ '2019-10-10' | date('YYYY') $>"

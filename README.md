@@ -330,8 +330,8 @@ requests:
       method: GET
 ```
 
-## Use strest file name as paramter in the tests
-You can use the strest file name as a parmater in the tests .
+## Use strest file name as parameter in the tests
+You can use the strest file name as a parameter in the tests .
 
 *note* that the strest suffix is removed 
 
@@ -349,6 +349,35 @@ requests:
     - jsonpath: status
       expect: 200
 ```
+
+## Using dates and dates format 
+You can insert dates times plus format them using the custom [nunjucks date filter](https://www.npmjs.com/package/nunjucks-date)
+under the hood its a wrapper for [momentjs](https://momentjs.com/) so all its [formatting](https://momentjs.com/docs/#/displaying/) is supported  
+
+**Usage**
+You can use the date filter inside a nunjuck brackets in the request and inside the validate parts.
+
+```yml
+requests:
+    moment-in-request:
+      request:
+        url: https://postman-echo.com/get
+        method: GET
+        queryString:
+        - name: foo
+          value: <$ now | date('YYYY') $>
+      validate:
+      - jsonpath: content.args.foo
+        expect: "<$ '2019-10-10' | date('YYYY') $>"
+    moment-in-validate:
+      request:
+        url: https://postman-echo.com/time/format?timestamp=2019-10-10&format=YYYY
+        method: GET
+      validate:
+      - jsonpath: content.format
+        expect: "<$ '2019-10-10' | date('YYYY') $>"
+```
+
 
 ## Response Validation
 
