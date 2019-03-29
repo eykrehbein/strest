@@ -137,10 +137,14 @@ interface cookiesObjectSchema {
   name: string,
   value: string,
 }
+interface paramsObjectSchema {
+  name: string,
+  value: string,
+}
 
 interface postDataObjectSchema {
   mimeType: string,
-  params: object,
+  params: Array<paramsObjectSchema>,
   text : string,
   comment: string,
 }

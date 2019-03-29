@@ -15,6 +15,7 @@
             - [`postData`](#postdata)
                 - [`mimeType`](#mimetype)
                 - [`text`](#text)
+                - [`params`](#params)
             - [`queryString`](#querystring)
             - [`headers`](#headers)
         - [`auth`](#auth)
