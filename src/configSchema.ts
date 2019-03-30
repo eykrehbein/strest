@@ -46,9 +46,14 @@ const postDataSchema = Joi.object().keys({
   mimeType: Joi.string().required(),
   params: Joi.array().items(paramsSchema).optional(),
   text : Joi.alternatives().try(Joi.object(), Joi.string()).optional(),
+  form : Joi.array().items(paramsSchema).optional(),
   comment: Joi.string().optional(),
 }).without('text', 'params')
   .without('params', 'text')
+  .without('form', 'params')
+  .without('form', 'text')
+  .without('text', 'form')
+  .without('params', 'form')
 
 const requestSchema = Joi.object().keys({
   url: Joi.string().required(),
@@ -141,11 +146,15 @@ interface paramsObjectSchema {
   name: string,
   value: string,
 }
-
+interface formObjectSchema {
+  name: string,
+  value: any,
+}
 interface postDataObjectSchema {
   mimeType: string,
   params: Array<paramsObjectSchema>,
   text : string,
+  form : Array<formObjectSchema>,
   comment: string,
 }
 

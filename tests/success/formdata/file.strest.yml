@@ -1,0 +1,22 @@
+version: 2
+requests:
+  postwithfile:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/x-www-form-urlencoded
+        form:
+          - name: title
+            value: foo
+          - name: body
+            value: bar
+          - name: userId
+            value: "1"
+          - name: avatar
+            value: <$ file("tests/strest.png") $>
+    validate:
+      - jsonpath: content.form.title
+        expect: foo
+      - jsonpath: content.files["strest.png"]
+        type: [ string]

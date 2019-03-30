@@ -1,0 +1,19 @@
+version: 2
+
+requests:
+  simpleformdata:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: application/x-www-form-urlencoded
+        form:
+          - name: title
+            value: foo
+          - name: body
+            value: bar
+          - name: userId
+            value: "1"
+    validate:
+      - jsonpath: content.form.title
+        expect: foo
