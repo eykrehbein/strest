@@ -405,6 +405,11 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     if (requestObject.request.postData.text) {
       axiosObject.data = requestObject.request.postData.text;
     }
+    if (requestObject.request.postData.params) {
+      const searchParams = new URLSearchParams()
+      requestObject.request.postData.params.forEach(item=>{searchParams.append(item.name,item.value)})
+      axiosObject.data = searchParams.toString();
+    }
   }
 
   try {
