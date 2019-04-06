@@ -379,7 +379,7 @@ requests:
 ```
 
 ## Sending files and form data
-Sending files and form data is easy, use form type in the postData prop.
+Sending files and form data is easy, use params type in the postData prop.
 ```yaml
 version: 2
 requests:
@@ -388,8 +388,8 @@ requests:
       url: https://postman-echo.com/post
       method: POST
       postData:
-        mimeType: application/x-www-form-urlencoded
-        form:
+        mimeType: multipart/form-data
+        params:
           - name: userId
             value: "1"
           - name: avatar
