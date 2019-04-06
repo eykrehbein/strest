@@ -413,25 +413,27 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     }
     
     if (requestObject.request.postData.params) {
-      const searchParams = new URLSearchParams()
-      requestObject.request.postData.params.forEach(item=>{searchParams.append(item.name,item.value)})
-      axiosObject.data = searchParams.toString();
-    }
-    
-    if (requestObject.request.postData.form) {
-      const form: FormData = new FormData();
-      requestObject.request.postData.form.forEach(item=>{
-        if(item.value.startsWith('sendFile:')){
-          const filePath = item.value.replace('sendFile:','');
-          const fileStream = fs.createReadStream(filePath);
-          form.append(item.name, fileStream, { filepath:filePath });
-        }
-        else{
-          form.append(item.name, item.value);
-        }
-      });
-      axiosObject.data  = form;
-      axiosObject.headers = {...axiosObject.headers,...form.getHeaders()};
+      if(requestObject.request.postData.mimeType && requestObject.request.postData.mimeType.toLowerCase()=='application/x-www-form-urlencoded')
+      {
+        const searchParams = new URLSearchParams()
+        requestObject.request.postData.params.forEach(item=>{searchParams.append(item.name,item.value)})
+        axiosObject.data = searchParams.toString();
+      }
+      else{
+        const form: FormData = new FormData();
+        requestObject.request.postData.params.forEach(item=>{
+          if(item.value.startsWith('sendFile:')){
+            const filePath = item.value.replace('sendFile:','');
+            const fileStream = fs.createReadStream(filePath);
+            form.append(item.name, fileStream, { filepath:filePath });
+          }
+          else{
+            form.append(item.name, item.value);
+          }
+        });   
+        axiosObject.data  = form;
+        axiosObject.headers = {...axiosObject.headers,...form.getHeaders()};
+      }
     }
   }
 
