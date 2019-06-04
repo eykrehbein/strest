@@ -378,7 +378,24 @@ requests:
         expect: "<$ '2019-10-10' | date('YYYY') $>"
 ```
 
+## Sending files and form data
+Sending files and form data is easy, use params type in the postData prop.
+```yaml
+version: 2
+requests:
+  postwithfile:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      postData:
+        mimeType: multipart/form-data
+        params:
+          - name: userId
+            value: "1"
+          - name: avatar
+            value: <$ file("tests/strest.png") $>
 
+```
 ## Response Validation
 
 The immediate response is stored in [HAR Format](http://www.softwareishard.com/blog/har-12-spec/#response)

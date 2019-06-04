@@ -141,7 +141,6 @@ interface paramsObjectSchema {
   name: string,
   value: string,
 }
-
 interface postDataObjectSchema {
   mimeType: string,
   params: Array<paramsObjectSchema>,
