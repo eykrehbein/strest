@@ -15,6 +15,7 @@ import * as Ajv from 'ajv';
 import * as nunjucksDate from 'nunjucks-date';
 import * as fs from 'fs';
 import * as FormData from 'form-data';
+import { URLSearchParams } from 'url';
 
 var deepEql = require("deep-eql");
 var lineNumber = require('line-number');
@@ -431,7 +432,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
             form.append(item.name, item.value);
           }
         });   
-        axiosObject.data  = form;
+        axiosObject.data  = form.getBuffer();
         axiosObject.headers = {...axiosObject.headers,...form.getHeaders()};
       }
     }
