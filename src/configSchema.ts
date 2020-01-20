@@ -58,6 +58,7 @@ const requestSchema = Joi.object().keys({
   headers: Joi.array().items(headerSchema).optional(),
   queryString: Joi.array().items(queryStringSchema).optional(),
   cookies: Joi.array().items(cookieSchema).optional(),
+  json: Joi.string().optional(),
 })
 
 const validateSchema = Joi.object().keys({
@@ -121,6 +122,7 @@ interface requestObjectSchema {
   headers: Array<headerObjectSchema>,
   queryString: Array<queryStringObjectSchema>,
   cookies: cookiesObjectSchema,
+  json?: string,
 }
 
 interface queryStringObjectSchema {

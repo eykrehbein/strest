@@ -438,6 +438,13 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     }
   }
 
+  if (typeof requestObject.request.json !== 'undefined') {
+    axiosObject.headers["Content-Type"] = 'application/json'
+    const file = requestObject.request.json;
+    const json = jsonfile.readFileSync(file);
+    axiosObject.data = json;
+  }
+
   try {
     let axiosInstance = axios.create({
       validateStatus: function (status) {
