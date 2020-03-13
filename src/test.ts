@@ -438,7 +438,7 @@ const performRequest = async (requestObject: requestsObjectSchema, requestName: 
     }
   }
 
-  if (typeof requestObject.request.json !== 'undefined') {
+  if (requestObject.request.json !== undefined) {
     axiosObject.headers["Content-Type"] = 'application/json'
     const file = requestObject.request.json;
     const json = jsonfile.readFileSync(file);

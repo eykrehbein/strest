@@ -384,8 +384,7 @@ If you have a JSON file that represents the body of your request, you can use th
 
 Strest will read the JSON file you have specified and add it to the body of the request, you won't even need to worry about the Content-Type header, Strest will take care of that for you.
 
-```
-yaml
+```yaml
 version: 2
 
 requests:
