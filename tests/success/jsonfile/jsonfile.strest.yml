@@ -1,0 +1,8 @@
+version: 2
+
+requests:
+  jsonfile:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      json: tests/success/jsonfile/data.json  # You have to put the whole path relative to the current directory that you run strest

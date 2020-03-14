@@ -10,7 +10,7 @@ requests:
           value: <$ now | date('YYYY') $>
       validate:
       - jsonpath: content.args.foo
-        expect: "<$ '2019-10-10' | date('YYYY') $>"
+        expect: "<$ '2020-10-10' | date('YYYY') $>"
     moment-in-validate:
       request:
         url: https://postman-echo.com/time/format?timestamp=2019-10-10&format=YYYY

@@ -378,6 +378,24 @@ requests:
         expect: "<$ '2019-10-10' | date('YYYY') $>"
 ```
 
+## Sending JSON requests from external files
+
+If you have a JSON file that represents the body of your request, you can use the `json` option.
+
+Strest will read the JSON file you have specified and add it to the body of the request, you won't even need to worry about the Content-Type header, Strest will take care of that for you.
+
+```yaml
+version: 2
+
+requests:
+  jsonfile:
+    request:
+      url: https://postman-echo.com/post
+      method: POST
+      json: tests/success/jsonfile/data.json  # You have to put the whole path relative to the current directory that you run strest
+    log: true
+```
+
 ## Sending files and form data
 Sending files and form data is easy, use params type in the postData prop.
 ```yaml
